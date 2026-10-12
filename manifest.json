@@ -1,6 +1,6 @@
 {
-  "name": "আমার বায়োডাটা",
-  "short_name": "বায়োডাটা",
+  "name": "SHUVO_BIO_DATA",
+  "short_name": "BIO_DATA",
   "start_url": "/biodata.com/",
   "scope": "/biodata.com/",
   "display": "standalone",
