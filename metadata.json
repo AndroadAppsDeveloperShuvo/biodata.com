@@ -1,0 +1,6 @@
+{
+  "name": "Shuvo Official Bio & Telegram Bot Service Manager",
+  "description": "Official Social Bio for Shuvo with Telegram Bot-controlled services and tools manager",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

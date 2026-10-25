@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Hind Siliguri', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: #09090b;
+    color: #f8fafc;
+  }
+}
+
+.font-tech {
+  font-family: 'Rajdhani', 'Hind Siliguri', sans-serif;
+}
+
+.neon-glow {
+  box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
+}
+
+.neon-glow-pink {
+  box-shadow: 0 0 25px rgba(236, 72, 153, 0.25);
+}
+
+.neon-border:hover {
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+.pulse-badge {
+  animation: pulseGlow 2.5s infinite;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0284c7;
+}

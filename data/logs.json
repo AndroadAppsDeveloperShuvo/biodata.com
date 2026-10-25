@@ -1,0 +1,31 @@
+[
+  {
+    "id": "log_1792913285390_p8du",
+    "timestamp": "2026-10-25T07:28:05.390Z",
+    "action": "start",
+    "user": "Admin (Simulated)",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792913213461_qtob",
+    "timestamp": "2026-10-25T07:26:53.461Z",
+    "action": "start",
+    "user": "👻",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792910163238_aeud",
+    "timestamp": "2026-10-25T06:36:03.239Z",
+    "action": "edit",
+    "user": "Web Admin",
+    "text": "ডিফল্ট ১২টি সাভিস রিস্টোর করা হয়েছে"
+  },
+  {
+    "id": "log_1792910146541_zhqh",
+    "timestamp": "2026-10-25T06:35:46.541Z",
+    "action": "add",
+    "user": "Admin (Simulated Web)",
+    "text": "সরাসরি কমান্ডে সাভিস যোগ: Shuvo Media Downloader",
+    "serviceTitle": "Shuvo Media Downloader"
+  }
+]
