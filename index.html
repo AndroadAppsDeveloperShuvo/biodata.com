@@ -57,7 +57,7 @@
     
     <!-- Banner Cover -->
     <div class="relative h-36 sm:h-44 w-full bg-slate-800 overflow-hidden">
-      <img src="https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg" alt="Banner" referrerpolicy="no-referrer" class="w-full h-full object-cover opacity-80" />
+      <img id="profileBanner" src="https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg" alt="Banner" referrerpolicy="no-referrer" onerror="this.src='https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'" class="w-full h-full object-cover opacity-80" />
       <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40"></div>
       
       <!-- Top Action Status -->
@@ -76,9 +76,11 @@
       <div class="relative group">
         <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl">
           <img 
+            id="profileAvatar"
             src="https://i.ibb.co/bRWhx1Lf/4880.jpg" 
             alt="⚡ 乂 ＳＨＵＶＯ 乂 ⚡" 
             referrerpolicy="no-referrer"
+            onerror="this.src='https://i.ibb.co/bRWhx1Lf/4880.jpg'"
             class="w-full h-full object-cover rounded-xl"
           />
         </div>
@@ -92,45 +94,25 @@
 
       <!-- Names & Title -->
       <h1 class="text-xl sm:text-2xl font-bold mt-2.5 text-white tracking-tight flex items-center gap-1.5 justify-center">
-        <span class="font-tech bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+        <span id="profileName" class="font-tech bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
           ⚡ 乂 ＳＨＵＶＯ 乂 ⚡
         </span>
       </h1>
-      <p class="text-xs font-mono text-cyan-400 font-semibold mt-0.5 tracking-wide">@shuvo_bhai_444</p>
-      <p class="text-xs text-slate-300 font-medium mt-1 max-w-sm leading-relaxed">💻 Full-Stack Developer & Tech Enthusiast</p>
+      <p id="profileHandle" class="text-xs font-mono text-cyan-400 font-semibold mt-0.5 tracking-wide">@shuvo_bhai_444</p>
+      <p id="profileTitle" class="text-xs text-slate-300 font-medium mt-1 max-w-sm leading-relaxed">💻 Full-Stack Developer & Tech Enthusiast</p>
       <p class="text-[11px] text-slate-400 mt-1 flex items-center gap-1 justify-center">
         <svg class="w-3 h-3 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        <span>Natore, Bangladesh</span>
+        <span id="profileLocation">Natore, Bangladesh</span>
       </p>
 
       <!-- Bio Text -->
       <div class="text-xs text-slate-300 bg-slate-900/70 border border-slate-800/90 px-3.5 py-2.5 rounded-xl mt-3 leading-relaxed text-center max-w-sm shadow-inner">
-        <p>🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!</p>
+        <p id="profileBio">🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!</p>
       </div>
 
       <!-- Badges -->
-      <div class="flex flex-wrap gap-1.5 justify-center mt-3">
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>⚡ Pro Gamer
-        </span>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-pink-500"></span>🔥 Shuvo Official
-        </span>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          💻 Developer
-        </span>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          🎧 Music Lover
-        </span>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          🇧🇩 Bangladesh
-        </span>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          💥 Free Fire Lover
-        </span>
-        <span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1">
-          👨‍💻 Professional Web & Apps Developer
-        </span>
+      <div id="badgesContainer" class="flex flex-wrap gap-1.5 justify-center mt-3">
+        <!-- Rendered dynamically -->
       </div>
     </div>
 
@@ -198,6 +180,14 @@
 
   <!-- JAVASCRIPT: Standalone, Self-Contained, Zero-Build Required, Live Telegram Bot Sync -->
   <script>
+    // Safe array normalizer (handles Firebase returning Object {"0": ..., "1": ...} instead of Array)
+    function toArray(val) {
+      if (!val) return [];
+      if (Array.isArray(val)) return val.filter(Boolean);
+      if (typeof val === 'object') return Object.values(val).filter(Boolean);
+      return [];
+    }
+
     // Bengali numerals converter: 1 -> ১, 2 -> ২, etc.
     function toBengaliNumber(num) {
       var bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
@@ -252,7 +242,7 @@
       },
       {
         id: "h_1789435907469k5v",
-        title: "AGE Calculator ",
+        title: "AGE Calculator",
         subtitle: "ফটো ও মেমোরিজ",
         imageUrl: "https://www.thegreatapps.com/application/upload/Apps/2022/02/age-calculating-tool-48.png",
         linkUrl: "https://androadappsdevelopershuvo.github.io/age/calculator.html"
@@ -287,7 +277,7 @@
       },
       {
         id: "h_1791802569270e74",
-        title: "Html Code Runner ",
+        title: "Html Code Runner",
         subtitle: "ফটো ও মেমোরিজ",
         imageUrl: "https://i.ytimg.com/vi/QHKzyKASMck/sddefault.jpg",
         linkUrl: "https://htmlcode-psi.vercel.app/"
@@ -343,6 +333,28 @@
       }
     ];
 
+    // Default Profile Info
+    var defaultProfile = {
+      name: "⚡ 乂 ＳＨＵＶＯ 乂 ⚡",
+      handle: "@shuvo_bhai_444",
+      title: "💻 Full-Stack Developer & Tech Enthusiast",
+      location: "Natore, Bangladesh",
+      bio: "🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!",
+      avatarUrl: "https://i.ibb.co/bRWhx1Lf/4880.jpg",
+      bannerUrl: "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg"
+    };
+
+    // Default Badges
+    var defaultBadges = [
+      { id: "b1", text: "⚡ Pro Gamer" },
+      { id: "b2", text: "🔥 Shuvo Official" },
+      { id: "b3", text: "💻 Developer" },
+      { id: "b4", text: "🎧 Music Lover" },
+      { id: "b5", text: "🇧🇩 Bangladesh" },
+      { id: "b6", text: "💥 Free Fire Lover" },
+      { id: "b7", text: "👨‍💻 Professional Web & Apps Developer" }
+    ];
+
     // Default Contact Info
     var defaultContact = {
       enabled: true,
@@ -351,6 +363,54 @@
       email: "freefirelover2111887942@gmail.com",
       customNote: "যেকোনো প্রজেক্ট, কলাবোরেশন বা যেকোনো প্রয়োজনে সরাসরি যোগাযোগ করুন।"
     };
+
+    // Render Profile Header & Bio
+    function renderProfile(profile) {
+      var p = profile || defaultProfile;
+      var bannerEl = document.getElementById('profileBanner');
+      if (bannerEl && p.bannerUrl) {
+        bannerEl.src = p.bannerUrl;
+      }
+
+      var avatarEl = document.getElementById('profileAvatar');
+      if (avatarEl && p.avatarUrl) {
+        avatarEl.src = p.avatarUrl;
+      }
+
+      var nameEl = document.getElementById('profileName');
+      if (nameEl && p.name) {
+        nameEl.textContent = p.name;
+        document.title = p.name + ' - Official Social Bio & Services';
+      }
+
+      var handleEl = document.getElementById('profileHandle');
+      if (handleEl && p.handle) handleEl.textContent = p.handle;
+
+      var titleEl = document.getElementById('profileTitle');
+      if (titleEl && p.title) titleEl.textContent = p.title;
+
+      var locEl = document.getElementById('profileLocation');
+      if (locEl && p.location) locEl.textContent = p.location;
+
+      var bioEl = document.getElementById('profileBio');
+      if (bioEl && p.bio) bioEl.textContent = p.bio;
+    }
+
+    // Render Badges
+    function renderBadges(badges) {
+      var container = document.getElementById('badgesContainer');
+      if (!container) return;
+      var list = toArray(badges || defaultBadges);
+      var html = '';
+      list.forEach(function(b) {
+        var text = typeof b === 'string' ? b : (b.text || '');
+        if (!text) return;
+        html += '<span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1 shadow-sm">'
+          + text
+          + '</span>';
+      });
+      container.innerHTML = html;
+    }
 
     // Platform SVG Icons
     function getSocialIconSvg(platform) {
@@ -362,6 +422,10 @@
         return '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>';
       } else if (platform === 'instagram') {
         return '<svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.13-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>';
+      } else if (platform === 'twitter') {
+        return '<svg class="w-5 h-5 text-zinc-100" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
+      } else if (platform === 'github') {
+        return '<svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>';
       } else {
         return '<svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>';
       }
@@ -371,7 +435,8 @@
     function renderSocialLinks(links) {
       var container = document.getElementById('socialLinksContainer');
       if (!container) return;
-      var activeLinks = (links || []).filter(function(l) { return l.enabled !== false; });
+      var raw = toArray(links || defaultSocial);
+      var activeLinks = raw.filter(function(l) { return l && l.enabled !== false; });
       var html = '';
       activeLinks.forEach(function(link) {
         html += '<a href="' + link.url + '" target="_blank" rel="noopener noreferrer" class="group w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl neon-border">'
@@ -386,7 +451,7 @@
           + '</div>'
           + '<div class="shrink-0 pl-2">'
           + '<span class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-xl bg-white/10 group-hover:bg-cyan-500 group-hover:text-slate-950 text-white transition-all">'
-          + link.buttonText
+          + (link.buttonText || 'যুক্ত হোন')
           + '<svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>'
           + '</span>'
           + '</div>'
@@ -399,7 +464,7 @@
     function renderServices(services) {
       var grid = document.getElementById('servicesGrid');
       if (!grid) return;
-      var list = services || defaultServices;
+      var list = toArray(services || defaultServices);
       var html = '';
       list.forEach(function(service, index) {
         var numBn = toBengaliNumber(index + 1);
@@ -453,96 +518,115 @@
       box.innerHTML = html;
     }
 
+    // Apply entire payload
+    var lastUpdatedSignature = '';
+    function applyAllData(data, shouldToast) {
+      if (!data || typeof data !== 'object') return;
+      var sig = (data.updatedAt || '') + '_' + JSON.stringify(data.profile || {}) + '_' + (data.badges ? JSON.stringify(data.badges).length : 0);
+      if (sig === lastUpdatedSignature) return;
+      lastUpdatedSignature = sig;
+
+      if (data.profile) renderProfile(data.profile);
+      if (data.badges) renderBadges(data.badges);
+      if (data.services) renderServices(data.services);
+      if (data.socialLinks) renderSocialLinks(data.socialLinks);
+      if (data.contact) renderContact(data.contact);
+
+      if (shouldToast) {
+        showToast('🔄 তথ্য লাইভ আপডেট হয়েছে!');
+      }
+    }
+
     // Initial instant rendering with default data (NO WHITE SCREEN EVER!)
+    renderProfile(defaultProfile);
+    renderBadges(defaultBadges);
     renderSocialLinks(defaultSocial);
     renderServices(defaultServices);
     renderContact(defaultContact);
 
     // 🔥 Firebase Realtime Database URL (ফর গিটহাব পেজেস 24/7 লাইভ সিঙ্ক)
     var FIREBASE_URL = window.FIREBASE_DB_URL || "https://biodata-fd087-default-rtdb.asia-southeast1.firebasedatabase.app";
+    var cleanFb = FIREBASE_URL.replace(/\/+$/, '') + '/bio.json';
 
-    // Live Server Base Detection
-    var API_HOST = (window.location.protocol === 'http:' || window.location.protocol === 'https:') && window.location.hostname !== 'localhost' && window.location.hostname.indexOf('github.io') === -1
-      ? ''
-      : '';
-
-    // Fetch latest live data from Server or Firebase
-    function syncLiveData() {
-      // 1. If Firebase URL is configured, use Firebase directly (Works 100% on GitHub Pages without CORS/auth issues!)
-      if (FIREBASE_URL && FIREBASE_URL.indexOf('http') === 0) {
-        var cleanFb = FIREBASE_URL.replace(/\/+$/, '') + '/bio.json';
-        fetch(cleanFb)
-          .then(function(res) {
-            if (res.ok) return res.json();
-            throw new Error('Firebase offline');
-          })
-          .then(function(data) {
-            if (data) {
-              if (data.services) renderServices(data.services);
-              if (data.socialLinks) renderSocialLinks(data.socialLinks);
-              if (data.contact) renderContact(data.contact);
-            }
-          })
-          .catch(function(err) {
-            console.warn('Firebase fetch fallback:', err);
-          });
-
-        // Listen to Firebase SSE stream for instant real-time changes
-        try {
-          var fbStream = new EventSource(cleanFb);
-          fbStream.onmessage = function(event) {
-            try {
-              var payload = JSON.parse(event.data);
-              var data = payload.data || payload;
-              if (data && typeof data === 'object') {
-                if (data.services) renderServices(data.services);
-                if (data.socialLinks) renderSocialLinks(data.socialLinks);
-                if (data.contact) renderContact(data.contact);
-                showToast('🔄 তথ্য লাইভ আপডেট হয়েছে!');
-              }
-            } catch (e) {}
-          };
-        } catch (e) {}
-        return;
-      }
-
-      // 2. Otherwise try local/direct API if on local or same origin
-      fetch('/api/data')
+    // 1. Fetch latest data from Firebase (with cache-busting timestamp)
+    function fetchFromFirebase(isBackgroundCheck) {
+      fetch(cleanFb + '?t=' + Date.now())
         .then(function(res) {
           if (res.ok) return res.json();
-          throw new Error('API offline');
+          throw new Error('Firebase offline');
         })
         .then(function(data) {
-          if (data && data.services) renderServices(data.services);
-          if (data && data.socialLinks) renderSocialLinks(data.socialLinks);
-          if (data && data.contact) renderContact(data.contact);
+          if (data && typeof data === 'object') {
+            applyAllData(data, isBackgroundCheck);
+          }
         })
         .catch(function(err) {
-          // Keep local default data
+          // silently keep current data
         });
-
-      // Local Server-Sent Events (SSE)
-      try {
-        var sse = new EventSource('/api/events');
-        sse.onmessage = function(event) {
-          try {
-            var payload = JSON.parse(event.data);
-            if (payload.type === 'services_updated' && payload.data) {
-              renderServices(payload.data);
-              showToast('🔄 সাভিস তালিকা আপডেট হয়েছে!');
-            } else if (payload.type === 'social_updated' && payload.data) {
-              renderSocialLinks(payload.data);
-              showToast('🔄 সোশ্যাল লিংক আপডেট হয়েছে!');
-            } else if (payload.type === 'contact_updated' && payload.data) {
-              renderContact(payload.data);
-              showToast('🔄 কন্টাক্ট তথ্য আপডেট হয়েছে!');
-            }
-          } catch (e) {}
-        };
-      } catch (e) {}
     }
 
-    syncLiveData();
+    fetchFromFirebase(false);
+
+    // 2. Attach Firebase Realtime Database SSE Stream Listener (Handles put & patch events)
+    try {
+      var fbStream = new EventSource(cleanFb);
+
+      function handleStreamEvent(e) {
+        try {
+          var payload = JSON.parse(e.data);
+          var data = payload && payload.data !== undefined ? payload.data : payload;
+          var path = payload && payload.path ? payload.path : '/';
+
+          if (!path || path === '/' || path === '') {
+            if (data && typeof data === 'object') {
+              applyAllData(data, true);
+            }
+          } else {
+            // Partial path update, re-fetch full clean data
+            fetchFromFirebase(true);
+          }
+        } catch (err) {
+          fetchFromFirebase(true);
+        }
+      }
+
+      fbStream.addEventListener('put', handleStreamEvent);
+      fbStream.addEventListener('patch', handleStreamEvent);
+      fbStream.onmessage = handleStreamEvent;
+    } catch (e) {
+      console.warn('Firebase EventSource error:', e);
+    }
+
+    // 3. Periodic Polling Interval (every 3.5s for 100% reliable GitHub Pages background live refresh)
+    setInterval(function() {
+      fetchFromFirebase(true);
+    }, 3500);
+
+    // 4. Local SSE Listener (works when testing locally or full-stack server)
+    try {
+      var localSSE = new EventSource('/api/events');
+      localSSE.onmessage = function(event) {
+        try {
+          var payload = JSON.parse(event.data);
+          if (payload.type === 'services_updated' && payload.data) {
+            renderServices(payload.data);
+            showToast('🔄 সাভিস তালিকা আপডেট হয়েছে!');
+          } else if (payload.type === 'social_updated' && payload.data) {
+            renderSocialLinks(payload.data);
+            showToast('🔄 সোশ্যাল লিংক আপডেট হয়েছে!');
+          } else if (payload.type === 'contact_updated' && payload.data) {
+            renderContact(payload.data);
+            showToast('🔄 কন্টাক্ট তথ্য আপডেট হয়েছে!');
+          } else if (payload.type === 'profile_updated' && payload.data) {
+            renderProfile(payload.data);
+            showToast('🔄 প্রোফাইল আপডেট হয়েছে!');
+          } else if (payload.type === 'badges_updated' && payload.data) {
+            renderBadges(payload.data);
+            showToast('🔄 ব্যাজ আপডেট হয়েছে!');
+          }
+        } catch (e) {}
+      };
+    } catch (e) {}
 
     // Share link copy
     function copyShareUrl() {

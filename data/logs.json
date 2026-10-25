@@ -1,5 +1,145 @@
 [
   {
+    "id": "log_1792923736545_a5yc",
+    "timestamp": "2026-10-25T10:22:16.545Z",
+    "action": "add",
+    "user": "Admin (Simulated)",
+    "text": "নতুন সোশ্যাল লিঙ্ক যোগ: GitHub Profile"
+  },
+  {
+    "id": "log_1792923724984_nmgt",
+    "timestamp": "2026-10-25T10:22:04.984Z",
+    "action": "delete",
+    "user": "Admin (Simulated)",
+    "text": "ব্যাজ মুছে ফেলা হয়েছে: 🚀 React & Node Master"
+  },
+  {
+    "id": "log_1792923711328_7b6p",
+    "timestamp": "2026-10-25T10:21:51.328Z",
+    "action": "add",
+    "user": "Admin (Simulated)",
+    "text": "নতুন ব্যাজ যোগ: 🚀 React & Node Master"
+  },
+  {
+    "id": "log_1792923696871_hrtj",
+    "timestamp": "2026-10-25T10:21:36.871Z",
+    "action": "start",
+    "user": "Admin (Simulated)",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792923205062_7za4",
+    "timestamp": "2026-10-25T10:13:25.062Z",
+    "action": "edit",
+    "user": "Admin (Simulated)",
+    "text": "প্রোফাইল নাম পরিবর্তন: ⚡ 乂 ＳＨＵＶＯ 乂 ⚡"
+  },
+  {
+    "id": "log_1792923187015_z7wg",
+    "timestamp": "2026-10-25T10:13:07.015Z",
+    "action": "edit",
+    "user": "Admin (Simulated)",
+    "text": "প্রোফাইল নাম পরিবর্তন: ⚡ 乂 ＳＨＵＶＯ 乂 ⚡ Pro"
+  },
+  {
+    "id": "log_1792923013856_lj66",
+    "timestamp": "2026-10-25T10:10:13.856Z",
+    "action": "edit",
+    "user": "👻",
+    "text": "ব্যাজ টেক্সট আপডেট: 👨‍💻 Professional Web & Apps Developer✅"
+  },
+  {
+    "id": "log_1792922967158_nbjs",
+    "timestamp": "2026-10-25T10:09:27.158Z",
+    "action": "start",
+    "user": "👻",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792921474946_porc",
+    "timestamp": "2026-10-25T09:44:34.946Z",
+    "action": "edit",
+    "user": "Admin (Simulated)",
+    "text": "প্রোফাইল নাম পরিবর্তন: ⚡ 乂 ＳＨＵＶＯ 乂 ⚡"
+  },
+  {
+    "id": "log_1792921463768_disj",
+    "timestamp": "2026-10-25T09:44:23.768Z",
+    "action": "start",
+    "user": "Admin (Simulated)",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792920693706_cdir",
+    "timestamp": "2026-10-25T09:31:33.706Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "X (Twitter) Profile অবস্থা পরিবর্তন: Active"
+  },
+  {
+    "id": "log_1792920690221_fx2h",
+    "timestamp": "2026-10-25T09:31:30.221Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Instagram Photos & Reels অবস্থা পরিবর্তন: Active"
+  },
+  {
+    "id": "log_1792920686740_te83",
+    "timestamp": "2026-10-25T09:31:26.740Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Youtube Channel অবস্থা পরিবর্তন: Active"
+  },
+  {
+    "id": "log_1792920677098_zqwm",
+    "timestamp": "2026-10-25T09:31:17.098Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Facebook Profile / Page অবস্থা পরিবর্তন: Active"
+  },
+  {
+    "id": "log_1792920663904_60o6",
+    "timestamp": "2026-10-25T09:31:03.904Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Telegram Channel / Inbox অবস্থা পরিবর্তন: Active"
+  },
+  {
+    "id": "log_1792920630185_0wva",
+    "timestamp": "2026-10-25T09:30:30.185Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "X (Twitter) Profile অবস্থা পরিবর্তন: Hidden"
+  },
+  {
+    "id": "log_1792920625333_kcij",
+    "timestamp": "2026-10-25T09:30:25.333Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Instagram Photos & Reels অবস্থা পরিবর্তন: Hidden"
+  },
+  {
+    "id": "log_1792920616103_g4zv",
+    "timestamp": "2026-10-25T09:30:16.103Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Youtube Channel অবস্থা পরিবর্তন: Hidden"
+  },
+  {
+    "id": "log_1792920610330_n39t",
+    "timestamp": "2026-10-25T09:30:10.330Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Telegram Channel / Inbox অবস্থা পরিবর্তন: Hidden"
+  },
+  {
+    "id": "log_1792920602418_qx8e",
+    "timestamp": "2026-10-25T09:30:02.419Z",
+    "action": "edit",
+    "user": "Telegram Bot",
+    "text": "Facebook Profile / Page অবস্থা পরিবর্তন: Hidden"
+  },
+  {
     "id": "log_1792916606329_k0sx",
     "timestamp": "2026-10-25T08:23:26.329Z",
     "action": "start",
