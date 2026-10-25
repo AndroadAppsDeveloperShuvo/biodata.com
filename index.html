@@ -565,6 +565,18 @@
         });
     }
 
+    // Dynamic config fetch if running on fullstack server
+    fetch('/api/public/config')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(cfg) {
+        if (cfg && cfg.firebaseUrl && cfg.firebaseUrl.startsWith('http') && cfg.firebaseUrl !== FIREBASE_URL) {
+          FIREBASE_URL = cfg.firebaseUrl;
+          cleanFb = FIREBASE_URL.replace(/\/+$/, '') + '/bio.json';
+          fetchFromFirebase(true);
+        }
+      })
+      .catch(function() {});
+
     fetchFromFirebase(false);
 
     // 2. Attach Firebase Realtime Database SSE Stream Listener (Handles put & patch events)

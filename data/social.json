@@ -1,57 +1,57 @@
 [
   {
+    "buttonText": "যুক্ত হোন",
+    "enabled": true,
     "id": "s_fb",
+    "isFeatured": true,
     "platform": "facebook",
+    "subtitle": "অফিসিয়াল ফেসবুক প্রোফাইল",
     "title": "Facebook Profile / Page",
     "url": "https://facebook.com/shuvo.official.2026",
-    "username": "@shuvo_bhai_444",
-    "subtitle": "অফিসিয়াল ফেসবুক প্রোফাইল",
-    "buttonText": "যুক্ত হোন",
-    "isFeatured": true,
-    "enabled": true
+    "username": "@shuvo_bhai_444"
   },
   {
+    "buttonText": "যুক্ত হোন",
+    "enabled": true,
     "id": "s_tg",
+    "isFeatured": true,
     "platform": "telegram",
+    "subtitle": "টেলিগ্রাম মেসেজ ইনবক্স",
     "title": "Telegram Channel / Inbox",
     "url": "https://t.me/djhakar007ff",
-    "username": "@djhakar007ff",
-    "subtitle": "টেলিগ্রাম মেসেজ ইনবক্স",
-    "buttonText": "যুক্ত হোন",
-    "isFeatured": true,
-    "enabled": true
+    "username": "@djhakar007ff"
   },
   {
+    "buttonText": "সাবস্ক্রাইব",
+    "enabled": true,
     "id": "s_yt",
+    "isFeatured": true,
     "platform": "youtube",
+    "subtitle": "ডেভোলপার এর চ্যানেল সাবস্ক্রাইব করুন",
     "title": "Youtube Channel",
     "url": "https://youtube.com/@lovewithsong",
-    "username": "@lovewithsong",
-    "subtitle": "ডেভোলপার এর চ্যানেল সাবস্ক্রাইব করুন",
-    "buttonText": "সাবস্ক্রাইব",
-    "isFeatured": true,
-    "enabled": true
+    "username": "@lovewithsong"
   },
   {
-    "id": "s_insta",
-    "platform": "instagram",
-    "title": "Instagram Photos & Reels",
-    "url": "https://instagram.com/fbuser0007",
-    "username": "@fbuser0007",
-    "subtitle": "ইনস্টাগ্রাম ফটো ও রিলস",
-    "buttonText": "ফলো করুন",
-    "isFeatured": false,
-    "enabled": true
-  },
-  {
-    "id": "s_x",
-    "platform": "twitter",
-    "title": "X (Twitter) Profile",
-    "url": "https://x.com/XSHUVOxxx",
-    "username": "@XSHUVOxxx",
-    "subtitle": "ডেভোলপার 乂 আইডি ফলো করুন",
     "buttonText": "ফলো করুন",
     "enabled": true,
-    "isFeatured": false
+    "id": "s_insta",
+    "isFeatured": false,
+    "platform": "instagram",
+    "subtitle": "ইনস্টাগ্রাম ফটো ও রিলস",
+    "title": "Instagram Photos & Reels",
+    "url": "https://instagram.com/fbuser0007",
+    "username": "@fbuser0007"
+  },
+  {
+    "buttonText": "ফলো করুন",
+    "enabled": true,
+    "id": "s_x",
+    "isFeatured": false,
+    "platform": "twitter",
+    "subtitle": "ডেভোলপার 乂 আইডি ফলো করুন",
+    "title": "X (Twitter) Profile",
+    "url": "https://x.com/XSHUVOxxx",
+    "username": "@XSHUVOxxx"
   }
 ]

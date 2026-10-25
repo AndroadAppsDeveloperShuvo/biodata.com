@@ -1,9 +1,9 @@
 {
-  "name": "⚡ 乂 ＳＨＵＶＯ 乂 ⚡",
-  "handle": "@shuvo_bhai_444",
-  "title": "💻 Full-Stack Developer & Tech Enthusiast",
-  "location": "Natore, Bangladesh",
-  "bio": "🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!",
   "avatarUrl": "https://i.ibb.co/bRWhx1Lf/4880.jpg",
-  "bannerUrl": "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg"
+  "bannerUrl": "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg",
+  "bio": "🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!",
+  "handle": "@shuvo_bhai_444",
+  "location": "Natore, Bangladesh",
+  "name": "⚡ 乂 ＳＨＵＶＯ 乂 ⚡",
+  "title": "💻 Full-Stack Developer & Tech Enthusiast"
 }

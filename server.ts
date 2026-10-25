@@ -1307,11 +1307,11 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
         linkUrl,
         createdAt: new Date().toISOString()
       };
-      services.unshift(newService);
+      services.push(newService);
       saveServices(services);
-      addLog('add', senderName, `সরাসরি কমান্ডে সাভিস যোগ: ${title}`, title);
+      addLog('add', senderName, `সরাসরি কমান্ডে সাভিস যোগ: ${title} (ক্রমিক: ${services.length})`, title);
 
-      const reply = `✅ <b>সাভিস সফলভাবে যোগ করা হয়েছে!</b>\n\n📌 <b>নাম:</b> ${escapeHtml(title)}\n🏷️ <b>ক্যাটাগরি:</b> ${escapeHtml(subtitle)}\n🔗 <b>লিংক:</b> ${escapeHtml(linkUrl)}`;
+      const reply = `✅ <b>সাভিস সফলভাবে যোগ করা হয়েছে!</b>\n\n🔢 <b>ক্রমিক নং:</b> #${services.length} (১২ এর পর ${services.length} নং)\n📌 <b>নাম:</b> ${escapeHtml(title)}\n🏷️ <b>ক্যাটাগরি:</b> ${escapeHtml(subtitle)}\n🔗 <b>লিংক:</b> ${escapeHtml(linkUrl)}`;
       await sendTelegramMessage(chatId, reply, { reply_markup: getServicesMenuKeyboard() });
       return reply;
     }
@@ -1529,12 +1529,12 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
       linkUrl,
       createdAt: new Date().toISOString()
     };
-    services.unshift(newService);
+    services.push(newService);
     saveServices(services);
-    addLog('add', senderName, `নতুন সাভিস যোগ: ${newService.title}`, newService.title);
+    addLog('add', senderName, `নতুন সাভিস যোগ: ${newService.title} (ক্রমিক: ${services.length})`, newService.title);
     userStates[chatId] = { step: 'idle' };
 
-    const msg = `🎉 <b>সাভিস সফলভাবে যুক্ত হয়েছে!</b>\n\n📌 <b>নাম:</b> ${escapeHtml(newService.title)}\n🏷️ <b>ক্যাটাগরি:</b> ${escapeHtml(newService.subtitle)}\n🔗 <b>লিংক:</b> ${escapeHtml(newService.linkUrl)}\n\n<i>ওয়েবসাইটে তাৎক্ষণিকভাবে লাইভ হয়ে গেছে!</i>`;
+    const msg = `🎉 <b>সাভিস সফলভাবে যুক্ত হয়েছে!</b>\n\n🔢 <b>ক্রমিক নং:</b> #${services.length} (১২ এর পর ${services.length} নং সাভিস)\n📌 <b>নাম:</b> ${escapeHtml(newService.title)}\n🏷️ <b>ক্যাটাগরি:</b> ${escapeHtml(newService.subtitle)}\n🔗 <b>লিংক:</b> ${escapeHtml(newService.linkUrl)}\n\n<i>ওয়েবসাইটে ক্রমিক অনুসারে সর্বশেষে লাইভ যুক্ত হয়ে গেছে!</i>`;
     await sendTelegramMessage(chatId, msg, { reply_markup: getServicesMenuKeyboard() });
     return msg;
   }
@@ -1708,7 +1708,7 @@ async function handleListCommand(chatId: string) {
 
 async function handleEditCommand(chatId: string) {
   const services = getServices();
-  const buttons = services.slice(0, 15).map((s, idx) => [
+  const buttons = services.slice(0, 50).map((s, idx) => [
     { text: `${idx + 1}. ✏️ ${s.title.substring(0, 24)}`, callback_data: `srv_edit:${s.id}` }
   ]);
   buttons.push([{ text: '🔙 সাভিস মেন্যু', callback_data: 'menu_services' }]);
@@ -1720,7 +1720,7 @@ async function handleEditCommand(chatId: string) {
 
 async function handleDeleteCommand(chatId: string) {
   const services = getServices();
-  const buttons = services.slice(0, 15).map((s, idx) => [
+  const buttons = services.slice(0, 50).map((s, idx) => [
     { text: `${idx + 1}. 🗑️ ${s.title.substring(0, 24)}`, callback_data: `srv_del:${s.id}` }
   ]);
   buttons.push([{ text: '🔙 সাভিস মেন্যু', callback_data: 'menu_services' }]);
