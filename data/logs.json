@@ -1,5 +1,33 @@
 [
   {
+    "id": "log_1792916606329_k0sx",
+    "timestamp": "2026-10-25T08:23:26.329Z",
+    "action": "start",
+    "user": "Admin (Simulated)",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792916332451_dh4t",
+    "timestamp": "2026-10-25T08:18:52.451Z",
+    "action": "edit",
+    "user": "Admin (Simulated)",
+    "text": "ফেসবুক লিংক আপডেট: https://facebook.com/shuvo.official.2026"
+  },
+  {
+    "id": "log_1792916228368_74xt",
+    "timestamp": "2026-10-25T08:17:08.368Z",
+    "action": "start",
+    "user": "👻",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
+    "id": "log_1792916197626_71c5",
+    "timestamp": "2026-10-25T08:16:37.626Z",
+    "action": "start",
+    "user": "👻",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
     "id": "log_1792913285390_p8du",
     "timestamp": "2026-10-25T07:28:05.390Z",
     "action": "start",

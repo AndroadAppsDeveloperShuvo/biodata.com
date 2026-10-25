@@ -458,15 +458,56 @@
     renderServices(defaultServices);
     renderContact(defaultContact);
 
-    // Live Server Base Detection:
-    // If hosted on GitHub Pages or custom domain, connect to the Cloud backend server:
-    var API_HOST = (window.location.hostname.indexOf('github.io') !== -1 || window.location.protocol === 'file:')
-      ? 'https://ais-pre-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app'
+    // 🔥 Firebase Realtime Database URL (ফর গিটহাব পেজেস 24/7 লাইভ সিঙ্ক)
+    var FIREBASE_URL = window.FIREBASE_DB_URL || "https://biodata-fd087-default-rtdb.asia-southeast1.firebasedatabase.app";
+
+    // Live Server Base Detection
+    var API_HOST = (window.location.protocol === 'http:' || window.location.protocol === 'https:') && window.location.hostname !== 'localhost' && window.location.hostname.indexOf('github.io') === -1
+      ? ''
       : '';
 
-    // Fetch latest live data from Server
+    // Fetch latest live data from Server or Firebase
     function syncLiveData() {
-      fetch(API_HOST + '/api/data')
+      // 1. If Firebase URL is configured, use Firebase directly (Works 100% on GitHub Pages without CORS/auth issues!)
+      if (FIREBASE_URL && FIREBASE_URL.indexOf('http') === 0) {
+        var cleanFb = FIREBASE_URL.replace(/\/+$/, '') + '/bio.json';
+        fetch(cleanFb)
+          .then(function(res) {
+            if (res.ok) return res.json();
+            throw new Error('Firebase offline');
+          })
+          .then(function(data) {
+            if (data) {
+              if (data.services) renderServices(data.services);
+              if (data.socialLinks) renderSocialLinks(data.socialLinks);
+              if (data.contact) renderContact(data.contact);
+            }
+          })
+          .catch(function(err) {
+            console.warn('Firebase fetch fallback:', err);
+          });
+
+        // Listen to Firebase SSE stream for instant real-time changes
+        try {
+          var fbStream = new EventSource(cleanFb);
+          fbStream.onmessage = function(event) {
+            try {
+              var payload = JSON.parse(event.data);
+              var data = payload.data || payload;
+              if (data && typeof data === 'object') {
+                if (data.services) renderServices(data.services);
+                if (data.socialLinks) renderSocialLinks(data.socialLinks);
+                if (data.contact) renderContact(data.contact);
+                showToast('🔄 তথ্য লাইভ আপডেট হয়েছে!');
+              }
+            } catch (e) {}
+          };
+        } catch (e) {}
+        return;
+      }
+
+      // 2. Otherwise try local/direct API if on local or same origin
+      fetch('/api/data')
         .then(function(res) {
           if (res.ok) return res.json();
           throw new Error('API offline');
@@ -477,31 +518,31 @@
           if (data && data.contact) renderContact(data.contact);
         })
         .catch(function(err) {
-          // Fallback to local default data silently
+          // Keep local default data
         });
+
+      // Local Server-Sent Events (SSE)
+      try {
+        var sse = new EventSource('/api/events');
+        sse.onmessage = function(event) {
+          try {
+            var payload = JSON.parse(event.data);
+            if (payload.type === 'services_updated' && payload.data) {
+              renderServices(payload.data);
+              showToast('🔄 সাভিস তালিকা আপডেট হয়েছে!');
+            } else if (payload.type === 'social_updated' && payload.data) {
+              renderSocialLinks(payload.data);
+              showToast('🔄 সোশ্যাল লিংক আপডেট হয়েছে!');
+            } else if (payload.type === 'contact_updated' && payload.data) {
+              renderContact(payload.data);
+              showToast('🔄 কন্টাক্ট তথ্য আপডেট হয়েছে!');
+            }
+          } catch (e) {}
+        };
+      } catch (e) {}
     }
 
     syncLiveData();
-
-    // Server-Sent Events (SSE) for Real-Time Telegram Bot Updates
-    try {
-      var sse = new EventSource(API_HOST + '/api/events');
-      sse.onmessage = function(event) {
-        try {
-          var payload = JSON.parse(event.data);
-          if (payload.type === 'services_updated' && payload.data) {
-            renderServices(payload.data);
-            showToast('🔄 সাভিস তালিকা আপডেট হয়েছে!');
-          } else if (payload.type === 'social_updated' && payload.data) {
-            renderSocialLinks(payload.data);
-            showToast('🔄 সোশ্যাল লিংক আপডেট হয়েছে!');
-          } else if (payload.type === 'contact_updated' && payload.data) {
-            renderContact(payload.data);
-            showToast('🔄 কন্টাক্ট তথ্য আপডেট হয়েছে!');
-          }
-        } catch (e) {}
-      };
-    } catch (e) {}
 
     // Share link copy
     function copyShareUrl() {

@@ -241,6 +241,8 @@ const DEFAULT_CONTACT: ContactInfo = {
   customNote: "যেকোনো প্রজেক্ট, কলাবোরেশন বা যেকোনো প্রয়োজনে সরাসরি যোগাযোগ করুন।"
 };
 
+const FIREBASE_FILE = path.join(DATA_DIR, 'firebase.json');
+
 // Initialize Storage
 function initDataStore() {
   if (!fs.existsSync(DATA_DIR)) {
@@ -255,12 +257,56 @@ function initDataStore() {
   if (!fs.existsSync(CONTACT_FILE)) {
     fs.writeFileSync(CONTACT_FILE, JSON.stringify(DEFAULT_CONTACT, null, 2), 'utf-8');
   }
+  if (!fs.existsSync(FIREBASE_FILE)) {
+    fs.writeFileSync(FIREBASE_FILE, JSON.stringify({ url: process.env.FIREBASE_URL || '' }, null, 2), 'utf-8');
+  }
   if (!fs.existsSync(LOGS_FILE)) {
     fs.writeFileSync(LOGS_FILE, JSON.stringify([], null, 2), 'utf-8');
   }
 }
 
 initDataStore();
+
+function getFirebaseConfig(): { url: string } {
+  try {
+    const raw = JSON.parse(fs.readFileSync(FIREBASE_FILE, 'utf-8'));
+    if (raw && raw.url) return raw;
+  } catch {}
+  return { url: 'https://biodata-fd087-default-rtdb.asia-southeast1.firebasedatabase.app' };
+}
+
+function saveFirebaseConfig(url: string) {
+  try {
+    fs.writeFileSync(FIREBASE_FILE, JSON.stringify({ url: url.trim() }, null, 2), 'utf-8');
+    syncToFirebase();
+    return true;
+  } catch (err) {
+    console.error('Error saving firebase config:', err);
+    return false;
+  }
+}
+
+async function syncToFirebase() {
+  const cfg = getFirebaseConfig();
+  if (!cfg.url || !cfg.url.startsWith('http')) return;
+  const baseUrl = cfg.url.replace(/\/+$/, '');
+  try {
+    const payload = {
+      services: getServices(),
+      socialLinks: getSocialLinks(),
+      contact: getContactInfo(),
+      updatedAt: new Date().toISOString()
+    };
+    await fetch(`${baseUrl}/bio.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    console.log('✅ Realtime Database synced to Firebase:', baseUrl);
+  } catch (err) {
+    console.error('Firebase sync error:', err);
+  }
+}
 
 // Read / Write Helpers
 function getServices(): HighlightService[] {
@@ -275,6 +321,7 @@ function saveServices(services: HighlightService[]): boolean {
   try {
     fs.writeFileSync(SERVICES_FILE, JSON.stringify(services, null, 2), 'utf-8');
     notifySSE({ type: 'services_updated', data: services });
+    syncToFirebase();
     return true;
   } catch (err) {
     console.error('Error saving services:', err);
@@ -294,6 +341,7 @@ function saveSocialLinks(links: SocialLink[]): boolean {
   try {
     fs.writeFileSync(SOCIAL_FILE, JSON.stringify(links, null, 2), 'utf-8');
     notifySSE({ type: 'social_updated', data: links });
+    syncToFirebase();
     return true;
   } catch (err) {
     console.error('Error saving social links:', err);
@@ -313,6 +361,7 @@ function saveContactInfo(contact: ContactInfo): boolean {
   try {
     fs.writeFileSync(CONTACT_FILE, JSON.stringify(contact, null, 2), 'utf-8');
     notifySSE({ type: 'contact_updated', data: contact });
+    syncToFirebase();
     return true;
   } catch (err) {
     console.error('Error saving contact info:', err);
@@ -571,13 +620,45 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
   const trimmed = text.trim();
   const state = userStates[chatId] || { step: 'idle' };
 
-  // Quick Command: /start or /help
-  if (trimmed === '/start' || trimmed === '/help' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
+  // Quick Command: /start or /help or /status
+  if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
     userStates[chatId] = { step: 'idle' };
     addLog('start', senderName, '/start কমান্ড রান করা হয়েছে');
-    const msg = `👋 আসসালামু আলাইকুম *⚡ 乂 ＳＨＵＶＯ 乂 ⚡*!\n\nআপনার অফিসিয়াল বায়ো ডাটা ওয়েবসাইটের *মাস্টার কন্ট্রোল বটে* স্বাগতম! 🚀\n\nআপনি এখান থেকে ওয়েবসাইটের:\n1️⃣ *সোশ্যাল মিডিয়া লিংক* (Facebook, Telegram, YouTube, Instagram, X)\n2️⃣ *সরাসরি যোগাযোগ* (WhatsApp নম্বর, মেসেজ ও ইমেইল)\n3️⃣ *হাইলাইটস ও সাভিস সমূহ* (QR Generator, PDF Converter ইত্যাদি)\nসবকিছু রিয়েল-টাইমে পরিবর্তন করতে পারবেন।\n\n👇 *নিচের অপশন থেকে নির্বাচন করুন:*`;
+    
+    const services = getServices();
+    const social = getSocialLinks();
+    const contact = getContactInfo();
+    const fbCfg = getFirebaseConfig();
+
+    const fbLink = social.find(s => s.platform === 'facebook')?.url || '';
+    const fbStatus = fbCfg.url ? `🟢 যুক্ত আছে (\`${fbCfg.url}\`)` : '⚪ যুক্ত নেই (যুক্ত করতে `/firebase আপনার_ইউআরএল` লিখুন)';
+
+    const msg = `👋 আসসালামু আলাইকুম *⚡ 乂 ＳＨＵＶＯ 乂 ⚡*!\n\nআপনার অফিসিয়াল বায়ো ডাটা ওয়েবসাইটের *মাস্টার কন্ট্রোল বটে* স্বাগতম! 🚀\n\n📊 *বর্তমান সংরক্ষিত তথ্য:*
+• 🛠️ মোট সাভিস: *${services.length}* টি সক্রিয়
+• 📘 Facebook: ${fbLink}
+• 📱 WhatsApp: \`${contact.whatsappNumber}\`
+• ✉️ Email: \`${contact.email}\`
+• 🔥 Firebase Realtime DB: ${fbStatus}
+
+👇 *কী পরিবর্তন করতে চান নির্বাচন করুন:*`;
     await sendTelegramMessage(chatId, msg, { reply_markup: getMainMenuKeyboard() });
     return msg;
+  }
+
+  // Connect Firebase: /firebase [url] or /setfirebase [url]
+  if (trimmed.startsWith('/firebase ') || trimmed.startsWith('/setfirebase ')) {
+    const rawUrl = trimmed.replace(/^\/(firebase|setfirebase)\s+/, '').trim();
+    if (rawUrl.startsWith('http')) {
+      saveFirebaseConfig(rawUrl);
+      addLog('edit', senderName, `Firebase URL যুক্ত করা হয়েছে: ${rawUrl}`);
+      const reply = `🎉 *Firebase Realtime Database সফলভাবে যুক্ত হয়েছে!* ✅\n\n🔗 *URL:* \`${rawUrl}\`\n\nসমস্ত সাভিস ও সোশ্যাল লিঙ্ক স্বয়ংক্রিয়ভাবে ফায়ারবেসে সিঙ্ক হয়ে গেছে। এখন GitHub Pages-এর সাথে 24/7 লাইভ আপডেট কাজ করবে! 🚀`;
+      await sendTelegramMessage(chatId, reply, { reply_markup: getMainMenuKeyboard() });
+      return reply;
+    } else {
+      const err = `❌ অনুগ্রহ করে সঠিক Firebase Realtime Database URL দিন।\n(উদাহরণ: \`/firebase https://my-project-default-rtdb.firebaseio.com\`)`;
+      await sendTelegramMessage(chatId, err);
+      return err;
+    }
   }
 
   // Quick Command: /social
