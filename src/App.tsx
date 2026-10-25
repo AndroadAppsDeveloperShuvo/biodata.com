@@ -32,10 +32,19 @@ export default function App() {
     }, 2500);
   };
 
+  // Base URL for API calls: when deployed on GitHub Pages, points to the live server
+  const getApiBase = () => {
+    if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
+      return 'https://ais-pre-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app';
+    }
+    return '';
+  };
+
   // Fetch all live data from backend
   const fetchData = async () => {
     try {
-      const res = await fetch('/api/data');
+      const apiBase = getApiBase();
+      const res = await fetch(`${apiBase}/api/data`);
       if (res.ok) {
         const data = await res.json();
         if (data.services && Array.isArray(data.services)) {
@@ -57,11 +66,10 @@ export default function App() {
     fetchData();
 
     // Listen to real-time events via Server-Sent Events (SSE)
-    // Whenever Shuvo uses the Telegram Bot to update Social Links, Contact, or Services,
-    // the website instantly updates live!
     let eventSource: EventSource | null = null;
     try {
-      eventSource = new EventSource('/api/events');
+      const apiBase = getApiBase();
+      eventSource = new EventSource(`${apiBase}/api/events`);
       eventSource.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
