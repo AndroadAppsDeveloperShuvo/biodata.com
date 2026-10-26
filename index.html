@@ -3,12 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>⚡ 乂 ＳＨＵＶＯ 乂 ⚡ - Official Social Bio & Services</title>
-  <meta name="description" content="💻 Full-Stack Developer & Tech Enthusiast">
-  <meta property="og:title" content="⚡ 乂 ＳＨＵＶＯ 乂 ⚡ - Official Social Bio & Services">
-  <meta property="og:description" content="🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!">
-  <meta property="og:image" content="https://i.ibb.co/bRWhx1Lf/4880.jpg">
-  <meta name="theme-color" content="#0284c7">
+  <title>Shuvo Official - Bio Data</title>
+  <meta name="description" content="Official Social Bio & Developer Portfolio of Shuvo">
+  <meta property="og:title" content="Shuvo Official - Bio Data">
+  <meta property="og:description" content="Official Social Bio & Developer Portfolio of Shuvo">
+  <meta property="og:image" content="pwa-512x512.png">
+  
+  <!-- PWA & Mobile Web App Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#09090b">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BIO DATA">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="pwa-192x192.png">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -50,6 +59,37 @@
   <!-- Toast Notification Feedback -->
   <div id="copyToast" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white border border-cyan-400 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold shadow-2xl backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none -translate-y-4 scale-95 flex items-center gap-2">
     <span id="toastText">✅ সফল হয়েছে!</span>
+  </div>
+
+  <!-- Offline Status Banner -->
+  <div id="offlineIndicator" class="hidden fixed bottom-4 left-4 z-50 flex items-center gap-2 rounded-xl bg-amber-500/95 text-white px-3.5 py-2 text-xs font-semibold shadow-2xl backdrop-blur-md border border-amber-400">
+    <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+    <span>অফলাইন মোড — ক্যাশ ডাটা প্রদর্শিত হচ্ছে</span>
+  </div>
+
+  <!-- iOS PWA Install Guide Modal -->
+  <div id="iosInstallModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-2xl bg-zinc-900 border border-zinc-700 p-5 shadow-2xl text-left space-y-3.5">
+      <div class="flex items-center gap-3">
+        <img src="pwa-192x192.png" alt="BIO DATA" class="w-12 h-12 rounded-xl border border-zinc-600 shadow-md" />
+        <div>
+          <h3 class="text-sm font-bold text-white">iPhone / iPad এ অ্যাপ ইনস্টল করুন</h3>
+          <p class="text-[11px] text-cyan-400 font-mono">BIO DATA App</p>
+        </div>
+      </div>
+      <div class="text-xs text-zinc-300 space-y-2 bg-zinc-950/60 p-3 rounded-xl border border-zinc-800 leading-relaxed">
+        <p>১. সাফারির নিচে <strong class="text-cyan-400">Share (শেয়ার)</strong> আইকনে চাপুন।</p>
+        <p>২. একটু নিচে স্ক্রল করে <strong class="text-cyan-400">"Add to Home Screen"</strong> চাপুন।</p>
+        <p>৩. ওপরে <strong class="text-emerald-400">"Add"</strong> চাপলে হোম স্ক্রিনে অ্যাপ যুক্ত হয়ে যাবে!</p>
+      </div>
+      <button 
+        type="button" 
+        onclick="closeIOSModal()"
+        class="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs rounded-xl transition-all cursor-pointer border border-zinc-700"
+      >
+        বন্ধ করুন
+      </button>
+    </div>
   </div>
 
   <!-- Main Responsive Bio Container (Phone Mockup Frame in Center) -->
@@ -116,6 +156,26 @@
       </div>
     </div>
 
+    <!-- PWA Install Banner Button (Prominent in-app installation prompt) -->
+    <div id="pwaInstallContainer" class="hidden px-4 sm:px-5 pb-3">
+      <button 
+        id="pwaInstallActionBtn"
+        type="button" 
+        class="w-full py-2.5 px-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-sky-600 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm shadow-xl shadow-cyan-500/20 flex items-center justify-between transition-all duration-300 active:scale-95 cursor-pointer border border-cyan-300/40 group"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <img src="pwa-192x192.png" alt="BIO DATA Logo" class="w-7 h-7 rounded-xl border border-white/40 shadow-sm shrink-0 object-cover" />
+          <div class="text-left min-w-0">
+            <span class="block leading-tight truncate">📲 অ্যাপ ইনস্টল করুন</span>
+            <span class="block text-[10px] text-cyan-100/90 font-mono font-normal truncate">হোম স্ক্রিনে BIO DATA অ্যাপ যুক্ত করুন</span>
+          </div>
+        </div>
+        <span class="px-2.5 py-1 bg-white/20 group-hover:bg-white text-white group-hover:text-slate-900 rounded-xl text-[11px] font-extrabold transition-all shrink-0">
+          ইনস্টল
+        </span>
+      </button>
+    </div>
+
     <!-- Content Sections -->
     <div class="px-4 sm:px-5 pb-6 space-y-5">
       
@@ -178,7 +238,7 @@
     </div>
   </main>
 
-  <!-- JAVASCRIPT: Standalone, Self-Contained, Zero-Build Required, Live Telegram Bot Sync -->
+  <!-- JAVASCRIPT: Standalone, Zero-Build Required, Live Telegram Bot Sync + PWA Controller -->
   <script>
     // Safe array normalizer (handles Firebase returning Object {"0": ..., "1": ...} instead of Array)
     function toArray(val) {
@@ -196,52 +256,19 @@
       });
     }
 
-    // Default Services (empty by default, loads from Firebase/Bot storage)
-    var defaultServices = [];
-
-    // Default Social Links (empty by default)
-    var defaultSocial = [];
-
-    // Default Profile Info
-    var defaultProfile = {
-      name: "⚡ 乂 ＳＨＵＶＯ 乂 ⚡",
-      handle: "@shuvo_bhai_444",
-      title: "💻 Full-Stack Developer & Tech Enthusiast",
-      location: "Natore, Bangladesh",
-      bio: "🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!",
-      avatarUrl: "https://i.ibb.co/bRWhx1Lf/4880.jpg",
-      bannerUrl: "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg"
-    };
-
-    // Default Badges (empty by default)
-    var defaultBadges = [];
-
-    // Default Contact Info
-    var defaultContact = {
-      enabled: true,
-      whatsappNumber: "+8801778526313",
-      whatsappMessage: "𝐻𝐼々ᗪᴇᴠʟᴏᴘᴇʀ—͟͞Sʜᴜᴠᴏ...𝐼 𝐜𝐚𝐦𝐞 𝐟𝐫𝐨𝐦 𝐘𝐨𝐮𝐫 𝘄𝗲𝗯𝘀𝗶𝘁𝗲...𝐼 𝘄𝗮𝗻𝘁  𝗧𝗼 𝗰𝗼𝗻𝗻𝗲𝗰𝘁 𝘄𝗶𝘁𝗵 𝐘𝐨𝐮 👨‍💻",
-      email: "freefirelover2111887942@gmail.com",
-      customNote: "যেকোনো প্রজেক্ট, কলাবোরেশন বা যেকোনো প্রয়োজনে সরাসরি যোগাযোগ করুন।"
-    };
-
     // Render Profile Header & Bio
-    function renderProfile(profile) {
-      var p = profile || defaultProfile;
+    function renderProfile(p) {
+      if (!p) return;
       var bannerEl = document.getElementById('profileBanner');
-      if (bannerEl && p.bannerUrl) {
-        bannerEl.src = p.bannerUrl;
-      }
+      if (bannerEl && p.bannerUrl) bannerEl.src = p.bannerUrl;
 
       var avatarEl = document.getElementById('profileAvatar');
-      if (avatarEl && p.avatarUrl) {
-        avatarEl.src = p.avatarUrl;
-      }
+      if (avatarEl && p.avatarUrl) avatarEl.src = p.avatarUrl;
 
       var nameEl = document.getElementById('profileName');
       if (nameEl && p.name) {
         nameEl.textContent = p.name;
-        document.title = p.name + ' - Official Social Bio & Services';
+        document.title = p.name + ' - BIO DATA';
       }
 
       var handleEl = document.getElementById('profileHandle');
@@ -261,7 +288,7 @@
     function renderBadges(badges) {
       var container = document.getElementById('badgesContainer');
       if (!container) return;
-      var list = toArray(badges || defaultBadges);
+      var list = toArray(badges);
       var html = '';
       list.forEach(function(b) {
         var text = typeof b === 'string' ? b : (b.text || '');
@@ -296,7 +323,7 @@
     function renderSocialLinks(links) {
       var container = document.getElementById('socialLinksContainer');
       if (!container) return;
-      var raw = toArray(links || defaultSocial);
+      var raw = toArray(links);
       var activeLinks = raw.filter(function(l) { return l && l.enabled !== false; });
       var html = '';
       activeLinks.forEach(function(link) {
@@ -325,18 +352,16 @@
     function renderServices(services) {
       var grid = document.getElementById('servicesGrid');
       if (!grid) return;
-      var list = toArray(services || defaultServices);
+      var list = toArray(services);
       var html = '';
       list.forEach(function(service, index) {
         var numBn = toBengaliNumber(index + 1);
         html += '<div class="group relative rounded-xl overflow-hidden aspect-square border border-slate-800/90 hover:border-cyan-400/80 transition-all duration-300 bg-slate-900 shadow-md">'
           + '<a href="' + service.linkUrl + '" target="_blank" rel="noopener noreferrer" class="w-full h-full block cursor-pointer" title="' + service.title + '">'
           + '<img src="' + service.imageUrl + '" alt="' + service.title + '" referrerpolicy="no-referrer" onerror="this.src=\'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10\'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" />'
-          // UI Matching Colored Corner Badge with Bengali numbers: ১, ২, ৩, ৪...
           + '<div class="absolute top-0 left-0 bg-gradient-to-br from-cyan-500 via-sky-600 to-blue-700 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-br-xl shadow-md border-b border-r border-cyan-300/40 font-tech tracking-wider pointer-events-none z-10 flex items-center justify-center min-w-[24px]">'
           + '<span>' + numBn + '</span>'
           + '</div>'
-          // Dark Gradient Overlay for text
           + '<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-2 transition-opacity group-hover:from-black/90">'
           + '<div class="flex items-center justify-between gap-1">'
           + '<h4 class="text-[11px] font-bold text-white leading-tight truncate group-hover:text-cyan-300 transition-colors">' + service.title + '</h4>'
@@ -351,10 +376,9 @@
     }
 
     // Render Contact Info
-    function renderContact(contact) {
+    function renderContact(c) {
       var box = document.getElementById('contactContainer');
-      if (!box) return;
-      var c = contact || defaultContact;
+      if (!box || !c) return;
       var cleanWa = (c.whatsappNumber || '').replace(/[^0-9]/g, '');
       var encodedWaMsg = encodeURIComponent(c.whatsappMessage || '');
 
@@ -379,7 +403,7 @@
       box.innerHTML = html;
     }
 
-    // Apply entire payload
+    // Apply entire payload + cache in localStorage for 0ms flicker-free reload
     var lastUpdatedSignature = '';
     function applyAllData(data, shouldToast) {
       if (!data || typeof data !== 'object') return;
@@ -393,23 +417,28 @@
       if (data.socialLinks) renderSocialLinks(data.socialLinks);
       if (data.contact) renderContact(data.contact);
 
+      // Save to localStorage
+      try {
+        localStorage.setItem('shuvo_bio_cache_v2', JSON.stringify(data));
+      } catch (e) {}
+
       if (shouldToast) {
         showToast('🔄 তথ্য লাইভ আপডেট হয়েছে!');
       }
     }
 
-    // Initial instant rendering with default data (NO WHITE SCREEN EVER!)
-    renderProfile(defaultProfile);
-    renderBadges(defaultBadges);
-    renderSocialLinks(defaultSocial);
-    renderServices(defaultServices);
-    renderContact(defaultContact);
+    // Step 1: Hydrate from localStorage instantly (Zero flicker!)
+    try {
+      var cached = localStorage.getItem('shuvo_bio_cache_v2');
+      if (cached) {
+        applyAllData(JSON.parse(cached), false);
+      }
+    } catch (e) {}
 
-    // 🔥 Firebase Realtime Database URL (ফর গিটহাব পেজেস 24/7 লাইভ সিঙ্ক)
+    // Step 2: Fetch latest data from Firebase
     var FIREBASE_URL = window.FIREBASE_DB_URL || "https://biodata-fd087-default-rtdb.asia-southeast1.firebasedatabase.app";
     var cleanFb = FIREBASE_URL.replace(/\/+$/, '') + '/bio.json';
 
-    // 1. Fetch latest data from Firebase (with cache-busting timestamp)
     function fetchFromFirebase(isBackgroundCheck) {
       fetch(cleanFb + '?t=' + Date.now())
         .then(function(res) {
@@ -421,10 +450,10 @@
             applyAllData(data, isBackgroundCheck);
           }
         })
-        .catch(function(err) {
-          // silently keep current data
-        });
+        .catch(function(err) {});
     }
+
+    fetchFromFirebase(false);
 
     // Dynamic config fetch if running on fullstack server
     fetch('/api/public/config')
@@ -438,12 +467,9 @@
       })
       .catch(function() {});
 
-    fetchFromFirebase(false);
-
-    // 2. Attach Firebase Realtime Database SSE Stream Listener (Handles put & patch events)
+    // Step 3: Attach Firebase SSE Stream Listener
     try {
       var fbStream = new EventSource(cleanFb);
-
       function handleStreamEvent(e) {
         try {
           var payload = JSON.parse(e.data);
@@ -455,27 +481,23 @@
               applyAllData(data, true);
             }
           } else {
-            // Partial path update, re-fetch full clean data
             fetchFromFirebase(true);
           }
         } catch (err) {
           fetchFromFirebase(true);
         }
       }
-
       fbStream.addEventListener('put', handleStreamEvent);
       fbStream.addEventListener('patch', handleStreamEvent);
       fbStream.onmessage = handleStreamEvent;
-    } catch (e) {
-      console.warn('Firebase EventSource error:', e);
-    }
+    } catch (e) {}
 
-    // 3. Periodic Polling Interval (every 3.5s for 100% reliable GitHub Pages background live refresh)
+    // Step 4: Polling Interval for GitHub Pages
     setInterval(function() {
       fetchFromFirebase(true);
-    }, 3500);
+    }, 4000);
 
-    // 4. Local SSE Listener (works when testing locally or full-stack server)
+    // Step 5: Local Server SSE Listener
     try {
       var localSSE = new EventSource('/api/events');
       localSSE.onmessage = function(event) {
@@ -483,19 +505,14 @@
           var payload = JSON.parse(event.data);
           if (payload.type === 'services_updated' && payload.data) {
             renderServices(payload.data);
-            showToast('🔄 সাভিস তালিকা আপডেট হয়েছে!');
           } else if (payload.type === 'social_updated' && payload.data) {
             renderSocialLinks(payload.data);
-            showToast('🔄 সোশ্যাল লিংক আপডেট হয়েছে!');
           } else if (payload.type === 'contact_updated' && payload.data) {
             renderContact(payload.data);
-            showToast('🔄 কন্টাক্ট তথ্য আপডেট হয়েছে!');
           } else if (payload.type === 'profile_updated' && payload.data) {
             renderProfile(payload.data);
-            showToast('🔄 প্রোফাইল আপডেট হয়েছে!');
           } else if (payload.type === 'badges_updated' && payload.data) {
             renderBadges(payload.data);
-            showToast('🔄 ব্যাজ আপডেট হয়েছে!');
           }
         } catch (e) {}
       };
@@ -503,7 +520,7 @@
 
     // Share link copy
     function copyShareUrl() {
-      var url = 'https://androadappsdevelopershuvo.github.io/biodata.com';
+      var url = window.location.href;
       if (navigator.clipboard) {
         navigator.clipboard.writeText(url).then(function() {
           showToast('🔗 শেয়ার লিংক কপি হয়েছে!');
@@ -542,6 +559,91 @@
         }, 2200);
       }
     }
+
+    // =========================================================================
+    // PWA CONTROLLER & IN-APP INSTALL LOGIC
+    // =========================================================================
+    var deferredInstallPrompt = null;
+    var pwaInstallContainer = document.getElementById('pwaInstallContainer');
+    var pwaInstallActionBtn = document.getElementById('pwaInstallActionBtn');
+    var iosInstallModal = document.getElementById('iosInstallModal');
+
+    // Detect if already installed in standalone mode
+    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator && window.navigator.standalone === true);
+    
+    // Detect iOS devices
+    var isIOS = /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+
+    if (!isStandalone) {
+      if (isIOS) {
+        // Show install button for iOS
+        if (pwaInstallContainer) pwaInstallContainer.classList.remove('hidden');
+        if (pwaInstallActionBtn) {
+          pwaInstallActionBtn.addEventListener('click', function() {
+            if (iosInstallModal) iosInstallModal.classList.remove('hidden');
+          });
+        }
+      } else {
+        // Chrome / Android / Desktop flow
+        window.addEventListener('beforeinstallprompt', function(e) {
+          e.preventDefault();
+          deferredInstallPrompt = e;
+          if (pwaInstallContainer) pwaInstallContainer.classList.remove('hidden');
+        });
+
+        if (pwaInstallActionBtn) {
+          pwaInstallActionBtn.addEventListener('click', function() {
+            if (deferredInstallPrompt) {
+              deferredInstallPrompt.prompt();
+              deferredInstallPrompt.userChoice.then(function(choice) {
+                if (choice.outcome === 'accepted') {
+                  showToast('🎉 অ্যাপ ইনস্টল সম্পন্ন হয়েছে!');
+                  if (pwaInstallContainer) pwaInstallContainer.classList.add('hidden');
+                }
+                deferredInstallPrompt = null;
+              });
+            } else {
+              showToast('অ্যাপ ইনস্টল করতে ব্রাউজারের ৩ ডট মেনু থেকে "Install" চাপুন');
+            }
+          });
+        }
+      }
+    }
+
+    window.addEventListener('appinstalled', function() {
+      if (pwaInstallContainer) pwaInstallContainer.classList.add('hidden');
+      showToast('🎉 BIO DATA অ্যাপ সফলভাবে ইনস্টল হয়েছে!');
+    });
+
+    function closeIOSModal() {
+      if (iosInstallModal) iosInstallModal.classList.add('hidden');
+    }
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').then(function(reg) {
+          console.log('✅ PWA Service Worker Registered:', reg.scope);
+        }).catch(function(err) {
+          console.warn('⚠️ PWA Service Worker Registration Failed:', err);
+        });
+      });
+    }
+
+    // Offline Connectivity Tracking
+    var offlineIndicator = document.getElementById('offlineIndicator');
+    function updateOnlineStatus() {
+      if (offlineIndicator) {
+        if (!navigator.onLine) {
+          offlineIndicator.classList.remove('hidden');
+        } else {
+          offlineIndicator.classList.add('hidden');
+        }
+      }
+    }
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    updateOnlineStatus();
   </script>
 </body>
 </html>
