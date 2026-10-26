@@ -3,6 +3,12 @@ import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
+import {
+  ClientRecord,
+  generateClientManifest,
+  generateClientServiceWorker,
+  generateClientIndexHtml
+} from './src/clientTemplates';
 
 dotenv.config();
 
@@ -34,6 +40,7 @@ const PROFILE_FILE = path.join(DATA_DIR, 'profile.json');
 const BADGES_FILE = path.join(DATA_DIR, 'badges.json');
 const FIREBASE_FILE = path.join(DATA_DIR, 'firebase.json');
 const LOGS_FILE = path.join(DATA_DIR, 'logs.json');
+const CLIENTS_FILE = path.join(DATA_DIR, 'clients.json');
 
 export interface ProfileInfo {
   name: string;
@@ -298,6 +305,9 @@ function initDataStore() {
   if (!fs.existsSync(LOGS_FILE)) {
     fs.writeFileSync(LOGS_FILE, JSON.stringify([], null, 2), 'utf-8');
   }
+  if (!fs.existsSync(CLIENTS_FILE)) {
+    fs.writeFileSync(CLIENTS_FILE, JSON.stringify([], null, 2), 'utf-8');
+  }
 }
 
 initDataStore();
@@ -348,12 +358,140 @@ async function pullFromFirebase() {
           fs.writeFileSync(CONTACT_FILE, JSON.stringify(fbData.contact, null, 2), 'utf-8');
         }
         console.log('✅ Successfully pulled and restored persistent user data from Firebase!');
-        return;
+      }
+    }
+
+    // Pull clients data from Firebase
+    const clientsRes = await fetch(`${baseUrl}/clients.json`);
+    if (clientsRes.ok) {
+      const fbClients = await clientsRes.json();
+      if (fbClients && typeof fbClients === 'object') {
+        const clientList: ClientRecord[] = Array.isArray(fbClients) ? fbClients : Object.values(fbClients);
+        if (clientList.length > 0) {
+          fs.writeFileSync(CLIENTS_FILE, JSON.stringify(clientList, null, 2), 'utf-8');
+          console.log(`✅ Successfully restored ${clientList.length} clients from Firebase!`);
+        }
       }
     }
   } catch (err) {
     console.warn('⚠️ Could not pull from Firebase on startup:', err);
   }
+}
+
+// Client Management Storage Helpers
+function getClients(): ClientRecord[] {
+  try {
+    const data = JSON.parse(fs.readFileSync(CLIENTS_FILE, 'utf-8'));
+    return Array.isArray(data) ? data : Object.values(data);
+  } catch {
+    return [];
+  }
+}
+
+function saveClients(clients: ClientRecord[]): boolean {
+  try {
+    fs.writeFileSync(CLIENTS_FILE, JSON.stringify(clients, null, 2), 'utf-8');
+    return true;
+  } catch (err) {
+    console.error('Error saving clients:', err);
+    return false;
+  }
+}
+
+function getClientByChatId(chatId: string | number): ClientRecord | undefined {
+  const clients = getClients();
+  const targetId = String(chatId).trim();
+  return clients.find(c => String(c.chatId).trim() === targetId);
+}
+
+function getClientById(id: string): ClientRecord | undefined {
+  const clients = getClients();
+  return clients.find(c => c.id === id);
+}
+
+function updateClientData(clientId: string, updater: (c: ClientRecord) => void): boolean {
+  const clients = getClients();
+  const client = clients.find(c => c.id === clientId);
+  if (!client) return false;
+  updater(client);
+  saveClients(clients);
+  syncClientToFirebase(client);
+  return true;
+}
+
+function deleteClient(clientId: string): boolean {
+  const clients = getClients();
+  const filtered = clients.filter(c => c.id !== clientId);
+  saveClients(filtered);
+  const cfg = getFirebaseConfig();
+  if (cfg.url && cfg.url.startsWith('http')) {
+    const baseUrl = cfg.url.replace(/\/+$/, '');
+    fetch(`${baseUrl}/clients/${clientId}.json`, { method: 'DELETE' }).catch(() => {});
+  }
+  return true;
+}
+
+async function syncClientToFirebase(client: ClientRecord) {
+  const cfg = getFirebaseConfig();
+  if (!cfg.url || !cfg.url.startsWith('http')) return;
+  const baseUrl = cfg.url.replace(/\/+$/, '');
+  try {
+    const payload = {
+      ...client,
+      updatedAt: new Date().toISOString()
+    };
+    await fetch(`${baseUrl}/clients/${client.id}.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    console.log(`✅ Client ${client.appName} (${client.id}) synced to Firebase`);
+  } catch (err) {
+    console.error(`Firebase sync error for client ${client.id}:`, err);
+  }
+}
+
+function createNewClient(chatId: string, appName: string, shortName: string, logoUrl: string): ClientRecord {
+  const id = 'c_' + Date.now();
+  const name = appName.replace(/[-|•].*$/, '').trim() || 'My Bio';
+  const newClient: ClientRecord = {
+    id,
+    chatId: String(chatId).trim(),
+    appName: appName.trim(),
+    shortName: (shortName.trim() || 'BIO DATA').toUpperCase(),
+    logoUrl: logoUrl.trim() || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10',
+    createdAt: new Date().toISOString(),
+    profile: {
+      name: name,
+      handle: '@' + name.toLowerCase().replace(/[^a-z0-9_]/g, '') || '@official_bio',
+      title: '🌟 Digital Creator & Entrepreneur',
+      location: 'Bangladesh',
+      bio: 'স্বাগতম আমার অফিসিয়াল বায়ো ডাটা ও প্রোফাইল পেজে! যেকোনো প্রয়োজনে সরাসরি যোগাযোগ করুন।',
+      avatarUrl: logoUrl.trim() || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10',
+      bannerUrl: 'https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'
+    },
+    badges: [
+      { id: 'b_1', text: '⚡ Verified Profile' },
+      { id: 'b_2', text: '🔥 Official Creator' }
+    ],
+    services: DEFAULT_SERVICES.map((s, idx) => ({
+      ...s,
+      id: 'cs_' + idx + '_' + Date.now()
+    })),
+    socialLinks: DEFAULT_SOCIAL.map((l, idx) => ({
+      ...l,
+      id: 'cl_' + idx + '_' + Date.now()
+    })),
+    contact: {
+      enabled: true,
+      whatsappNumber: '+8801700000000',
+      whatsappMessage: `Hello ${name}, I visited your bio website and want to connect!`,
+      email: 'client@gmail.com',
+      telegramUsername: '',
+      customNote: 'যেকোনো প্রজেক্ট, কলাবোরেশন বা প্রয়োজনে সরাসরি মেসেজ দিন।'
+    }
+  };
+  return newClient;
 }
 
 // Execute pull on startup immediately
@@ -589,6 +727,39 @@ app.get('/api/contact', (req, res) => {
   res.json({ success: true, contact: getContactInfo() });
 });
 
+app.get('/api/clients', (req, res) => {
+  res.json({ success: true, clients: getClients() });
+});
+
+app.get('/api/clients/:id', (req, res) => {
+  const client = getClientById(req.params.id);
+  if (!client) return res.status(404).json({ error: 'Client not found' });
+  res.json({ success: true, client });
+});
+
+app.get('/api/clients/:id/files/:filename', (req, res) => {
+  const client = getClientById(req.params.id);
+  if (!client) return res.status(404).send('Client not found');
+  const filename = req.params.filename;
+  const cfg = getFirebaseConfig();
+  const fbUrl = cfg.url || FIREBASE_DEFAULT_URL;
+
+  if (filename === 'index.html') {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="index.html"`);
+    return res.send(generateClientIndexHtml(client, fbUrl));
+  } else if (filename === 'manifest.json') {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="manifest.json"`);
+    return res.send(generateClientManifest(client));
+  } else if (filename === 'sw.js') {
+    res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="sw.js"`);
+    return res.send(generateClientServiceWorker(client));
+  }
+  res.status(404).send('File not found');
+});
+
 app.post('/api/telegram/simulate', async (req, res) => {
   const { text } = req.body;
   if (!text) return res.status(400).json({ error: 'Text required' });
@@ -630,7 +801,31 @@ interface TelegramUserState {
     | 'prof_edit_banner'
     // Badge flows
     | 'badge_add_text'
-    | 'badge_edit_text';
+    | 'badge_edit_text'
+    // Admin Wizard flows
+    | 'admin_wizard_chatid'
+    | 'admin_wizard_appname'
+    | 'admin_wizard_shortname'
+    | 'admin_wizard_logo'
+    // Client self-management flows
+    | 'client_prof_name'
+    | 'client_prof_handle'
+    | 'client_prof_title'
+    | 'client_prof_location'
+    | 'client_prof_bio'
+    | 'client_prof_avatar'
+    | 'client_prof_banner'
+    | 'client_badge_add_text'
+    | 'client_srv_title'
+    | 'client_srv_subtitle'
+    | 'client_srv_image'
+    | 'client_srv_link'
+    | 'client_srv_edit_val'
+    | 'client_social_url'
+    | 'client_contact_wa'
+    | 'client_contact_wa_msg'
+    | 'client_contact_email'
+    | 'client_contact_note';
   tempData?: any;
 }
 
@@ -707,6 +902,7 @@ function getMainMenuKeyboard() {
   const services = getServices();
   const social = getSocialLinks();
   const badges = getBadges();
+  const clients = getClients();
 
   return {
     inline_keyboard: [
@@ -721,6 +917,10 @@ function getMainMenuKeyboard() {
       [
         { text: `🛠️ সাভিস সমূহ (${services.length}টি)`, callback_data: 'menu_services' },
         { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: 'cmd_full_summary' }
+      ],
+      [
+        { text: `👥 ক্লায়েন্ট সেল ও ম্যানেজমেন্ট (${clients.length} জন)`, callback_data: 'admin_menu_clients' },
+        { text: '➕ নতুন ক্লায়েন্ট তৈরি', callback_data: 'admin_btn_add_client' }
       ],
       [
         { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
@@ -878,10 +1078,728 @@ function getContactMenuKeyboard() {
   };
 }
 
+// ==========================================
+// TELEGRAM DOCUMENT SENDER & CLIENT FILES
+// ==========================================
+async function sendTelegramDocument(
+  chatId: string | number,
+  filename: string,
+  content: string | Uint8Array | any,
+  caption?: string
+) {
+  try {
+    const formData = new FormData();
+    formData.append('chat_id', String(chatId));
+    const blob = new Blob([content as any], {
+      type: filename.endsWith('.html')
+        ? 'text/html; charset=utf-8'
+        : filename.endsWith('.json')
+        ? 'application/json; charset=utf-8'
+        : 'text/javascript; charset=utf-8'
+    });
+    formData.append('document', blob, filename);
+    if (caption) {
+      formData.append('caption', caption);
+      formData.append('parse_mode', 'HTML');
+    }
+
+    const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      console.warn(`Telegram sendDocument failed for ${filename}:`, data.description || data.error);
+    }
+    return data;
+  } catch (err) {
+    console.error(`Failed to send document ${filename} to ${chatId}:`, err);
+    return { ok: false, error: String(err) };
+  }
+}
+
+async function sendClientFilesToTelegram(chatId: string | number, client: ClientRecord) {
+  const cfg = getFirebaseConfig();
+  const fbUrl = cfg.url || FIREBASE_DEFAULT_URL;
+
+  // 1. Send announcement message
+  await sendTelegramMessage(
+    chatId,
+    `📦 <b>৩টি ফাইল তৈরি করা হচ্ছে...</b>\n\n` +
+    `👤 ক্লায়েন্ট: <b>${escapeHtml(client.appName)}</b>\n` +
+    `🆔 ক্লায়েন্ট আইডি: <code>${client.id}</code>\n\n` +
+    `⏳ একটু অপেক্ষা করুন, Telegram-এ ৩টি ফাইল পাঠানো হচ্ছে...`
+  );
+
+  const indexHtml = generateClientIndexHtml(client, fbUrl);
+  const manifestJson = generateClientManifest(client);
+  const swJs = generateClientServiceWorker(client);
+
+  // Send 1. index.html
+  await sendTelegramDocument(
+    chatId,
+    'index.html',
+    indexHtml,
+    `📄 <b>index.html</b>\n` +
+    `• ক্লায়েন্টের সম্পূর্ণ লাইভ বায়ো ওয়েবসাইট\n` +
+    `• ফায়ারবেজ আইডি: <code>${client.id}</code>`
+  );
+
+  // Send 2. manifest.json
+  await sendTelegramDocument(
+    chatId,
+    'manifest.json',
+    manifestJson,
+    `⚙️ <b>manifest.json</b>\n` +
+    `• PWA অ্যাপ কনফিগারেশন\n` +
+    `• অ্যাপের নাম: <b>${escapeHtml(client.appName)}</b>\n` +
+    `• শর্ট নেম: <code>${escapeHtml(client.shortName)}</code>`
+  );
+
+  // Send 3. sw.js
+  await sendTelegramDocument(
+    chatId,
+    'sw.js',
+    swJs,
+    `🚀 <b>sw.js</b>\n` +
+    `• PWA Service Worker (অফলাইন ও সুপারফাস্ট ক্যাশিং)`
+  );
+
+  // Send instructions message
+  const instructions =
+    `🎉 <b>৩টি ফাইল সফলভাবে পাঠানো হয়েছে!</b>\n\n` +
+    `<b>পরবর্তী সহজ ৩টি পদক্ষেপ:</b>\n` +
+    `১. ক্লায়েন্টের GitHub অ্যাকাউন্টে যান এবং একটি রিপোজিটরি তৈরি করুন (যেমন: <code>username.github.io</code> অথবা যেকোনো নাম)।\n` +
+    `২. এই ৩টি ফাইল (<code>index.html</code>, <code>manifest.json</code>, <code>sw.js</code>) রিপোজিটরির রুটে আপলোড / Commit করুন।\n` +
+    `৩. GitHub Pages চালু করে দিন।\n\n` +
+    `✅ <b>ব্যাস কাজ শেষ!</b> ক্লায়েন্ট তার টেলিগ্রাম চ্যাট আইডি (<code>${client.chatId}</code>) থেকে আমাদের বটকে <code>/start</code> পাঠালেই নিজের ওয়েবসাইট সাথে সাথে লাইভ কন্ট্রোল করতে পারবে। আপনার কোনো কিছু করার প্রয়োজন হবে না!`;
+
+  await sendTelegramMessage(chatId, instructions, {
+    reply_markup: getAdminSingleClientKeyboard(client.id)
+  });
+}
+
+// ==========================================
+// ADMIN CLIENTS KEYBOARDS
+// ==========================================
+function getAdminClientsListKeyboard() {
+  const clients = getClients();
+  const rows: any[] = [];
+
+  clients.forEach(c => {
+    rows.push([
+      {
+        text: `👤 ${c.appName} (${c.id})`,
+        callback_data: `admin_view_client:${c.id}`
+      }
+    ]);
+  });
+
+  rows.push([
+    { text: '➕ নতুন ক্লায়েন্ট তৈরি', callback_data: 'admin_btn_add_client' }
+  ]);
+  rows.push([
+    { text: '🔙 প্রধান মেন্যু', callback_data: 'cmd_menu' }
+  ]);
+
+  return { inline_keyboard: rows };
+}
+
+function getAdminSingleClientKeyboard(clientId: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '📁 ৩টি ফাইল পুনরায় পাঠান', callback_data: `admin_dl_client:${clientId}` }
+      ],
+      [
+        { text: '🗑️ এই ক্লায়েন্ট ডিলিট করুন', callback_data: `admin_del_client:${clientId}` }
+      ],
+      [
+        { text: '🔙 ক্লায়েন্ট তালিকায় ফিরুন', callback_data: 'admin_menu_clients' }
+      ]
+    ]
+  };
+}
+
+// ==========================================
+// CLIENT SELF-MANAGEMENT KEYBOARDS
+// ==========================================
+function getClientMainMenuKeyboard(client: ClientRecord) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: 'cl_menu_profile' },
+        { text: `🏷️ ব্যাজ সমূহ (${client.badges.length}টি)`, callback_data: 'cl_menu_badges' }
+      ],
+      [
+        { text: `🌐 সোশ্যাল মিডিয়া (${client.socialLinks.length}টি)`, callback_data: 'cl_menu_social' },
+        { text: '📞 সরাসরি যোগাযোগ', callback_data: 'cl_menu_contact' }
+      ],
+      [
+        { text: `🛠️ সাভিস সমূহ (${client.services.length}টি)`, callback_data: 'cl_menu_services' },
+        { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: 'cl_cmd_summary' }
+      ]
+    ]
+  };
+}
+
+function getClientProfileMenuKeyboard(client?: ClientRecord) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '✏️ নাম পরিবর্তন', callback_data: 'cl_prof_edit_name' },
+        { text: '🔗 ইউজারনেম পরিবর্তন', callback_data: 'cl_prof_edit_handle' }
+      ],
+      [
+        { text: '💻 পদবী / টাইটেল পরিবর্তন', callback_data: 'cl_prof_edit_title' },
+        { text: '📍 লোকেশন পরিবর্তন', callback_data: 'cl_prof_edit_loc' }
+      ],
+      [
+        { text: '📝 বায়ো বিবরণ পরিবর্তন', callback_data: 'cl_prof_edit_bio' }
+      ],
+      [
+        { text: '🖼️ প্রোফাইল ছবি পরিবর্তন', callback_data: 'cl_prof_edit_avatar' },
+        { text: '🏞️ ব্যানার ছবি পরিবর্তন', callback_data: 'cl_prof_edit_banner' }
+      ],
+      [
+        { text: '🔙 প্রধান মেন্যু', callback_data: 'cl_menu_main' }
+      ]
+    ]
+  };
+}
+
+function getClientBadgesMenuKeyboard(client: ClientRecord) {
+  const rows: any[] = [];
+  client.badges.forEach((b, idx) => {
+    rows.push([
+      { text: `${idx + 1}. ${b.text}`, callback_data: `cl_noop` },
+      { text: '🗑️ মুছুন', callback_data: `cl_badge_del:${b.id}` }
+    ]);
+  });
+  rows.push([
+    { text: '➕ নতুন ব্যাজ যোগ করুন', callback_data: 'cl_badge_add' }
+  ]);
+  rows.push([
+    { text: '🔙 প্রধান মেন্যু', callback_data: 'cl_menu_main' }
+  ]);
+  return { inline_keyboard: rows };
+}
+
+function getClientServicesMenuKeyboard(client: ClientRecord) {
+  const rows: any[] = [];
+  client.services.forEach(s => {
+    rows.push([
+      { text: `🛠️ ${s.title}`, callback_data: `cl_srv_view:${s.id}` },
+      { text: '🗑️ মুছুন', callback_data: `cl_srv_del:${s.id}` }
+    ]);
+  });
+  rows.push([
+    { text: '➕ নতুন সাভিস যোগ করুন', callback_data: 'cl_srv_add' }
+  ]);
+  rows.push([
+    { text: '🔙 প্রধান মেন্যু', callback_data: 'cl_menu_main' }
+  ]);
+  return { inline_keyboard: rows };
+}
+
+function getClientSingleServiceKeyboard(serviceId: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '✏️ শিরোনাম পরিবর্তন', callback_data: `cl_srv_ed:title:${serviceId}` },
+        { text: '📝 বিবরণ পরিবর্তন', callback_data: `cl_srv_ed:sub:${serviceId}` }
+      ],
+      [
+        { text: '🖼️ ছবি পরিবর্তন', callback_data: `cl_srv_ed:img:${serviceId}` },
+        { text: '🔗 লিংক পরিবর্তন', callback_data: `cl_srv_ed:lnk:${serviceId}` }
+      ],
+      [
+        { text: '🗑️ এই সার্ভিসটি ডিলিট করুন', callback_data: `cl_srv_del:${serviceId}` }
+      ],
+      [
+        { text: '🔙 সার্ভিস তালিকায় ফিরুন', callback_data: 'cl_menu_services' }
+      ]
+    ]
+  };
+}
+
+function getClientSocialMenuKeyboard(client: ClientRecord) {
+  const rows: any[] = [];
+  client.socialLinks.forEach(s => {
+    const status = s.enabled ? '🟢' : '⚪';
+    rows.push([
+      { text: `${status} ${s.title}`, callback_data: `cl_social_toggle:${s.id}` },
+      { text: '✏️ লিংক', callback_data: `cl_social_edit:${s.id}` }
+    ]);
+  });
+  rows.push([
+    { text: '🔙 প্রধান মেন্যু', callback_data: 'cl_menu_main' }
+  ]);
+  return { inline_keyboard: rows };
+}
+
+function getClientContactMenuKeyboard(client?: ClientRecord) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '📱 WhatsApp নম্বর পরিবর্তন', callback_data: 'cl_contact_edit_wa' },
+        { text: '💬 WhatsApp মেসেজ পরিবর্তন', callback_data: 'cl_contact_edit_wa_msg' }
+      ],
+      [
+        { text: '✉️ ইমেইল পরিবর্তন', callback_data: 'cl_contact_edit_email' },
+        { text: '📝 কোট/বার্তা পরিবর্তন', callback_data: 'cl_contact_edit_note' }
+      ],
+      [
+        { text: '🔙 প্রধান মেন্যু', callback_data: 'cl_menu_main' }
+      ]
+    ]
+  };
+}
+
+// ==========================================
+// CLIENT SELF-MANAGEMENT HANDLER
+// ==========================================
+
+async function sendClientFullSummary(chatId: string, client: ClientRecord) {
+  let text = `📊 <b>আপনার বায়ো ওয়েবসাইটের সম্পূর্ণ লাইভ কনফিগারেশন:</b>\n\n`;
+  text += `👤 <b>প্রোফাইল:</b> <b>${escapeHtml(client.profile.name)}</b>\n`;
+  text += `🔗 <b>হ্যান্ডেল:</b> <code>${escapeHtml(client.profile.handle)}</code>\n`;
+  text += `💼 <b>পদবী:</b> ${escapeHtml(client.profile.title)}\n`;
+  text += `📍 <b>লোকেশন:</b> ${escapeHtml(client.profile.location)}\n`;
+  text += `📝 <b>বায়ো:</b> <i>"${escapeHtml(client.profile.bio)}"</i>\n\n`;
+
+  text += `🏷️ <b>ব্যাজ সমূহ (${client.badges.length}টি):</b>\n`;
+  client.badges.forEach((b, i) => {
+    text += `${i + 1}. ${escapeHtml(b.text)}\n`;
+  });
+
+  text += `\n🌐 <b>সোশ্যাল মিডিয়া (${client.socialLinks.length}টি):</b>\n`;
+  client.socialLinks.forEach(s => {
+    const st = s.enabled !== false ? '🟢' : '⚪';
+    text += `• ${st} <b>${escapeHtml(s.title)}</b>: ${escapeHtml(s.url)} [${escapeHtml(s.buttonText)}]\n`;
+  });
+
+  text += `\n📞 <b>যোগাযোগ:</b>\n`;
+  text += `• WhatsApp: <code>${escapeHtml(client.contact.whatsappNumber)}</code>\n`;
+  text += `• Email: <code>${escapeHtml(client.contact.email)}</code>\n`;
+
+  text += `\n🛠️ <b>মোট সাভিস:</b> ${client.services.length} টি লাইভ\n`;
+
+  await sendTelegramMessage(chatId, text, { reply_markup: getClientMainMenuKeyboard(client) });
+}
+
+async function handleClientUserMessage(chatId: string, text: string, senderName: string, client: ClientRecord) {
+  const trimmed = text.trim();
+  const state = userStates[chatId] || { step: 'idle' };
+
+  if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed === '/menu' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
+    userStates[chatId] = { step: 'idle' };
+    const msg = `👋 আসসালামু আলাইকুম <b>${escapeHtml(client.profile.name)}</b>!\n\n`
+      + `আপনার বায়ো ডাটা ওয়েবসাইটের <b>কন্ট্রোল প্যানেলে</b> স্বাগতম! 🚀\n\n`
+      + `📊 <b>বর্তমান অবস্থা:</b>\n`
+      + `• 👤 নাম: <b>${escapeHtml(client.profile.name)}</b> (<code>${escapeHtml(client.profile.handle)}</code>)\n`
+      + `• 💻 পদবী: ${escapeHtml(client.profile.title)}\n`
+      + `• 🛠️ মোট সাভিস: <b>${client.services.length}</b> টি লাইভ\n`
+      + `• 🌐 সোশ্যাল লিংক: <b>${client.socialLinks.length}</b> টি সক্রিয়\n`
+      + `• 🏷️ ব্যাজ: <b>${client.badges.length}</b> টি\n`
+      + `• 📱 WhatsApp: <code>${escapeHtml(client.contact.whatsappNumber)}</code>\n`
+      + `• ✉️ Email: <code>${escapeHtml(client.contact.email)}</code>\n\n`
+      + `👇 <b>কী পরিবর্তন করতে চান নির্বাচন করুন:</b>`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getClientMainMenuKeyboard(client) });
+    return msg;
+  }
+
+  if (trimmed === '/cancel') {
+    userStates[chatId] = { step: 'idle' };
+    const msg = `🔙 <b>অপারেশন বাতিল করা হয়েছে!</b>\nপ্রধান মেন্যুতে ফিরে যাওয়া হলো।`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getClientMainMenuKeyboard(client) });
+    return msg;
+  }
+
+  // Quick Client Shortcuts
+  if (trimmed.startsWith('/name ')) {
+    const newName = trimmed.substring(6).trim();
+    updateClientData(client.id, c => { c.profile.name = newName; });
+    const reply = `✅ <b>নাম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n⚡ <b>${escapeHtml(newName)}</b>\n<i>ওয়েবসাইটে সাথে সাথে আপডেট হয়েছে!</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/handle ')) {
+    let newHandle = trimmed.substring(8).trim();
+    if (!newHandle.startsWith('@')) newHandle = '@' + newHandle;
+    updateClientData(client.id, c => { c.profile.handle = newHandle; });
+    const reply = `✅ <b>ইউজারনেম / হ্যান্ডেল আপডেট হয়েছে!</b>\n\n🔗 <code>${escapeHtml(newHandle)}</code>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/title ')) {
+    const newTitle = trimmed.substring(7).trim();
+    updateClientData(client.id, c => { c.profile.title = newTitle; });
+    const reply = `✅ <b>পদবী / টাইটেল আপডেট হয়েছে!</b>\n\n💻 <b>${escapeHtml(newTitle)}</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/bio ')) {
+    const newBio = trimmed.substring(5).trim();
+    updateClientData(client.id, c => { c.profile.bio = newBio; });
+    const reply = `✅ <b>বায়ো বিবরণ সফলভাবে আপডেট হয়েছে!</b>\n\n📝 <i>"${escapeHtml(newBio)}"</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/wa ')) {
+    const newWa = trimmed.substring(4).trim();
+    updateClientData(client.id, c => { c.contact.whatsappNumber = newWa; });
+    const reply = `✅ <b>হোয়াটসঅ্যাপ নম্বর আপডেট হয়েছে!</b>\n\n📱 <code>${escapeHtml(newWa)}</code>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/email ')) {
+    const newEmail = trimmed.substring(7).trim();
+    updateClientData(client.id, c => { c.contact.email = newEmail; });
+    const reply = `✅ <b>ইমেইল সফলভাবে আপডেট হয়েছে!</b>\n\n✉️ <code>${escapeHtml(newEmail)}</code>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  // Client Step Handlers
+  if (state.step === 'client_prof_name') {
+    updateClientData(client.id, c => { c.profile.name = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>প্রোফাইল নাম সফলভাবে আপডেট হয়েছে!</b>\n\n⚡ <b>${escapeHtml(trimmed)}</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_prof_handle') {
+    let cleanHandle = trimmed;
+    if (!cleanHandle.startsWith('@')) cleanHandle = '@' + cleanHandle;
+    updateClientData(client.id, c => { c.profile.handle = cleanHandle; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>ইউজারনেম / হ্যান্ডেল আপডেট হয়েছে!</b>\n\n🔗 <code>${escapeHtml(cleanHandle)}</code>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_prof_title') {
+    updateClientData(client.id, c => { c.profile.title = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>পদবী / টাইটেল আপডেট হয়েছে!</b>\n\n💻 <b>${escapeHtml(trimmed)}</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_prof_location') {
+    updateClientData(client.id, c => { c.profile.location = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>লোকেশন আপডেট হয়েছে!</b>\n\n📍 <b>${escapeHtml(trimmed)}</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_prof_bio') {
+    updateClientData(client.id, c => { c.profile.bio = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>বায়ো বিবরণ আপডেট হয়েছে!</b>\n\n📝 <i>"${escapeHtml(trimmed)}"</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_prof_avatar') {
+    updateClientData(client.id, c => { c.profile.avatarUrl = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_prof_banner') {
+    updateClientData(client.id, c => { c.profile.bannerUrl = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const reply = `✅ <b>ব্যানার কভার ছবি সফলভাবে আপডেট হয়েছে!</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (state.step === 'client_badge_add_text') {
+    updateClientData(client.id, c => {
+      c.badges.push({ id: 'b_' + Date.now(), text: trimmed });
+    });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `✅ <b>নতুন ব্যাজ যুক্ত হয়েছে!</b>\n\n🏷️ <b>${escapeHtml(trimmed)}</b>\n<i>মোট ব্যাজ: ${updated.badges.length}টি</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientBadgesMenuKeyboard(updated) });
+    return reply;
+  }
+
+  // Client Service Wizard
+  if (state.step === 'client_srv_title') {
+    state.tempData = { ...state.tempData, title: trimmed };
+    state.step = 'client_srv_subtitle';
+    userStates[chatId] = state;
+    const msg = `🏷️ <b>ধাপ ২/৪: সাব-টাইটেল বা ক্যাটাগরি লিখুন:</b>\n<i>(যেমন: 'ফটো ও মেমোরিজ' বা 'টুলস')</i>`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  if (state.step === 'client_srv_subtitle') {
+    state.tempData = { ...state.tempData, subtitle: trimmed || 'ফটো ও মেমোরিজ' };
+    state.step = 'client_srv_image';
+    userStates[chatId] = state;
+    const msg = `🖼️ <b>ধাপ ৩/৪: সাভিসের ছবির লিংক বা সরাসরি ফটো সেন্ড করুন:</b>`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  if (state.step === 'client_srv_image') {
+    state.tempData = { ...state.tempData, imageUrl: trimmed };
+    state.step = 'client_srv_link';
+    userStates[chatId] = state;
+    const msg = `🔗 <b>ধাপ ৪/৪: ক্লিক লিংক (Target URL):</b>\n\nসাভিসটিতে ক্লিক করলে কোন লিংকে যাবে?`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  if (state.step === 'client_srv_link') {
+    const linkUrl = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+    const newSrv = {
+      id: 'cs_' + Date.now(),
+      title: state.tempData?.title || 'New Service',
+      subtitle: state.tempData?.subtitle || 'ফটো ও মেমোরিজ',
+      imageUrl: state.tempData?.imageUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10',
+      linkUrl,
+      createdAt: new Date().toISOString()
+    };
+    updateClientData(client.id, c => { c.services.push(newSrv); });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `🎉 <b>নতুন সাভিস সফলভাবে যুক্ত হয়েছে!</b>\n\n📌 <b>নাম:</b> ${escapeHtml(newSrv.title)}\n🏷️ <b>ক্যাটাগরি:</b> ${escapeHtml(newSrv.subtitle)}\n🔗 <b>লিংক:</b> ${escapeHtml(newSrv.linkUrl)}\n\n<i>আপনার ওয়েবসাইটে লাইভ যুক্ত হয়েছে! (মোট: ${updated.services.length}টি)</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientServicesMenuKeyboard(updated) });
+    return reply;
+  }
+
+  if (state.step === 'client_srv_edit_val') {
+    const serviceId = state.tempData?.serviceId;
+    const field = state.tempData?.field;
+    updateClientData(client.id, c => {
+      const s = c.services.find(item => item.id === serviceId);
+      if (s && field) {
+        if (field === 'linkUrl') s.linkUrl = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+        else if (field === 'title') s.title = trimmed;
+        else if (field === 'subtitle') s.subtitle = trimmed;
+        else if (field === 'imageUrl') s.imageUrl = trimmed;
+      }
+    });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `✅ <b>সাভিস তথ্য সফলভাবে আপডেট হয়েছে!</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientServicesMenuKeyboard(updated) });
+    return reply;
+  }
+
+  // Client Contact Fields
+  if (state.step === 'client_contact_wa') {
+    updateClientData(client.id, c => { c.contact.whatsappNumber = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `✅ <b>WhatsApp নম্বর আপডেট হয়েছে!</b>\n\n📱 <code>${escapeHtml(trimmed)}</code>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
+    return reply;
+  }
+
+  if (state.step === 'client_contact_wa_msg') {
+    updateClientData(client.id, c => { c.contact.whatsappMessage = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `✅ <b>WhatsApp বার্তা আপডেট হয়েছে!</b>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
+    return reply;
+  }
+
+  if (state.step === 'client_contact_email') {
+    updateClientData(client.id, c => { c.contact.email = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `✅ <b>ইমেইল আপডেট হয়েছে!</b>\n\n✉️ <code>${escapeHtml(trimmed)}</code>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
+    return reply;
+  }
+
+  if (state.step === 'client_contact_note') {
+    updateClientData(client.id, c => { c.contact.customNote = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const reply = `✅ <b>বার্তা/কোটেশন আপডেট হয়েছে!</b>\n\n📝 <i>"${escapeHtml(trimmed)}"</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
+    return reply;
+  }
+
+  // Fallback for client
+  const fallback = `❓ বুঝতে পারিনি। নিচের মেন্যু থেকে অপশন নির্বাচন করুন অথবা /menu লিখুন।`;
+  await sendTelegramMessage(chatId, fallback, { reply_markup: getClientMainMenuKeyboard(client) });
+  return fallback;
+}
+
 // Handle User Message Text
 async function handleUserMessage(chatId: string, text: string, senderName: string = 'User') {
   const trimmed = text.trim();
   const state = userStates[chatId] || { step: 'idle' };
+
+  const isAdmin = String(chatId).trim() === TELEGRAM_ADMIN_CHAT_ID;
+  const registeredClient = getClientByChatId(chatId);
+
+  // If user is neither admin nor a registered client
+  if (!isAdmin && !registeredClient) {
+    const unknownMsg = `👋 আসসালামু আলাইকুম <b>${escapeHtml(senderName)}</b>!\n\n`
+      + `এটি <b>বায়ো ডাটা ও সার্ভিস ম্যানেজার মাস্টার বট</b> 🤖\n\n`
+      + `✨ আপনি যদি আপনার নিজের নাম ও লোগো দিয়ে নিজস্ব প্রফেশনাল বায়ো ডাটা ওয়েবসাইট তৈরি করতে চান অথবা আপনার ওয়েবসাইটের বট এক্সেস নিতে চান, তবে সরাসরি অ্যাডমিনের সাথে যোগাযোগ করুন:\n\n`
+      + `👉 <b>টেলিগ্রাম ইনবক্স:</b> @djhakar007ff\n`
+      + `📱 <b>WhatsApp:</b> +8801778526313\n`
+      + `🌐 <b>অফিসিয়াল বায়ো সাইট:</b> https://androadappsdevelopershuvo.github.io/biodata.com`;
+    await sendTelegramMessage(chatId, unknownMsg, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '💬 টেলিগ্রামে অ্যাডমিনকে মেসেজ দিন', url: 'https://t.me/djhakar007ff' }],
+          [{ text: '📱 WhatsApp এ যোগাযোগ করুন', url: 'https://wa.me/8801778526313' }],
+          [{ text: '🌐 অফিসিয়াল বায়ো সাইট দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }]
+        ]
+      }
+    });
+    return unknownMsg;
+  }
+
+  // If registered client, route directly to client handler
+  if (!isAdmin && registeredClient) {
+    return await handleClientUserMessage(chatId, text, senderName, registeredClient);
+  }
+
+  // ==========================================
+  // MASTER ADMIN FLOWS (chat_id: 5440151107)
+  // ==========================================
+
+  // Admin Cancel Command
+  if (trimmed === '/cancel') {
+    userStates[chatId] = { step: 'idle' };
+    const cancelMsg = `🔙 <b>অপারেশন বাতিল করা হয়েছে!</b>\nমাস্টার অ্যাডমিন মেন্যুতে ফিরে যাওয়া হলো।`;
+    await sendTelegramMessage(chatId, cancelMsg, { reply_markup: getMainMenuKeyboard() });
+    return cancelMsg;
+  }
+
+  // Admin Add Client Command: /newclient or /addclient
+  if (trimmed === '/newclient' || trimmed === '/addclient') {
+    userStates[chatId] = { step: 'admin_wizard_chatid', tempData: {} };
+    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ১/৪): ক্লায়েন্টের Telegram Chat ID</b>\n\n`
+      + `ক্লাইন্টের টেলিগ্রাম চ্যাট আইডিটি লিখে পাঠান:\n`
+      + `<i>(ক্লাইন্ট টেলিগ্রামে @userinfobot এ স্টার্ট দিলে তার Chat ID পেয়ে যাবে, যেমন: <code>1234567890</code>)</i>\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  // Admin Clients List Command: /clients or /clientlist
+  if (trimmed === '/clients' || trimmed === '/clientlist') {
+    userStates[chatId] = { step: 'idle' };
+    const clients = getClients();
+    const msg = `📋 <b>নিবন্ধিত ক্লায়েন্ট তালিকা (${clients.length} জন):</b>\n\nযেকোনো ক্লায়েন্টের তথ্য দেখতে, ৩টি ফাইল ডাউনলোড করতে বা ডিলিট করতে নিচে নির্বাচন করুন:`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getAdminClientsListKeyboard() });
+    return msg;
+  }
+
+  // Admin Wizard Step 1: Client Chat ID
+  if (state.step === 'admin_wizard_chatid') {
+    const rawId = trimmed.replace(/[^0-9-]/g, '');
+    if (!rawId || rawId.length < 5) {
+      const err = `❌ অনুগ্রহ করে সঠিক টেলিগ্রাম Chat ID দিন (যেমন: <code>1234567890</code>)\nবাতিল করতে /cancel লিখুন।`;
+      await sendTelegramMessage(chatId, err);
+      return err;
+    }
+    const existing = getClientByChatId(rawId);
+    if (existing) {
+      const err = `⚠️ এই Chat ID (<code>${rawId}</code>) দিয়ে ইতিমধ্যে ক্লায়েন্ট <b>${escapeHtml(existing.appName)}</b> নিবন্ধিত আছে!\n\nঅন্য Chat ID দিন অথবা /cancel লিখুন।`;
+      await sendTelegramMessage(chatId, err);
+      return err;
+    }
+    state.tempData = { clientChatId: rawId };
+    state.step = 'admin_wizard_appname';
+    userStates[chatId] = state;
+    const msg = `🏷️ <b>ধাপ ২/৪: সাইট / অ্যাপের পূর্ণ নাম (App Full Name)</b>\n\n`
+      + `ক্লাইন্টের বায়ো সাইটের নাম কী হবে? লিখে পাঠান:\n`
+      + `<i>(যেমন: <code>Md Tamim - Bio Data</code> বা <code>শাকিব - অফিসিয়াল বায়ো</code>)</i>\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  // Admin Wizard Step 2: App Name
+  if (state.step === 'admin_wizard_appname') {
+    const appName = trimmed;
+    if (!appName || appName.length < 2) {
+      const err = `❌ অনুগ্রহ করে একটি নাম লিখুন (যেমন: <code>Md Tamim - Bio Data</code>)`;
+      await sendTelegramMessage(chatId, err);
+      return err;
+    }
+    state.tempData = { ...state.tempData, appName };
+    state.step = 'admin_wizard_shortname';
+    userStates[chatId] = state;
+    const msg = `📱 <b>ধাপ ৩/৪: PWA শর্ট নেম (Short Name for Home Screen)</b>\n\n`
+      + `মোবাইলের হোমস্ক্রিনে শর্টকাট আইকনের নিচে যে সংক্ষিপ্ত নাম দেখাবে তা লিখুন (১২ অক্ষরের মধ্যে):\n`
+      + `<i>(যেমন: <code>TAMIM BIO</code> বা <code>SHAKIB APP</code>)</i>\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  // Admin Wizard Step 3: Short Name
+  if (state.step === 'admin_wizard_shortname') {
+    const shortName = (trimmed || 'BIO DATA').substring(0, 15).toUpperCase();
+    state.tempData = { ...state.tempData, shortName };
+    state.step = 'admin_wizard_logo';
+    userStates[chatId] = state;
+    const msg = `🖼️ <b>ধাপ ৪/৪: PWA অ্যাপ লোগো (App Icon / Logo)</b>\n\n`
+      + `📷 ক্লাইন্টের পছন্দের লোগো বা ছবি সরাসরি এই চ্যাটে <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (Image URL)</b> লিখে পাঠান:\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  // Admin Wizard Step 4: Logo & Finish
+  if (state.step === 'admin_wizard_logo') {
+    const logoUrl = trimmed.startsWith('http')
+      ? trimmed
+      : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10';
+    
+    const newClient = createNewClient(
+      state.tempData?.clientChatId,
+      state.tempData?.appName || 'My Bio',
+      state.tempData?.shortName || 'BIO DATA',
+      logoUrl
+    );
+
+    const clients = getClients();
+    clients.push(newClient);
+    saveClients(clients);
+    await syncClientToFirebase(newClient);
+
+    userStates[chatId] = { step: 'idle' };
+    addLog('add', senderName, `নতুন ক্লায়েন্ট তৈরি: ${newClient.appName} (${newClient.chatId})`);
+
+    await sendTelegramMessage(
+      chatId,
+      `🎉 <b>অভিনন্দন! ক্লায়েন্ট সফলভাবে তৈরি এবং রেজিস্টার হয়েছে!</b> ✅\n\n`
+      + `• 👤 <b>ক্লায়েন্ট Chat ID:</b> <code>${newClient.chatId}</code>\n`
+      + `• 🏷️ <b>অ্যাপের নাম:</b> <b>${escapeHtml(newClient.appName)}</b>\n`
+      + `• 📱 <b>PWA শর্ট নেম:</b> <code>${escapeHtml(newClient.shortName)}</code>\n`
+      + `• 🆔 <b>ক্লায়েন্ট আইডি:</b> <code>${newClient.id}</code>\n\n`
+      + `📦 <b>এখন ক্লাইন্টের ৩টি কনফিগারেশন ফাইল তৈরি হচ্ছে এবং নিচে পাঠানো হচ্ছে...</b>`
+    );
+
+    await sendClientFilesToTelegram(chatId, newClient);
+    return 'Client created successfully';
+  }
 
   // Quick Command: /start or /help or /status
   if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
@@ -894,21 +1812,22 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     const badges = getBadges();
     const contact = getContactInfo();
     const fbCfg = getFirebaseConfig();
+    const clients = getClients();
 
     const fbStatus = fbCfg.url ? `🟢 যুক্ত আছে (<code>${escapeHtml(fbCfg.url)}</code>)` : '⚪ যুক্ত নেই';
 
-    const msg = `👋 আসসালামু আলাইকুম <b>${escapeHtml(profile.name)}</b>!\n\n`
-      + `আপনার অফিসিয়াল বায়ো ডাটা ওয়েবসাইটের <b>মাস্টার কন্ট্রোল বটে</b> স্বাগতম! 🚀\n\n`
-      + `📊 <b>বর্তমান সংরক্ষিত তথ্য:</b>\n`
-      + `• 👤 নাম: <b>${escapeHtml(profile.name)}</b> (<code>${escapeHtml(profile.handle)}</code>)\n`
+    const msg = `👑 আসসালামু আলাইকুম <b>${escapeHtml(profile.name)}</b>!\n\n`
+      + `আপনার বায়ো ডাটা এবং ক্লায়েন্ট রিসেলার <b>মাস্টার কন্ট্রোল প্যানেলে</b> স্বাগতম! 🚀\n\n`
+      + `📊 <b>বর্তমান লাইভ পরিসংখ্যান:</b>\n`
+      + `• 👥 মোট ক্লায়েন্ট: <b>${clients.length}</b> জন\n`
+      + `• 👤 আপনার নাম: <b>${escapeHtml(profile.name)}</b> (<code>${escapeHtml(profile.handle)}</code>)\n`
       + `• 💻 পদবী: ${escapeHtml(profile.title)}\n`
-      + `• 🏷️ ব্যাজ: <b>${badges.length}</b> টি সক্রিয়\n`
+      + `• 🛠️ আপনার নিজস্ব সাভিস: <b>${services.length}</b> টি লাইভ\n`
       + `• 🌐 সোশ্যাল লিংক: <b>${social.length}</b> টি সক্রিয়\n`
-      + `• 🛠️ মোট সাভিস: <b>${services.length}</b> টি লাইভ\n`
+      + `• 🏷️ ব্যাজ: <b>${badges.length}</b> টি\n`
       + `• 📱 WhatsApp: <code>${escapeHtml(contact.whatsappNumber)}</code>\n`
-      + `• ✉️ Email: <code>${escapeHtml(contact.email)}</code>\n`
       + `• 🔥 Firebase Realtime DB: ${fbStatus}\n\n`
-      + `👇 <b>কী পরিবর্তন করতে চান নির্বাচন করুন:</b>`;
+      + `👇 <b>কী করতে চান নির্বাচন করুন:</b>`;
     await sendTelegramMessage(chatId, msg, { reply_markup: getMainMenuKeyboard() });
     return msg;
   }
@@ -1801,10 +2720,482 @@ async function sendFullSummary(chatId: string) {
 // Handle Callback Queries (Inline button clicks)
 async function handleCallbackQuery(cb: any) {
   const chatId = String(cb.message.chat.id);
-  const data = cb.data;
+  const data = String(cb.data);
   const cbId = cb.id;
 
   await answerCallbackQuery(cbId);
+
+  // ==========================================
+  // ADMIN RESELLER CALLBACKS
+  // ==========================================
+
+  if (data === 'admin_menu_clients') {
+    userStates[chatId] = { step: 'idle' };
+    const clients = getClients();
+    const msg = `📋 <b>নিবন্ধিত ক্লায়েন্ট তালিকা (${clients.length} জন):</b>\n\nযেকোনো ক্লায়েন্টের তথ্য দেখতে, ৩টি ফাইল ডাউনলোড করতে বা ডিলিট করতে নিচে নির্বাচন করুন:`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getAdminClientsListKeyboard() });
+    return;
+  }
+
+  if (data === 'admin_btn_add_client') {
+    userStates[chatId] = { step: 'admin_wizard_chatid', tempData: {} };
+    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ১/৪): ক্লায়েন্টের Telegram Chat ID</b>\n\n`
+      + `ক্লাইন্টের টেলিগ্রাম চ্যাট আইডিটি লিখে পাঠান:\n`
+      + `<i>(ক্লাইন্ট টেলিগ্রামে @userinfobot এ স্টার্ট দিলে তার Chat ID পেয়ে যাবে, যেমন: <code>1234567890</code>)</i>\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন`;
+    await sendTelegramMessage(chatId, msg);
+    return;
+  }
+
+  if (data.startsWith('admin_view_client:')) {
+    const clientId = data.replace('admin_view_client:', '');
+    const client = getClientById(clientId);
+    if (!client) {
+      await sendTelegramMessage(chatId, `❌ ক্লায়েন্ট খুঁজে পাওয়া যায়নি!`, { reply_markup: getAdminClientsListKeyboard() });
+      return;
+    }
+
+    const text = `👤 <b>ক্লায়েন্ট প্রোফাইল ও কন্ট্রোল:</b>\n\n`
+      + `• 🏷️ <b>অ্যাপের নাম:</b> <b>${escapeHtml(client.appName)}</b>\n`
+      + `• 📱 <b>PWA শর্ট নেম:</b> <code>${escapeHtml(client.shortName)}</code>\n`
+      + `• 🆔 <b>ক্লায়েন্ট আইডি:</b> <code>${client.id}</code>\n`
+      + `• 💬 <b>Telegram Chat ID:</b> <code>${client.chatId}</code>\n`
+      + `• 👤 <b>প্রোফাইল নাম:</b> ${escapeHtml(client.profile.name)}\n`
+      + `• 🛠️ <b>সাভিস সংখ্যা:</b> ${client.services.length}টি লাইভ\n`
+      + `• 🌐 <b>সোশ্যাল লিংক:</b> ${client.socialLinks.length}টি\n`
+      + `• 📱 <b>WhatsApp:</b> <code>${escapeHtml(client.contact.whatsappNumber)}</code>\n`
+      + `• 📅 <b>তৈরি:</b> ${new Date(client.createdAt).toLocaleDateString('bn-BD')}\n\n`
+      + `<i>নিচের বাটন চেপে ৩টি ফাইল ডাউনলোড করুন অথবা ক্লায়েন্ট মুছুন:</i>`;
+
+    await sendTelegramMessage(chatId, text, { reply_markup: getAdminSingleClientKeyboard(client.id) });
+    return;
+  }
+
+  if (data.startsWith('admin_dl_client:')) {
+    const clientId = data.replace('admin_dl_client:', '');
+    const client = getClientById(clientId);
+    if (!client) {
+      await sendTelegramMessage(chatId, `❌ ক্লায়েন্ট খুঁজে পাওয়া যায়নি!`);
+      return;
+    }
+    await sendClientFilesToTelegram(chatId, client);
+    return;
+  }
+
+  if (data.startsWith('admin_del_client:')) {
+    const clientId = data.replace('admin_del_client:', '');
+    const client = getClientById(clientId);
+    if (client) {
+      deleteClient(clientId);
+      addLog('delete', 'Master Admin', `ক্লায়েন্ট মুছে ফেলা হয়েছে: ${client.appName} (${client.chatId})`);
+      await sendTelegramMessage(chatId, `🗑️ <b>'${escapeHtml(client.appName)}' (${client.chatId}) ক্লায়েন্টটি সফলভাবে মুছে ফেলা হয়েছে!</b>`, {
+        reply_markup: getAdminClientsListKeyboard()
+      });
+    }
+    return;
+  }
+
+  // ==========================================
+  // CLIENT INTERACTIVE CALLBACKS (cl_*)
+  // ==========================================
+
+  if (data.startsWith('cl_menu:')) {
+    const clientId = data.replace('cl_menu:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    userStates[chatId] = { step: 'idle' };
+    await sendTelegramMessage(chatId, `🏠 <b>কন্ট্রোল প্যানেল মেন্যু:</b>\nকোন বিভাগটি পরিবর্তন করতে চান নির্বাচন করুন:`, {
+      reply_markup: getClientMainMenuKeyboard(client)
+    });
+    return;
+  }
+
+  if (data.startsWith('cl_prof:')) {
+    const clientId = data.replace('cl_prof:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    userStates[chatId] = { step: 'idle' };
+    const p = client.profile;
+    const text = `👤 <b>আপনার প্রোফাইল তথ্য:</b>\n\n`
+      + `• ⚡ <b>নাম:</b> <b>${escapeHtml(p.name)}</b>\n`
+      + `• 🔗 <b>হ্যান্ডেল:</b> <code>${escapeHtml(p.handle)}</code>\n`
+      + `• 💻 <b>পদবী:</b> ${escapeHtml(p.title)}\n`
+      + `• 📍 <b>লোকেশন:</b> ${escapeHtml(p.location)}\n`
+      + `• 📝 <b>বায়ো:</b> <i>"${escapeHtml(p.bio)}"</i>\n`
+      + `• 👤 <b>ছবি:</b> <a href="${escapeHtml(p.avatarUrl)}">দেখুন</a>\n`
+      + `• 🏞️ <b>ব্যানার:</b> <a href="${escapeHtml(p.bannerUrl)}">দেখুন</a>\n\n`
+      + `<i>কোনটি পরিবর্তন করতে চান নির্বাচন করুন:</i>`;
+    await sendTelegramMessage(chatId, text, { reply_markup: getClientProfileMenuKeyboard(client) });
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_name:')) {
+    const clientId = data.replace('cl_prof_edit_name:', '');
+    userStates[chatId] = { step: 'client_prof_name', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `⚡ <b>নতুন নাম লিখে পাঠান:</b>\n\n<i>(ওয়েবসাইটে সাথে সাথে নাম পরিবর্তন হবে)</i>`);
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_handle:')) {
+    const clientId = data.replace('cl_prof_edit_handle:', '');
+    userStates[chatId] = { step: 'client_prof_handle', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `🔗 <b>নতুন ইউজারনেম / হ্যান্ডেল লিখে পাঠান:</b>\n<i>(যেমন: @my_name)</i>`);
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_title:')) {
+    const clientId = data.replace('cl_prof_edit_title:', '');
+    userStates[chatId] = { step: 'client_prof_title', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `💻 <b>নতুন পদবী / পেশাগত টাইটেল লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_loc:')) {
+    const clientId = data.replace('cl_prof_edit_loc:', '');
+    userStates[chatId] = { step: 'client_prof_location', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `📍 <b>নতুন লোকেশন লিখে পাঠান:</b>\n<i>(যেমন: Dhaka, Bangladesh)</i>`);
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_bio:')) {
+    const clientId = data.replace('cl_prof_edit_bio:', '');
+    userStates[chatId] = { step: 'client_prof_bio', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `📝 <b>নতুন বায়ো বিবরণ লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_avatar:')) {
+    const clientId = data.replace('cl_prof_edit_avatar:', '');
+    userStates[chatId] = { step: 'client_prof_avatar', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `🖼️ <b>প্রোফাইল ছবি পরিবর্তন</b>\n\n📷 আপনার পছন্দের ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
+    return;
+  }
+
+  if (data.startsWith('cl_prof_edit_banner:')) {
+    const clientId = data.replace('cl_prof_edit_banner:', '');
+    userStates[chatId] = { step: 'client_prof_banner', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `🏞️ <b>ব্যানার ছবি পরিবর্তন</b>\n\n📷 আপনার ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
+    return;
+  }
+
+  // Client Badges
+  if (data.startsWith('cl_badges:')) {
+    const clientId = data.replace('cl_badges:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    userStates[chatId] = { step: 'idle' };
+    let msg = `🏷️ <b>আপনার ব্যাজ সমূহ (${client.badges.length}টি):</b>\n\n`;
+    client.badges.forEach((b, i) => {
+      msg += `• <b>${i + 1}.</b> ${escapeHtml(b.text)}\n`;
+    });
+    msg += `\n<i>নতুন ব্যাজ যোগ করতে বা মুছতে নিচের অপশন ব্যবহার করুন:</i>`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getClientBadgesMenuKeyboard(client) });
+    return;
+  }
+
+  if (data.startsWith('cl_badge_add:')) {
+    const clientId = data.replace('cl_badge_add:', '');
+    userStates[chatId] = { step: 'client_badge_add_text', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `➕ <b>নতুন ব্যাজ যোগ করুন:</b>\n\nব্যাজের লেখা লিখে পাঠান (যেমন: "⚡ Pro Gamer"):`);
+    return;
+  }
+
+  if (data.startsWith('cl_badge_manage:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const badgeId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    const badge = client.badges.find(b => b.id === badgeId);
+    if (!badge) return;
+
+    await sendTelegramMessage(
+      chatId,
+      `🏷️ <b>ব্যাজ:</b> <b>${escapeHtml(badge.text)}</b>\n\nমুছে ফেলতে নিচে চাপুন:`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '🗑️ ব্যাজটি মুছুন', callback_data: `cl_badge_del:${clientId}:${badge.id}` }],
+            [{ text: '🔙 ব্যাজ তালিকা', callback_data: `cl_badges:${clientId}` }]
+          ]
+        }
+      }
+    );
+    return;
+  }
+
+  if (data.startsWith('cl_badge_del:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const badgeId = parts[2];
+    updateClientData(clientId, c => {
+      c.badges = c.badges.filter(b => b.id !== badgeId);
+    });
+    const updated = getClientById(clientId);
+    if (updated) {
+      await sendTelegramMessage(chatId, `🗑️ <b>ব্যাজটি সফলভাবে মুছে ফেলা হয়েছে!</b>`, {
+        reply_markup: getClientBadgesMenuKeyboard(updated)
+      });
+    }
+    return;
+  }
+
+  // Client Services
+  if (data.startsWith('cl_services:')) {
+    const clientId = data.replace('cl_services:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    userStates[chatId] = { step: 'idle' };
+    await sendTelegramMessage(
+      chatId,
+      `🛠️ <b>সাভিস ও টুলস ম্যানেজমেন্ট:</b>\nমোট সাভিস: <b>${client.services.length}</b>টি\n\nএকটি অপশন নির্বাচন করুন:`,
+      { reply_markup: getClientServicesMenuKeyboard(client) }
+    );
+    return;
+  }
+
+  if (data.startsWith('cl_srv_list:')) {
+    const clientId = data.replace('cl_srv_list:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    let text = `📋 <b>আপনার মোট ${client.services.length}টি সাভিসের তালিকা:</b>\n\n`;
+    client.services.forEach((s, idx) => {
+      text += `<b>${idx + 1}.</b> <a href="${escapeHtml(s.linkUrl)}">${escapeHtml(s.title)}</a>\n🏷️ <i>${escapeHtml(s.subtitle)}</i>\n\n`;
+    });
+    await sendTelegramMessage(chatId, text, { reply_markup: getClientServicesMenuKeyboard(client) });
+    return;
+  }
+
+  if (data.startsWith('cl_srv_add:')) {
+    const clientId = data.replace('cl_srv_add:', '');
+    userStates[chatId] = { step: 'client_srv_title', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `➕ <b>নতুন সাভিস যোগ (ধাপ ১/৪)</b>\n\n📌 সাভিসের নাম (Title) লিখে পাঠান:`);
+    return;
+  }
+
+  if (data.startsWith('cl_srv_edit_menu:')) {
+    const clientId = data.replace('cl_srv_edit_menu:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    const buttons = client.services.slice(0, 50).map((s, idx) => [
+      { text: `${idx + 1}. ✏️ ${s.title.substring(0, 24)}`, callback_data: `cl_srv_edit_item:${client.id}:${s.id}` }
+    ]);
+    buttons.push([{ text: '🔙 সাভিস মেন্যু', callback_data: `cl_services:${client.id}` }]);
+    await sendTelegramMessage(chatId, `✏️ <b>কোন সাভিসটি এডিট করবেন নির্বাচন করুন:</b>`, {
+      reply_markup: { inline_keyboard: buttons }
+    });
+    return;
+  }
+
+  if (data.startsWith('cl_srv_edit_item:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const serviceId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    const s = client.services.find(item => item.id === serviceId);
+    if (!s) return;
+
+    await sendTelegramMessage(
+      chatId,
+      `✏️ <b>সাভিস:</b> <b>${escapeHtml(s.title)}</b>\n\nকোন তথ্যটি পরিবর্তন করতে চান?`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: '📌 নাম পরিবর্তন', callback_data: `cl_srv_fld:${clientId}:${s.id}:title` },
+              { text: '🔗 লিংক পরিবর্তন', callback_data: `cl_srv_fld:${clientId}:${s.id}:linkUrl` }
+            ],
+            [
+              { text: '🖼️ ছবি পরিবর্তন', callback_data: `cl_srv_fld:${clientId}:${s.id}:imageUrl` },
+              { text: '🏷️ সাবটাইটেল পরিবর্তন', callback_data: `cl_srv_fld:${clientId}:${s.id}:subtitle` }
+            ],
+            [{ text: '🔙 সাভিস তালিকা', callback_data: `cl_srv_edit_menu:${clientId}` }]
+          ]
+        }
+      }
+    );
+    return;
+  }
+
+  if (data.startsWith('cl_srv_fld:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const serviceId = parts[2];
+    const field = parts[3];
+    userStates[chatId] = { step: 'client_srv_edit_val', tempData: { clientId, serviceId, field } };
+    await sendTelegramMessage(chatId, `✍️ নতুন মান লিখে পাঠান:`);
+    return;
+  }
+
+  if (data.startsWith('cl_srv_del_menu:')) {
+    const clientId = data.replace('cl_srv_del_menu:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    const buttons = client.services.slice(0, 50).map((s, idx) => [
+      { text: `${idx + 1}. 🗑️ ${s.title.substring(0, 24)}`, callback_data: `cl_srv_del:${client.id}:${s.id}` }
+    ]);
+    buttons.push([{ text: '🔙 সাভিস মেন্যু', callback_data: `cl_services:${client.id}` }]);
+    await sendTelegramMessage(chatId, `🗑️ <b>কোন সাভিসটি ডিলিট করতে চান নির্বাচন করুন:</b>`, {
+      reply_markup: { inline_keyboard: buttons }
+    });
+    return;
+  }
+
+  if (data.startsWith('cl_srv_del:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const serviceId = parts[2];
+    updateClientData(clientId, c => {
+      c.services = c.services.filter(s => s.id !== serviceId);
+    });
+    const updated = getClientById(clientId);
+    if (updated) {
+      await sendTelegramMessage(chatId, `🗑️ <b>সাভিসটি মুছে ফেলা হয়েছে!</b>`, {
+        reply_markup: getClientServicesMenuKeyboard(updated)
+      });
+    }
+    return;
+  }
+
+  // Client Social
+  if (data.startsWith('cl_social:')) {
+    const clientId = data.replace('cl_social:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    userStates[chatId] = { step: 'idle' };
+    await sendTelegramMessage(
+      chatId,
+      `🌐 <b>সোশ্যাল মিডিয়া প্রোফাইল ও লিংকসমূহ:</b>\nযে অ্যাকাউন্টটি পরিবর্তন করতে চান নির্বাচন করুন:`,
+      { reply_markup: getClientSocialMenuKeyboard(client) }
+    );
+    return;
+  }
+
+  if (data.startsWith('cl_soc_manage:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    const link = client.socialLinks.find(l => l.id === linkId);
+    if (!link) return;
+
+    const st = link.enabled !== false ? '🟢 সক্রিয়' : '⚪ লুকানো';
+    const text = `🌐 <b>সোশ্যাল অ্যাকাউন্ট:</b> <b>${escapeHtml(link.title)}</b>\n\n`
+      + `• 🔗 <b>লিংক:</b> ${escapeHtml(link.url)}\n`
+      + `• 🔘 <b>বাটন টেক্সট:</b> [${escapeHtml(link.buttonText)}]\n`
+      + `• 👁️ <b>অবস্থা:</b> ${st}\n\n`
+      + `<i>কী করতে চান নির্বাচন করুন:</i>`;
+
+    await sendTelegramMessage(chatId, text, {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: '🔗 লিংক পরিবর্তন', callback_data: `cl_soc_edit_url:${clientId}:${link.id}` },
+            { text: '🔘 বাটন টেক্সট', callback_data: `cl_soc_edit_btn:${clientId}:${link.id}` }
+          ],
+          [
+            { text: link.enabled !== false ? '👁️ হাইড করুন' : '🟢 অন করুন', callback_data: `cl_soc_toggle:${clientId}:${link.id}` },
+            { text: '🗑️ মুছে ফেলুন', callback_data: `cl_soc_del:${clientId}:${link.id}` }
+          ],
+          [{ text: '🔙 সোশ্যাল মেন্যু', callback_data: `cl_social:${clientId}` }]
+        ]
+      }
+    });
+    return;
+  }
+
+  if (data.startsWith('cl_soc_toggle:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    updateClientData(clientId, c => {
+      const l = c.socialLinks.find(item => item.id === linkId);
+      if (l) l.enabled = l.enabled === false ? true : false;
+    });
+    const updated = getClientById(clientId);
+    if (updated) {
+      await sendTelegramMessage(chatId, `✅ <b>সোশ্যাল লিংকের অবস্থা পরিবর্তন সম্পন্ন!</b>`, {
+        reply_markup: getClientSocialMenuKeyboard(updated)
+      });
+    }
+    return;
+  }
+
+  if (data.startsWith('cl_soc_del:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    updateClientData(clientId, c => {
+      c.socialLinks = c.socialLinks.filter(l => l.id !== linkId);
+    });
+    const updated = getClientById(clientId);
+    if (updated) {
+      await sendTelegramMessage(chatId, `🗑️ <b>সোশ্যাল লিংক মুছে ফেলা হয়েছে!</b>`, {
+        reply_markup: getClientSocialMenuKeyboard(updated)
+      });
+    }
+    return;
+  }
+
+  // Client Contact
+  if (data.startsWith('cl_contact:')) {
+    const clientId = data.replace('cl_contact:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    userStates[chatId] = { step: 'idle' };
+    const c = client.contact;
+    const msg = `📞 <b>সরাসরি যোগাযোগ সেটিংস:</b>\n\n`
+      + `📱 <b>WhatsApp নম্বর:</b> <code>${escapeHtml(c.whatsappNumber)}</code>\n`
+      + `💬 <b>WhatsApp বার্তা:</b> <code>${escapeHtml(c.whatsappMessage)}</code>\n`
+      + `✉️ <b>ইমেইল:</b> <code>${escapeHtml(c.email)}</code>\n`
+      + `📝 <b>কোট/বার্তা:</b> <i>"${escapeHtml(c.customNote)}"</i>\n\n`
+      + `<i>কোনটি পরিবর্তন করবেন নির্বাচন করুন:</i>`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getClientContactMenuKeyboard(client) });
+    return;
+  }
+
+  if (data.startsWith('cl_contact_edit_wa:')) {
+    const clientId = data.replace('cl_contact_edit_wa:', '');
+    userStates[chatId] = { step: 'client_contact_wa', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `📱 <b>নতুন WhatsApp নম্বর দিন:</b>\n<i>(যেমন: +8801700000000)</i>`);
+    return;
+  }
+
+  if (data.startsWith('cl_contact_edit_wa_msg:')) {
+    const clientId = data.replace('cl_contact_edit_wa_msg:', '');
+    userStates[chatId] = { step: 'client_contact_wa_msg', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `💬 <b>হোয়াটসঅ্যাপে স্বয়ংক্রিয় টাইপ বার্তাটি লিখুন:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_contact_edit_email:')) {
+    const clientId = data.replace('cl_contact_edit_email:', '');
+    userStates[chatId] = { step: 'client_contact_email', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `✉️ <b>নতুন ইমেইল ঠিকানা লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_contact_edit_note:')) {
+    const clientId = data.replace('cl_contact_edit_note:', '');
+    userStates[chatId] = { step: 'client_contact_note', tempData: { clientId } };
+    await sendTelegramMessage(chatId, `📝 <b>যোগাযোগ বক্সের নিচে দেখানো বার্তাটি লিখুন:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_preview:')) {
+    const clientId = data.replace('cl_preview:', '');
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (client) {
+      await sendClientFullSummary(chatId, client);
+    }
+    return;
+  }
+
+  // ==========================================
+  // MASTER ADMIN ORIGINAL CALLBACKS
+  // ==========================================
 
   // Main Menus
   if (data === 'cmd_menu') {
@@ -2311,7 +3702,16 @@ async function startTelegramPolling() {
               // Photo support
               if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
                 const state = userStates[chatId];
-                if (state && (state.step === 'add_image' || state.step === 'edit_service_val' || state.step === 'prof_edit_avatar' || state.step === 'prof_edit_banner')) {
+                if (state && (
+                  state.step === 'add_image' ||
+                  state.step === 'edit_service_val' ||
+                  state.step === 'prof_edit_avatar' ||
+                  state.step === 'prof_edit_banner' ||
+                  state.step === 'admin_wizard_logo' ||
+                  state.step === 'client_srv_image' ||
+                  state.step === 'client_prof_avatar' ||
+                  state.step === 'client_prof_banner'
+                )) {
                   const bestPhoto = msg.photo[msg.photo.length - 1];
                   const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
                   if (fileInfo.ok && fileInfo.result?.file_path) {

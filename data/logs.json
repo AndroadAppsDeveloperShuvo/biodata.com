@@ -1,5 +1,19 @@
 [
   {
+    "id": "log_1793025522292_015o",
+    "timestamp": "2026-10-26T14:38:42.292Z",
+    "action": "add",
+    "user": "Admin (Simulated)",
+    "text": "নতুন ক্লায়েন্ট তৈরি: Md Tamim - Bio Data (987654321)"
+  },
+  {
+    "id": "log_1793025475730_l4nt",
+    "timestamp": "2026-10-26T14:37:55.730Z",
+    "action": "start",
+    "user": "Admin (Simulated)",
+    "text": "/start কমান্ড রান করা হয়েছে"
+  },
+  {
     "id": "log_1793006434364_rvp0",
     "timestamp": "2026-10-26T09:20:34.364Z",
     "action": "add",
