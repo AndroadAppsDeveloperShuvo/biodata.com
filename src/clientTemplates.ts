@@ -40,6 +40,7 @@ export interface ClientRecord {
     telegramUsername: string;
     customNote: string;
   };
+  layoutStyle?: 'social_first' | 'services_first';
 }
 
 function escapeHtml(text: string): string {
@@ -161,6 +162,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     services: client.services,
     socialLinks: client.socialLinks,
     contact: client.contact,
+    layoutStyle: client.layoutStyle || 'social_first',
     updatedAt: client.createdAt
   });
 
@@ -289,28 +291,57 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       </div>
     </div>
 
-    <!-- Section 1: Services Grid (১২টি বা সকল সাভিস) -->
-    <div class="px-5 mb-6">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-          <h2 class="text-sm font-bold uppercase tracking-wider text-white">সাভিস ও টুলস সমূহ</h2>
+    <!-- Reorderable Sections Container -->
+    <div id="contentSections" class="flex flex-col">
+      ${client.layoutStyle === 'services_first' ? `
+      <!-- Section: Services Grid -->
+      <div id="sectionServices" class="px-5 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সাভিস ও টুলস সমূহ</h2>
+          </div>
+          <span id="servicesCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-cyan-400 font-bold">লাইভ</span>
         </div>
-        <span id="servicesCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-cyan-400 font-bold">লাইভ</span>
+        <div id="servicesGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
       </div>
-      <div id="servicesGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
-    </div>
 
-    <!-- Section 2: Social Links List -->
-    <div class="px-5 mb-6">
-      <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-          <h2 class="text-sm font-bold uppercase tracking-wider text-white">সোশ্যাল মিডিয়া প্রোফাইল</h2>
+      <!-- Section: Social Links List -->
+      <div id="sectionSocial" class="px-5 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সোশ্যাল মিডিয়া প্রোফাইল</h2>
+          </div>
+          <span class="text-[10px] text-zinc-500 font-mono">Connect</span>
         </div>
-        <span class="text-[10px] text-zinc-500 font-mono">Connect</span>
+        <div id="socialLinksContainer" class="flex flex-col gap-2.5"></div>
       </div>
-      <div id="socialLinksContainer" class="flex flex-col gap-2.5"></div>
+      ` : `
+      <!-- Section: Social Links List -->
+      <div id="sectionSocial" class="px-5 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সোশ্যাল মিডিয়া প্রোফাইল</h2>
+          </div>
+          <span class="text-[10px] text-zinc-500 font-mono">Connect</span>
+        </div>
+        <div id="socialLinksContainer" class="flex flex-col gap-2.5"></div>
+      </div>
+
+      <!-- Section: Services Grid -->
+      <div id="sectionServices" class="px-5 mb-6">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সাভিস ও টুলস সমূহ</h2>
+          </div>
+          <span id="servicesCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-cyan-400 font-bold">লাইভ</span>
+        </div>
+        <div id="servicesGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+      </div>
+      `}
     </div>
 
     <!-- Section 3: Direct Contact Box -->
@@ -531,13 +562,31 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       box.innerHTML = html;
     }
 
+    function applyLayoutStyle(style) {
+      var container = document.getElementById('contentSections');
+      var srv = document.getElementById('sectionServices');
+      var soc = document.getElementById('sectionSocial');
+      if (!container || !srv || !soc) return;
+      if (style === 'services_first') {
+        if (container.firstElementChild !== srv) {
+          container.insertBefore(srv, soc);
+        }
+      } else {
+        if (container.firstElementChild !== soc) {
+          container.insertBefore(soc, srv);
+        }
+      }
+    }
+
     var lastUpdatedSig = '';
     function applyAllData(data, shouldToast) {
       if (!data || typeof data !== 'object') return;
-      var sig = (data.updatedAt || '') + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
+      var currentLayout = data.layoutStyle || 'social_first';
+      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
       if (sig === lastUpdatedSig) return;
       lastUpdatedSig = sig;
 
+      applyLayoutStyle(currentLayout);
       if (data.profile) renderProfile(data.profile);
       if (data.badges) renderBadges(data.badges);
       if (data.services) renderServices(data.services);
