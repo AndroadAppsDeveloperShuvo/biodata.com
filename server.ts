@@ -268,15 +268,7 @@ const DEFAULT_PROFILE: ProfileInfo = {
   bannerUrl: "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg"
 };
 
-const DEFAULT_BADGES: BadgeItem[] = [
-  { id: "b1", text: "⚡ Pro Gamer" },
-  { id: "b2", text: "🔥 Shuvo Official" },
-  { id: "b3", text: "💻 Developer" },
-  { id: "b4", text: "🎧 Music Lover" },
-  { id: "b5", text: "🇧🇩 Bangladesh" },
-  { id: "b6", text: "💥 Free Fire Lover" },
-  { id: "b7", text: "👨‍💻 Professional Web & Apps Developer" }
-];
+const DEFAULT_BADGES: BadgeItem[] = [];
 
 const FIREBASE_DEFAULT_URL = 'https://biodata-fd087-default-rtdb.asia-southeast1.firebasedatabase.app';
 
@@ -329,6 +321,44 @@ function saveFirebaseConfig(url: string) {
   }
 }
 
+// Pull latest saved data from Firebase on server startup so bot changes are never lost across restarts
+async function pullFromFirebase() {
+  const cfg = getFirebaseConfig();
+  if (!cfg.url || !cfg.url.startsWith('http')) return;
+  const baseUrl = cfg.url.replace(/\/+$/, '');
+  try {
+    console.log('🔄 Checking Firebase for persistent user data...');
+    const res = await fetch(`${baseUrl}/bio.json`);
+    if (res.ok) {
+      const fbData = await res.json();
+      if (fbData && typeof fbData === 'object' && Object.keys(fbData).length > 0) {
+        if (fbData.profile) {
+          fs.writeFileSync(PROFILE_FILE, JSON.stringify(fbData.profile, null, 2), 'utf-8');
+        }
+        if (Array.isArray(fbData.badges)) {
+          fs.writeFileSync(BADGES_FILE, JSON.stringify(fbData.badges, null, 2), 'utf-8');
+        }
+        if (Array.isArray(fbData.services)) {
+          fs.writeFileSync(SERVICES_FILE, JSON.stringify(fbData.services, null, 2), 'utf-8');
+        }
+        if (Array.isArray(fbData.socialLinks)) {
+          fs.writeFileSync(SOCIAL_FILE, JSON.stringify(fbData.socialLinks, null, 2), 'utf-8');
+        }
+        if (fbData.contact) {
+          fs.writeFileSync(CONTACT_FILE, JSON.stringify(fbData.contact, null, 2), 'utf-8');
+        }
+        console.log('✅ Successfully pulled and restored persistent user data from Firebase!');
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('⚠️ Could not pull from Firebase on startup:', err);
+  }
+}
+
+// Execute pull on startup immediately
+pullFromFirebase();
+
 async function syncToFirebase() {
   const cfg = getFirebaseConfig();
   if (!cfg.url || !cfg.url.startsWith('http')) return;
@@ -356,11 +386,6 @@ async function syncToFirebase() {
     console.error('Firebase sync error:', err);
   }
 }
-
-// Initial Firebase sync on startup
-setTimeout(() => {
-  syncToFirebase();
-}, 2000);
 
 // Read / Write Helpers
 function getServices(): HighlightService[] {
@@ -523,6 +548,11 @@ app.get('/api/events', (req, res) => {
 });
 
 // REST API for all Bio data
+app.post('/api/sync', async (req, res) => {
+  await syncToFirebase();
+  res.json({ success: true, message: 'Synced to Firebase' });
+});
+
 app.get('/api/data', (req, res) => {
   res.json({
     success: true,

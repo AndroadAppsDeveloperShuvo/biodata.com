@@ -43,6 +43,8 @@ export const SocialLinks: React.FC<Props> = ({ links }) => {
     }
   };
 
+  if (!links || links.length === 0) return null;
+
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between px-1">

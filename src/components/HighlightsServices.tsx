@@ -13,6 +13,8 @@ const toBengaliNumber = (num: number): string => {
 };
 
 export const HighlightsServices: React.FC<Props> = ({ services }) => {
+  if (!services || services.length === 0) return null;
+
   return (
     <div className="space-y-2">
       {/* Clean original section header */}

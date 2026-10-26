@@ -3,11 +3,11 @@ import { Mail, MessageCircle } from 'lucide-react';
 import { ContactInfo } from '../types/bio';
 
 interface Props {
-  contact: ContactInfo;
+  contact: ContactInfo | null;
 }
 
 export const DirectContact: React.FC<Props> = ({ contact }) => {
-  if (!contact.enabled) return null;
+  if (!contact || !contact.enabled) return null;
 
   return (
     <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 space-y-3 shadow-lg">

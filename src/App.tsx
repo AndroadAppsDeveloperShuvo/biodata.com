@@ -3,28 +3,59 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BioHeader } from './components/BioHeader';
 import { SocialLinks } from './components/SocialLinks';
 import { HighlightsServices } from './components/HighlightsServices';
 import { DirectContact } from './components/DirectContact';
 import { ShareAndFooter } from './components/ShareAndFooter';
-import {
-  INITIAL_SERVICES,
-  PROFILE_INFO,
-  BADGES,
-  SOCIAL_LINKS,
-  CONTACT_INFO
-} from './data/defaultServices';
-import { HighlightService, SocialLink, ContactInfo } from './types/bio';
+import { HighlightService, SocialLink, ContactInfo, PersonalInfo, Badge } from './types/bio';
+
+const CACHE_KEY = 'shuvo_bio_live_cache_v2';
+const FIREBASE_FALLBACK_URL = 'https://biodata-fd087-default-rtdb.asia-southeast1.firebasedatabase.app/bio.json';
+
+interface CachedBioData {
+  profile?: PersonalInfo | null;
+  badges?: Badge[];
+  services?: HighlightService[];
+  socialLinks?: SocialLink[];
+  contact?: ContactInfo | null;
+}
+
+function getLocalCache(): CachedBioData | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {
+    console.warn('Error reading bio cache:', e);
+  }
+  return null;
+}
+
+function setLocalCache(data: Partial<CachedBioData>) {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = getLocalCache() || {};
+    const updated = { ...current, ...data };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+  } catch (e) {
+    console.warn('Error writing bio cache:', e);
+  }
+}
 
 export default function App() {
-  const [services, setServices] = useState<HighlightService[]>(INITIAL_SERVICES);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(SOCIAL_LINKS);
-  const [contact, setContact] = useState<ContactInfo>(CONTACT_INFO);
+  const initialCache = getLocalCache();
+
+  // All state is purely driven by Bot / Database (no hardcoded defaults)
+  const [profile, setProfile] = useState<PersonalInfo | null>(initialCache?.profile || null);
+  const [badges, setBadges] = useState<Badge[]>(initialCache?.badges || []);
+  const [services, setServices] = useState<HighlightService[]>(initialCache?.services || []);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
+  const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
+  const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
-  // Show Toast feedback
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => {
@@ -32,7 +63,6 @@ export default function App() {
     }, 2500);
   };
 
-  // Base URL for API calls: when deployed on GitHub Pages, points to the live server
   const getApiBase = () => {
     if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
       return 'https://ais-pre-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app';
@@ -40,27 +70,63 @@ export default function App() {
     return '';
   };
 
-  // Fetch all live data from backend
-  const fetchData = async () => {
+  // Apply fetched data to state & cache
+  const applyData = useCallback((data: any) => {
+    if (!data) return;
+    if (data.profile) {
+      setProfile(data.profile);
+    }
+    if (Array.isArray(data.badges)) {
+      setBadges(data.badges);
+    }
+    if (Array.isArray(data.services)) {
+      setServices(data.services);
+    }
+    if (Array.isArray(data.socialLinks)) {
+      setSocialLinks(data.socialLinks);
+    }
+    if (data.contact) {
+      setContact(data.contact);
+    }
+    setLocalCache({
+      profile: data.profile,
+      badges: Array.isArray(data.badges) ? data.badges : undefined,
+      services: Array.isArray(data.services) ? data.services : undefined,
+      socialLinks: Array.isArray(data.socialLinks) ? data.socialLinks : undefined,
+      contact: data.contact
+    });
+    setIsLoading(false);
+  }, []);
+
+  // Fetch from backend API with automatic Firebase fallback
+  const fetchData = useCallback(async () => {
+    const apiBase = getApiBase();
     try {
-      const apiBase = getApiBase();
       const res = await fetch(`${apiBase}/api/data`);
       if (res.ok) {
         const data = await res.json();
-        if (data.services && Array.isArray(data.services)) {
-          setServices(data.services);
-        }
-        if (data.socialLinks && Array.isArray(data.socialLinks)) {
-          setSocialLinks(data.socialLinks);
-        }
-        if (data.contact) {
-          setContact(data.contact);
-        }
+        applyData(data);
+        return;
       }
     } catch (err) {
-      console.warn('Backend fetch fallback to initial data:', err);
+      console.warn('API fetch failed, falling back to Firebase:', err);
     }
-  };
+
+    // Direct Firebase fallback (for GitHub Pages or when API is cold)
+    try {
+      const fbRes = await fetch(FIREBASE_FALLBACK_URL);
+      if (fbRes.ok) {
+        const fbData = await fbRes.json();
+        if (fbData) {
+          applyData(fbData);
+        }
+      }
+    } catch (fbErr) {
+      console.error('Firebase fallback also failed:', fbErr);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [applyData]);
 
   useEffect(() => {
     fetchData();
@@ -73,12 +139,21 @@ export default function App() {
       eventSource.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
-          if (payload.type === 'services_updated' && Array.isArray(payload.data)) {
+          if (payload.type === 'profile_updated' && payload.data) {
+            setProfile(payload.data);
+            setLocalCache({ profile: payload.data });
+          } else if (payload.type === 'badges_updated' && Array.isArray(payload.data)) {
+            setBadges(payload.data);
+            setLocalCache({ badges: payload.data });
+          } else if (payload.type === 'services_updated' && Array.isArray(payload.data)) {
             setServices(payload.data);
+            setLocalCache({ services: payload.data });
           } else if (payload.type === 'social_updated' && Array.isArray(payload.data)) {
             setSocialLinks(payload.data);
+            setLocalCache({ socialLinks: payload.data });
           } else if (payload.type === 'contact_updated' && payload.data) {
             setContact(payload.data);
+            setLocalCache({ contact: payload.data });
           }
         } catch (e) {
           console.error('Error parsing SSE event:', e);
@@ -93,7 +168,7 @@ export default function App() {
         eventSource.close();
       }
     };
-  }, []);
+  }, [fetchData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black">
@@ -108,13 +183,10 @@ export default function App() {
         <span>{toastMsg}</span>
       </div>
 
-      {/* Main Responsive Bio Container (Phone Mockup Frame in Center) */}
+      {/* Main Responsive Bio Container */}
       <main className="w-full max-w-[480px] bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 relative">
-        {/* Profile Header & Avatar */}
-        <BioHeader
-          profile={PROFILE_INFO}
-          badges={BADGES}
-        />
+        {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
+        <BioHeader profile={profile} badges={badges} />
 
         {/* Content Sections */}
         <div className="px-4 sm:px-5 pb-6 space-y-5">
@@ -126,6 +198,14 @@ export default function App() {
 
           {/* Direct Contact Buttons (Live Controlled via Telegram Bot) */}
           <DirectContact contact={contact} />
+
+          {/* Skeleton placeholder during first visit if waiting for initial network load */}
+          {isLoading && !profile && (
+            <div className="space-y-3 py-4 animate-pulse">
+              <div className="h-10 bg-slate-900/80 rounded-xl border border-slate-800" />
+              <div className="h-28 bg-slate-900/80 rounded-xl border border-slate-800" />
+            </div>
+          )}
 
           {/* QR Code & Share Box */}
           <ShareAndFooter onShowToast={showToast} />

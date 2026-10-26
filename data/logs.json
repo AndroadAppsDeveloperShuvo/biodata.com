@@ -1,5 +1,33 @@
 [
   {
+    "id": "log_1793006434364_rvp0",
+    "timestamp": "2026-10-26T09:20:34.364Z",
+    "action": "add",
+    "user": "Admin (Simulated)",
+    "text": "নতুন ব্যাজ যোগ: ⚡ Pro Gamer"
+  },
+  {
+    "id": "log_1793006409464_bi6r",
+    "timestamp": "2026-10-26T09:20:09.464Z",
+    "action": "delete",
+    "user": "Admin (Simulated)",
+    "text": "ব্যাজ মুছে ফেলা হয়েছে: ⚡ Pro Gamer"
+  },
+  {
+    "id": "log_1793005031712_cmk5",
+    "timestamp": "2026-10-26T08:57:11.712Z",
+    "action": "add",
+    "user": "Admin (Simulated)",
+    "text": "নতুন ব্যাজ যোগ: ⚡ Pro Gamer"
+  },
+  {
+    "id": "log_1793004988288_qsb7",
+    "timestamp": "2026-10-26T08:56:28.288Z",
+    "action": "delete",
+    "user": "Admin (Simulated)",
+    "text": "ব্যাজ মুছে ফেলা হয়েছে: ⚡ Pro Gamer"
+  },
+  {
     "id": "log_1792929751599_gd5c",
     "timestamp": "2026-10-25T12:02:31.599Z",
     "action": "add",
