@@ -481,14 +481,8 @@ function createNewClient(
       { id: 'b_1', text: '⚡ Verified Profile' },
       { id: 'b_2', text: '🔥 Official Creator' }
     ],
-    services: DEFAULT_SERVICES.map((s, idx) => ({
-      ...s,
-      id: 'cs_' + idx + '_' + Date.now()
-    })),
-    socialLinks: DEFAULT_SOCIAL.map((l, idx) => ({
-      ...l,
-      id: 'cl_' + idx + '_' + Date.now()
-    })),
+    services: [],
+    socialLinks: [],
     contact: {
       enabled: true,
       whatsappNumber: '+8801700000000',
