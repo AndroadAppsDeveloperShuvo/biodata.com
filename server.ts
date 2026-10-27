@@ -4073,9 +4073,6 @@ async function startTelegramPolling() {
   botState.isPolling = true;
 
   try {
-    // Ensure any leftover webhook is deleted so getUpdates never encounters 409 Conflict
-    await telegramRequest('deleteWebhook', { drop_pending_updates: false });
-
     const meRes = await telegramRequest('getMe', {});
     if (meRes.ok) {
       botState.botUsername = meRes.result.username;
