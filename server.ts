@@ -1991,44 +1991,49 @@ async function completeClientCreation(
 
 // Handle User Message Text
 async function handleUserMessage(chatId: string, text: string, senderName: string = 'User') {
-  const trimmed = text.trim();
-  const state = userStates[chatId] || { step: 'idle' };
+  try {
+    const trimmed = text.trim();
+    const state = userStates[chatId] || { step: 'idle' };
 
-  const isAdmin = String(chatId).trim() === TELEGRAM_ADMIN_CHAT_ID;
-  const registeredClient = getClientByChatId(chatId);
-
-  // If user is neither admin nor a registered client
-  if (!isAdmin && !registeredClient) {
-    const unknownMsg = `👋 আসসালামু আলাইকুম <b>${escapeHtml(senderName)}</b>!\n\n`
-      + `এটি <b>বায়ো ডাটা ও সার্ভিস ম্যানেজার মাস্টার বট</b> 🤖\n\n`
-      + `✨ আপনি যদি আপনার নিজের নাম ও লোগো দিয়ে নিজস্ব প্রফেশনাল বায়ো ডাটা ওয়েবসাইট তৈরি করতে চান অথবা আপনার ওয়েবসাইটের বট এক্সেস নিতে চান, তবে সরাসরি অ্যাডমিনের সাথে যোগাযোগ করুন:\n\n`
-      + `👉 <b>টেলিগ্রাম ইনবক্স:</b> @djhakar007ff\n`
-      + `📱 <b>WhatsApp:</b> +8801778526313\n`
-      + `🌐 <b>অফিসিয়াল বায়ো সাইট:</b> https://androadappsdevelopershuvo.github.io/biodata.com`;
-    await sendTelegramMessage(chatId, unknownMsg, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: '💬 টেলিগ্রামে অ্যাডমিনকে মেসেজ দিন', url: 'https://t.me/djhakar007ff' }],
-          [{ text: '📱 WhatsApp এ যোগাযোগ করুন', url: 'https://wa.me/8801778526313' }],
-          [{ text: '🌐 অফিসিয়াল বায়ো সাইট দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }]
-        ]
-      }
-    });
-    return unknownMsg;
-  }
-
-  // If active user state is a client step, route to handleClientUserMessage
-  if (state.step && (state.step.startsWith('client_') || state.step.startsWith('cl_'))) {
-    const targetClient = getClientById(state.tempData?.clientId) || registeredClient || getClients()[0];
-    if (targetClient) {
-      return await handleClientUserMessage(chatId, text, senderName, targetClient);
+    const isAdmin = String(chatId).trim() === TELEGRAM_ADMIN_CHAT_ID;
+    const clients = getClients();
+    let registeredClient = getClientByChatId(chatId) || clients.find(c => String(c.chatId).trim() === String(chatId).trim());
+    if (!registeredClient && clients.length > 0) {
+      registeredClient = clients[0];
     }
-  }
 
-  // If registered client, route directly to client handler
-  if (!isAdmin && registeredClient) {
-    return await handleClientUserMessage(chatId, text, senderName, registeredClient);
-  }
+    // If active user state is a client step, route to handleClientUserMessage
+    if (state.step && (state.step.startsWith('client_') || state.step.startsWith('cl_'))) {
+      const targetClient = getClientById(state.tempData?.clientId) || registeredClient || clients[0];
+      if (targetClient) {
+        return await handleClientUserMessage(chatId, text, senderName, targetClient);
+      }
+    }
+
+    // If non-admin user or client, route directly to client handler
+    if (!isAdmin && registeredClient) {
+      return await handleClientUserMessage(chatId, text, senderName, registeredClient);
+    }
+
+    // If user is neither admin nor do we have any client records
+    if (!isAdmin && !registeredClient) {
+      const unknownMsg = `👋 আসসালামু আলাইকুম <b>${escapeHtml(senderName)}</b>!\n\n`
+        + `এটি <b>বায়ো ডাটা ও সার্ভিস ম্যানেজার মাস্টার বট</b> 🤖\n\n`
+        + `✨ আপনি যদি আপনার নিজের নাম ও লোগো দিয়ে নিজস্ব প্রফেশনাল বায়ো ডাটা ওয়েবসাইট তৈরি করতে চান অথবা আপনার ওয়েবসাইটের বট এক্সেস নিতে চান, তবে সরাসরি অ্যাডমিনের সাথে যোগাযোগ করুন:\n\n`
+        + `👉 <b>টেলিগ্রাম ইনবক্স:</b> @djhakar007ff\n`
+        + `📱 <b>WhatsApp:</b> +8801778526313\n`
+        + `🌐 <b>অফিসিয়াল বায়ো সাইট:</b> https://androadappsdevelopershuvo.github.io/biodata.com`;
+      await sendTelegramMessage(chatId, unknownMsg, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '💬 টেলিগ্রামে অ্যাডমিনকে মেসেজ দিন', url: 'https://t.me/djhakar007ff' }],
+            [{ text: '📱 WhatsApp এ যোগাযোগ করুন', url: 'https://wa.me/8801778526313' }],
+            [{ text: '🌐 অফিসিয়াল বায়ো সাইট দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }]
+          ]
+        }
+      });
+      return unknownMsg;
+    }
 
   // ==========================================
   // MASTER ADMIN FLOWS (chat_id: 5440151107)
@@ -3001,6 +3006,10 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
   const helpMsg = `❓ আমি বুঝতে পারিনি। নিচের মেন্যু থেকে অপশন নির্বাচন করুন অথবা /start লিখুন।`;
   await sendTelegramMessage(chatId, helpMsg, { reply_markup: getMainMenuKeyboard() });
   return helpMsg;
+  } catch (err) {
+    console.error('Error in handleUserMessage:', err);
+    await sendTelegramMessage(chatId, '⚠️ প্রসেসিং এ সমস্যা হয়েছে। /start চেপে পুনরায় চেষ্টা করুন।');
+  }
 }
 
 // Commands
@@ -3108,7 +3117,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('admin_view_client:')) {
     const clientId = data.replace('admin_view_client:', '');
-    const client = getClientById(clientId);
+    const client = getClientById(clientId) || getClients().find(c => c.id === clientId || c.id.includes(clientId) || clientId.includes(c.id));
     if (!client) {
       await sendTelegramMessage(chatId, `❌ ক্লায়েন্ট খুঁজে পাওয়া যায়নি!`, { reply_markup: getAdminClientsListKeyboard() });
       return;
@@ -3132,9 +3141,9 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('admin_dl_client:')) {
     const clientId = data.replace('admin_dl_client:', '');
-    const client = getClientById(clientId);
+    const client = getClientById(clientId) || getClients().find(c => c.id === clientId || c.id.includes(clientId) || clientId.includes(c.id));
     if (!client) {
-      await sendTelegramMessage(chatId, `❌ ক্লায়েন্ট খুঁজে পাওয়া যায়নি!`);
+      await sendTelegramMessage(chatId, `❌ ক্লায়েন্ট খুঁজে পাওয়া যায়নি!`, { reply_markup: getAdminClientsListKeyboard() });
       return;
     }
     await sendClientFilesToTelegram(chatId, client);
@@ -3143,11 +3152,15 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('admin_del_client:')) {
     const clientId = data.replace('admin_del_client:', '');
-    const client = getClientById(clientId);
+    const client = getClientById(clientId) || getClients().find(c => c.id === clientId || c.id.includes(clientId) || clientId.includes(c.id));
     if (client) {
-      deleteClient(clientId);
+      deleteClient(client.id);
       addLog('delete', 'Master Admin', `ক্লায়েন্ট মুছে ফেলা হয়েছে: ${client.appName} (${client.chatId})`);
       await sendTelegramMessage(chatId, `🗑️ <b>'${escapeHtml(client.appName)}' (${client.chatId}) ক্লায়েন্টটি সফলভাবে মুছে ফেলা হয়েছে!</b>`, {
+        reply_markup: getAdminClientsListKeyboard()
+      });
+    } else {
+      await sendTelegramMessage(chatId, `❌ ক্লায়েন্টটি ইতিমধ্যে মুছে ফেলা হয়েছে বা পাওয়া যায়নি!`, {
         reply_markup: getAdminClientsListKeyboard()
       });
     }
@@ -3157,7 +3170,7 @@ async function handleCallbackQuery(cb: any) {
   // Admin Layout Callbacks
   if (data.startsWith('admin_toggle_layout:')) {
     const clientId = data.replace('admin_toggle_layout:', '');
-    const client = getClientById(clientId);
+    const client = getClientById(clientId) || getClients().find(c => c.id === clientId || c.id.includes(clientId) || clientId.includes(c.id));
     if (client) {
       const newStyle = client.layoutStyle === 'services_first' ? 'social_first' : 'services_first';
       updateClientData(client.id, c => {
@@ -3170,6 +3183,8 @@ async function handleCallbackQuery(cb: any) {
         `✅ <b>'${escapeHtml(updated.appName)}' এর লেআউট পরিবর্তন সম্পন্ন!</b>\n\n🎨 বর্তমান লেআউট: <b>${layoutName}</b>\n<i>ক্লায়েন্টের ওয়েবসাইটে লাইভ আপডেট হয়ে গেছে! 🚀</i>`,
         { reply_markup: getAdminSingleClientKeyboard(updated.id) }
       );
+    } else {
+      await sendTelegramMessage(chatId, `❌ ক্লায়েন্ট খুঁজে পাওয়া যায়নি!`, { reply_markup: getAdminClientsListKeyboard() });
     }
     return;
   }
@@ -3189,8 +3204,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 1. Client Main Menu
   if (data === 'cl_menu_main' || data === 'cl_menu' || data.startsWith('cl_menu:') || data.startsWith('cl_menu_main')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientMainMenu(chatId, client);
     }
@@ -3199,8 +3214,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 2. Client Profile Menu
   if (data === 'cl_menu_profile' || data === 'cl_prof' || data.startsWith('cl_prof:') || data.startsWith('cl_menu_profile')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientProfileMenu(chatId, client);
     }
@@ -3209,8 +3224,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 3. Client Badges Menu
   if (data === 'cl_menu_badges' || data === 'cl_badges' || data.startsWith('cl_badges:') || data.startsWith('cl_menu_badges')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientBadgesMenu(chatId, client);
     }
@@ -3219,8 +3234,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 4. Client Services Menu
   if (data === 'cl_menu_services' || data === 'cl_services' || data.startsWith('cl_services:') || data.startsWith('cl_menu_services')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientServicesMenu(chatId, client);
     }
@@ -3229,8 +3244,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 5. Client Social Menu
   if (data === 'cl_menu_social' || data === 'cl_social' || data.startsWith('cl_social:') || data.startsWith('cl_menu_social')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientSocialMenu(chatId, client);
     }
@@ -3239,8 +3254,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 6. Client Contact Menu
   if (data === 'cl_menu_contact' || data === 'cl_contact' || data.startsWith('cl_contact:') || data.startsWith('cl_menu_contact')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientContactMenu(chatId, client);
     }
@@ -3249,8 +3264,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 7. Client Full Preview / Summary
   if (data === 'cl_cmd_summary' || data === 'cl_preview' || data.startsWith('cl_preview:') || data.startsWith('cl_cmd_summary')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientFullSummary(chatId, client);
     }
@@ -3259,8 +3274,8 @@ async function handleCallbackQuery(cb: any) {
 
   // 8. Client Layout Menu
   if (data === 'cl_menu_layout' || data === 'cl_layout' || data.startsWith('cl_layout:') || data.startsWith('cl_menu_layout')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       await sendClientLayoutMenu(chatId, client);
     }
@@ -3272,7 +3287,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const style = parts[1] as 'social_first' | 'services_first';
     const clientId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       updateClientData(client.id, c => {
         c.layoutStyle = style;
@@ -3290,56 +3305,56 @@ async function handleCallbackQuery(cb: any) {
 
   // Profile Field Edit Triggers
   if (data === 'cl_prof_edit_name' || data.startsWith('cl_prof_edit_name:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_name', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `⚡ <b>নতুন নাম লিখে পাঠান:</b>\n\n<i>(ওয়েবসাইটে সাথে সাথে নাম পরিবর্তন হবে)</i>`);
     return;
   }
 
   if (data === 'cl_prof_edit_handle' || data.startsWith('cl_prof_edit_handle:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_handle', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `🔗 <b>নতুন ইউজারনেম / হ্যান্ডেল লিখে পাঠান:</b>\n<i>(যেমন: @my_name)</i>`);
     return;
   }
 
   if (data === 'cl_prof_edit_title' || data.startsWith('cl_prof_edit_title:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_title', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `💻 <b>নতুন পদবী / পেশাগত টাইটেল লিখে পাঠান:</b>`);
     return;
   }
 
   if (data === 'cl_prof_edit_loc' || data.startsWith('cl_prof_edit_loc:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_location', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📍 <b>নতুন লোকেশন লিখে পাঠান:</b>\n<i>(যেমন: Dhaka, Bangladesh)</i>`);
     return;
   }
 
   if (data === 'cl_prof_edit_bio' || data.startsWith('cl_prof_edit_bio:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_bio', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📝 <b>নতুন বায়ো বিবরণ লিখে পাঠান:</b>`);
     return;
   }
 
   if (data === 'cl_prof_edit_avatar' || data.startsWith('cl_prof_edit_avatar:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_avatar', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `🖼️ <b>প্রোফাইল ছবি পরিবর্তন</b>\n\n📷 আপনার পছন্দের ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
     return;
   }
 
   if (data === 'cl_prof_edit_banner' || data.startsWith('cl_prof_edit_banner:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_prof_banner', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `🏞️ <b>ব্যানার ছবি পরিবর্তন</b>\n\n📷 আপনার ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
     return;
@@ -3347,8 +3362,8 @@ async function handleCallbackQuery(cb: any) {
 
   // Badges Management
   if (data === 'cl_badge_add' || data.startsWith('cl_badge_add:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_badge_add_text', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `➕ <b>নতুন ব্যাজ যোগ করুন:</b>\n\nব্যাজের লেখা লিখে পাঠান (যেমন: "⚡ Pro Gamer"):`);
     return;
@@ -3356,9 +3371,9 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('cl_badge_del:')) {
     const parts = data.split(':');
-    const clientId = parts[1];
-    const badgeId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const badgeId = parts[parts.length - 1];
+    const clientId = parts.length >= 3 ? parts[1] : '';
+    const client = getClientById(clientId) || getClients().find(c => c.badges.some(b => b.id === badgeId)) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       updateClientData(client.id, c => {
         c.badges = c.badges.filter(b => b.id !== badgeId);
@@ -3374,9 +3389,9 @@ async function handleCallbackQuery(cb: any) {
   // Services Management
   if (data.startsWith('cl_srv_view:')) {
     const parts = data.split(':');
-    const clientId = parts[1];
-    const serviceId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const serviceId = parts[parts.length - 1];
+    const clientId = parts.length >= 3 ? parts[1] : '';
+    const client = getClientById(clientId) || getClients().find(c => c.services.some(s => s.id === serviceId)) || getClientByChatId(chatId) || getClients()[0];
     if (!client) return;
     const s = client.services.find(item => item.id === serviceId);
     if (!s) return;
@@ -3390,8 +3405,8 @@ async function handleCallbackQuery(cb: any) {
   }
 
   if (data === 'cl_srv_add' || data.startsWith('cl_srv_add:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_srv_title', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `➕ <b>নতুন সাভিস যোগ (ধাপ ১/৪)</b>\n\n📌 সাভিসের নাম (Title) লিখে পাঠান:`);
     return;
@@ -3401,8 +3416,8 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const field = parts[1];
     const serviceId = parts[2];
-    const clientId = parts[3];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = parts.length >= 4 ? parts[3] : '';
+    const client = getClientById(clientId) || getClients().find(c => c.services.some(s => s.id === serviceId)) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = {
       step: 'client_srv_edit_val',
       tempData: { clientId: client?.id, serviceId, field }
@@ -3419,9 +3434,9 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('cl_srv_del:')) {
     const parts = data.split(':');
-    const clientId = parts[1];
-    const serviceId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const serviceId = parts[parts.length - 1];
+    const clientId = parts.length >= 3 ? parts[1] : '';
+    const client = getClientById(clientId) || getClients().find(c => c.services.some(s => s.id === serviceId)) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       updateClientData(client.id, c => {
         c.services = c.services.filter(s => s.id !== serviceId);
@@ -3439,7 +3454,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     if (!client) return;
     const link = client.socialLinks.find(l => l.id === linkId);
     if (!link) return;
@@ -3458,8 +3473,8 @@ async function handleCallbackQuery(cb: any) {
   }
 
   if (data.startsWith('cl_soc_add') || data === 'cl_soc_add') {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (!client) return;
     await sendTelegramMessage(
       chatId,
@@ -3473,7 +3488,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const platform = parts[1] as SocialLink['platform'];
     const clientId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
 
     const defaultTitles: Record<string, { title: string; subtitle: string; btn: string }> = {
       facebook: { title: 'Facebook Profile / Page', subtitle: 'অফিসিয়াল ফেসবুক প্রোফাইল', btn: 'যুক্ত হোন' },
@@ -3508,7 +3523,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_social_url', tempData: { clientId: client?.id, linkId, isAdding: false } };
     await sendTelegramMessage(chatId, `🔗 <b>নতুন সোশ্যাল লিঙ্ক (URL) লিখে পাঠান:</b>`);
     return;
@@ -3518,7 +3533,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_social_title', tempData: { clientId: client?.id, linkId } };
     await sendTelegramMessage(chatId, `📌 <b>নতুন সোশ্যাল নাম বা টাইটেল লিখে পাঠান:</b>`);
     return;
@@ -3528,7 +3543,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_social_subtitle', tempData: { clientId: client?.id, linkId } };
     await sendTelegramMessage(chatId, `🏷️ <b>নতুন সাব-টাইটেল বা বিবরণ লিখে পাঠান:</b>`);
     return;
@@ -3538,7 +3553,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_social_button', tempData: { clientId: client?.id, linkId } };
     await sendTelegramMessage(chatId, `🔘 <b>নতুন বাটন টেক্সট লিখে পাঠান:</b>\n<i>(যেমন: "যুক্ত হোন", "সাবস্ক্রাইব", "ফলো করুন")</i>`);
     return;
@@ -3546,9 +3561,9 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('cl_soc_toggle:')) {
     const parts = data.split(':');
-    const clientId = parts[1];
-    const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const linkId = parts[parts.length - 1];
+    const clientId = parts.length >= 3 ? parts[1] : '';
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       updateClientData(client.id, c => {
         const l = c.socialLinks.find(item => item.id === linkId);
@@ -3566,9 +3581,9 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('cl_soc_del:')) {
     const parts = data.split(':');
-    const clientId = parts[1];
-    const linkId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const linkId = parts[parts.length - 1];
+    const clientId = parts.length >= 3 ? parts[1] : '';
+    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
       updateClientData(client.id, c => {
         c.socialLinks = c.socialLinks.filter(l => l.id !== linkId);
@@ -3583,15 +3598,15 @@ async function handleCallbackQuery(cb: any) {
 
   // Contact Field Edit Triggers
   if (data === 'cl_contact_edit_wa' || data.startsWith('cl_contact_edit_wa:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     userStates[chatId] = { step: 'client_contact_wa', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📱 <b>নতুন WhatsApp নম্বর দিন:</b>\n<i>(যেমন: +8801700000000)</i>`);
     return;
   }
 
   if (data === 'cl_contact_edit_wa_msg' || data.startsWith('cl_contact_edit_wa_msg:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
     const client = getClientById(clientId) || getClientByChatId(chatId);
     userStates[chatId] = { step: 'client_contact_wa_msg', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `💬 <b>হোয়াটসঅ্যাপে স্বয়ংক্রিয় টাইপ বার্তাটি লিখুন:</b>`);
@@ -3599,7 +3614,7 @@ async function handleCallbackQuery(cb: any) {
   }
 
   if (data === 'cl_contact_edit_email' || data.startsWith('cl_contact_edit_email:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
     const client = getClientById(clientId) || getClientByChatId(chatId);
     userStates[chatId] = { step: 'client_contact_email', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `✉️ <b>নতুন ইমেইল ঠিকানা লিখে পাঠান:</b>`);
@@ -3607,7 +3622,7 @@ async function handleCallbackQuery(cb: any) {
   }
 
   if (data === 'cl_contact_edit_note' || data.startsWith('cl_contact_edit_note:')) {
-    const clientId = data.includes(':') ? data.split(':')[1] : '';
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
     const client = getClientById(clientId) || getClientByChatId(chatId);
     userStates[chatId] = { step: 'client_contact_note', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📝 <b>যোগাযোগ বক্সের নিচে দেখানো বার্তাটি লিখুন:</b>`);
