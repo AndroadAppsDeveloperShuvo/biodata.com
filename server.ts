@@ -1582,6 +1582,7 @@ async function sendClientFullSummary(chatId: string, client: ClientRecord) {
 async function handleClientUserMessage(chatId: string, text: string, senderName: string, client: ClientRecord) {
   const trimmed = text.trim();
   const state = userStates[chatId] || { step: 'idle' };
+  const activeClient = getClientById(state.tempData?.clientId) || client || getClientByChatId(chatId) || getClients()[0];
 
   if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed === '/menu' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
     userStates[chatId] = { step: 'idle' };
@@ -1684,69 +1685,69 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 
   // Client Step Handlers
   if (state.step === 'client_prof_name') {
-    updateClientData(client.id, c => { c.profile.name = trimmed; });
+    updateClientData(activeClient.id, c => { c.profile.name = trimmed; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>প্রোফাইল নাম সফলভাবে আপডেট হয়েছে!</b>\n\n⚡ <b>${escapeHtml(trimmed)}</b>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_prof_handle') {
     let cleanHandle = trimmed;
     if (!cleanHandle.startsWith('@')) cleanHandle = '@' + cleanHandle;
-    updateClientData(client.id, c => { c.profile.handle = cleanHandle; });
+    updateClientData(activeClient.id, c => { c.profile.handle = cleanHandle; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>ইউজারনেম / হ্যান্ডেল আপডেট হয়েছে!</b>\n\n🔗 <code>${escapeHtml(cleanHandle)}</code>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_prof_title') {
-    updateClientData(client.id, c => { c.profile.title = trimmed; });
+    updateClientData(activeClient.id, c => { c.profile.title = trimmed; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>পদবী / টাইটেল আপডেট হয়েছে!</b>\n\n💻 <b>${escapeHtml(trimmed)}</b>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_prof_location') {
-    updateClientData(client.id, c => { c.profile.location = trimmed; });
+    updateClientData(activeClient.id, c => { c.profile.location = trimmed; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>লোকেশন আপডেট হয়েছে!</b>\n\n📍 <b>${escapeHtml(trimmed)}</b>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_prof_bio') {
-    updateClientData(client.id, c => { c.profile.bio = trimmed; });
+    updateClientData(activeClient.id, c => { c.profile.bio = trimmed; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>বায়ো বিবরণ আপডেট হয়েছে!</b>\n\n📝 <i>"${escapeHtml(trimmed)}"</i>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_prof_avatar') {
-    updateClientData(client.id, c => { c.profile.avatarUrl = trimmed; });
+    updateClientData(activeClient.id, c => { c.profile.avatarUrl = trimmed; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>প্রোফাইল ছবি সফলভাবে আপডেট হয়েছে!</b>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_prof_banner') {
-    updateClientData(client.id, c => { c.profile.bannerUrl = trimmed; });
+    updateClientData(activeClient.id, c => { c.profile.bannerUrl = trimmed; });
     userStates[chatId] = { step: 'idle' };
     const reply = `✅ <b>ব্যানার কভার ছবি সফলভাবে আপডেট হয়েছে!</b>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(client) });
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
     return reply;
   }
 
   if (state.step === 'client_badge_add_text') {
-    updateClientData(client.id, c => {
+    updateClientData(activeClient.id, c => {
       c.badges.push({ id: 'b_' + Date.now(), text: trimmed });
     });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `✅ <b>নতুন ব্যাজ যুক্ত হয়েছে!</b>\n\n🏷️ <b>${escapeHtml(trimmed)}</b>\n<i>মোট ব্যাজ: ${updated.badges.length}টি</i>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientBadgesMenuKeyboard(updated) });
     return reply;
@@ -1790,9 +1791,9 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
       linkUrl,
       createdAt: new Date().toISOString()
     };
-    updateClientData(client.id, c => { c.services.push(newSrv); });
+    updateClientData(activeClient.id, c => { c.services.push(newSrv); });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `🎉 <b>নতুন সাভিস সফলভাবে যুক্ত হয়েছে!</b>\n\n📌 <b>নাম:</b> ${escapeHtml(newSrv.title)}\n🏷️ <b>ক্যাটাগরি:</b> ${escapeHtml(newSrv.subtitle)}\n🔗 <b>লিংক:</b> ${escapeHtml(newSrv.linkUrl)}\n\n<i>আপনার ওয়েবসাইটে লাইভ যুক্ত হয়েছে! (মোট: ${updated.services.length}টি)</i>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientServicesMenuKeyboard(updated) });
     return reply;
@@ -1801,7 +1802,7 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
   if (state.step === 'client_srv_edit_val') {
     const serviceId = state.tempData?.serviceId;
     const field = state.tempData?.field;
-    updateClientData(client.id, c => {
+    updateClientData(activeClient.id, c => {
       const s = c.services.find(item => item.id === serviceId);
       if (s && field) {
         if (field === 'linkUrl' || field === 'lnk') s.linkUrl = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
@@ -1811,7 +1812,7 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
       }
     });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `✅ <b>সাভিস তথ্য সফলভাবে আপডেট হয়েছে!</b>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientServicesMenuKeyboard(updated) });
     return reply;
@@ -1844,19 +1845,19 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
         buttonText,
         enabled: true
       };
-      updateClientData(client.id, c => { c.socialLinks.push(newSocial); });
+      updateClientData(activeClient.id, c => { c.socialLinks.push(newSocial); });
       userStates[chatId] = { step: 'idle' };
-      const updated = getClientById(client.id) || client;
+      const updated = getClientById(activeClient.id) || activeClient;
       const reply = `🎉 <b>নতুন সোশ্যাল লিঙ্ক সফলভাবে যুক্ত হয়েছে!</b>\n\n📌 <b>নাম:</b> ${escapeHtml(newSocial.title)}\n🔗 <b>লিংক:</b> ${escapeHtml(newSocial.url)}\n🏷️ <b>বিবরণ:</b> ${escapeHtml(newSocial.subtitle)}\n🔘 <b>বাটন:</b> [${escapeHtml(newSocial.buttonText)}]\n\n<i>আপনার ওয়েবসাইটে তাৎক্ষণিকভাবে লাইভ সিঙ্ক হয়ে গেছে!</i>`;
       await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, newSocial.id, true) });
       return reply;
     } else {
-      updateClientData(client.id, c => {
+      updateClientData(activeClient.id, c => {
         const l = c.socialLinks.find(item => item.id === linkId);
         if (l) l.url = url;
       });
       userStates[chatId] = { step: 'idle' };
-      const updated = getClientById(client.id) || client;
+      const updated = getClientById(activeClient.id) || activeClient;
       const l = updated.socialLinks.find(item => item.id === linkId);
       const reply = `✅ <b>সোশ্যাল লিংক সফলভাবে পরিবর্তন হয়েছে!</b>\n\n🔗 <b>নতুন লিংক:</b> ${escapeHtml(url)}`;
       await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
@@ -1866,12 +1867,12 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 
   if (state.step === 'client_social_title') {
     const linkId = state.tempData?.linkId;
-    updateClientData(client.id, c => {
+    updateClientData(activeClient.id, c => {
       const l = c.socialLinks.find(item => item.id === linkId);
       if (l) l.title = trimmed;
     });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const l = updated.socialLinks.find(item => item.id === linkId);
     const reply = `✅ <b>সোশ্যাল নাম/টাইটেল সফলভাবে আপডেট হয়েছে!</b>\n\n📌 <b>নতুন নাম:</b> ${escapeHtml(trimmed)}`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
@@ -1880,12 +1881,12 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 
   if (state.step === 'client_social_subtitle') {
     const linkId = state.tempData?.linkId;
-    updateClientData(client.id, c => {
+    updateClientData(activeClient.id, c => {
       const l = c.socialLinks.find(item => item.id === linkId);
       if (l) l.subtitle = trimmed;
     });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const l = updated.socialLinks.find(item => item.id === linkId);
     const reply = `✅ <b>সাব-টাইটেল সফলভাবে আপডেট হয়েছে!</b>\n\n🏷️ <b>নতুন সাব-টাইটেল:</b> ${escapeHtml(trimmed)}`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
@@ -1894,12 +1895,12 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 
   if (state.step === 'client_social_button') {
     const linkId = state.tempData?.linkId;
-    updateClientData(client.id, c => {
+    updateClientData(activeClient.id, c => {
       const l = c.socialLinks.find(item => item.id === linkId);
       if (l) l.buttonText = trimmed;
     });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const l = updated.socialLinks.find(item => item.id === linkId);
     const reply = `✅ <b>বাটন টেক্সট সফলভাবে আপডেট হয়েছে!</b>\n\n🔘 <b>নতুন বাটন:</b> [${escapeHtml(trimmed)}]`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
@@ -1908,36 +1909,36 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 
   // Client Contact Fields
   if (state.step === 'client_contact_wa') {
-    updateClientData(client.id, c => { c.contact.whatsappNumber = trimmed; });
+    updateClientData(activeClient.id, c => { c.contact.whatsappNumber = trimmed; });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `✅ <b>WhatsApp নম্বর আপডেট হয়েছে!</b>\n\n📱 <code>${escapeHtml(trimmed)}</code>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
     return reply;
   }
 
   if (state.step === 'client_contact_wa_msg') {
-    updateClientData(client.id, c => { c.contact.whatsappMessage = trimmed; });
+    updateClientData(activeClient.id, c => { c.contact.whatsappMessage = trimmed; });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `✅ <b>WhatsApp বার্তা আপডেট হয়েছে!</b>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
     return reply;
   }
 
   if (state.step === 'client_contact_email') {
-    updateClientData(client.id, c => { c.contact.email = trimmed; });
+    updateClientData(activeClient.id, c => { c.contact.email = trimmed; });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `✅ <b>ইমেইল আপডেট হয়েছে!</b>\n\n✉️ <code>${escapeHtml(trimmed)}</code>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
     return reply;
   }
 
   if (state.step === 'client_contact_note') {
-    updateClientData(client.id, c => { c.contact.customNote = trimmed; });
+    updateClientData(activeClient.id, c => { c.contact.customNote = trimmed; });
     userStates[chatId] = { step: 'idle' };
-    const updated = getClientById(client.id) || client;
+    const updated = getClientById(activeClient.id) || activeClient;
     const reply = `✅ <b>বার্তা/কোটেশন আপডেট হয়েছে!</b>\n\n📝 <i>"${escapeHtml(trimmed)}"</i>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientContactMenuKeyboard(updated) });
     return reply;
@@ -2014,6 +2015,14 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
       }
     });
     return unknownMsg;
+  }
+
+  // If active user state is a client step, route to handleClientUserMessage
+  if (state.step && (state.step.startsWith('client_') || state.step.startsWith('cl_'))) {
+    const targetClient = getClientById(state.tempData?.clientId) || registeredClient || getClients()[0];
+    if (targetClient) {
+      return await handleClientUserMessage(chatId, text, senderName, targetClient);
+    }
   }
 
   // If registered client, route directly to client handler
