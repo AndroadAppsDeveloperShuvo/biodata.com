@@ -337,11 +337,35 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       <div id="contactContainer" class="glass-card rounded-2xl p-4 flex flex-col gap-3"></div>
     </div>
 
-    <!-- Section 4: Share Profile Button (Bottom) -->
+    <!-- Section 4: Premium Glowing Share Profile Card -->
     <div class="px-5 mb-8">
-      <button id="btnShareProfile" class="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800/90 hover:border-cyan-500/50 text-xs sm:text-sm font-bold text-zinc-200 transition-all active:scale-95 shadow-lg group">
-        <svg class="w-4.5 h-4.5 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-        <span>🔗 প্রফেশনাল প্রোফাইল শেয়ার করুন</span>
+      <button id="btnShareProfile" type="button" class="w-full relative group overflow-hidden rounded-2xl p-[1px] transition-all duration-300 active:scale-[0.98] shadow-xl hover:shadow-cyan-500/20">
+        <!-- Animated glowing gradient border layer -->
+        <span class="absolute inset-0 bg-gradient-to-r from-cyan-500 via-sky-400 to-purple-500 group-hover:opacity-100 opacity-75 transition-opacity blur-[1px]"></span>
+        
+        <!-- Inner glassmorphism button content -->
+        <div class="relative w-full bg-zinc-950/90 group-hover:bg-zinc-900/95 rounded-[15px] p-3.5 flex items-center justify-between gap-3 transition-colors">
+          <div class="flex items-center gap-3 min-w-0">
+            <!-- Icon Box with Glow -->
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-sky-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-inner">
+              <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+              </svg>
+            </div>
+            <div class="text-left min-w-0">
+              <h3 class="text-xs sm:text-sm font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">প্রোফাইল শেয়ার করুন</h3>
+              <p class="text-[10.5px] text-zinc-400 truncate">এক ক্লিকে লিঙ্ক শেয়ার বা কপি করুন</p>
+            </div>
+          </div>
+          
+          <!-- Right action badge -->
+          <div class="shrink-0">
+            <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 text-zinc-950 group-hover:from-cyan-400 group-hover:to-sky-400 transition-all shadow-md">
+              <span>শেয়ার</span>
+              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </span>
+          </div>
+        </div>
       </button>
     </div>
 
