@@ -568,13 +568,11 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var soc = document.getElementById('sectionSocial');
       if (!container || !srv || !soc) return;
       if (style === 'services_first') {
-        if (container.firstElementChild !== srv) {
-          container.insertBefore(srv, soc);
-        }
+        container.appendChild(srv);
+        container.appendChild(soc);
       } else {
-        if (container.firstElementChild !== soc) {
-          container.insertBefore(soc, srv);
-        }
+        container.appendChild(soc);
+        container.appendChild(srv);
       }
     }
 

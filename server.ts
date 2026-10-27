@@ -830,6 +830,9 @@ interface TelegramUserState {
     | 'client_srv_link'
     | 'client_srv_edit_val'
     | 'client_social_url'
+    | 'client_social_title'
+    | 'client_social_subtitle'
+    | 'client_social_button'
     | 'client_contact_wa'
     | 'client_contact_wa_msg'
     | 'client_contact_email'
@@ -1329,9 +1332,9 @@ function getClientBadgesMenuKeyboard(client: ClientRecord) {
 
 function getClientServicesMenuKeyboard(client: ClientRecord) {
   const rows: any[] = [];
-  client.services.forEach(s => {
+  client.services.forEach((s, idx) => {
     rows.push([
-      { text: `🛠️ ${s.title.substring(0, 22)}`, callback_data: `cl_srv_view:${client.id}:${s.id}` },
+      { text: `#${idx + 1}. 🛠️ ${s.title.substring(0, 22)}`, callback_data: `cl_srv_view:${client.id}:${s.id}` },
       { text: '🗑️ মুছুন', callback_data: `cl_srv_del:${client.id}:${s.id}` }
     ]);
   });
@@ -1349,8 +1352,8 @@ function getClientSingleServiceKeyboard(serviceId: string, clientId?: string) {
   return {
     inline_keyboard: [
       [
-        { text: '✏️ শিরোনাম পরিবর্তন', callback_data: `cl_srv_ed:title:${serviceId}${cid}` },
-        { text: '📝 বিবরণ পরিবর্তন', callback_data: `cl_srv_ed:sub:${serviceId}${cid}` }
+        { text: '📌 নাম পরিবর্তন', callback_data: `cl_srv_ed:title:${serviceId}${cid}` },
+        { text: '🏷️ সাব-টাইটেল/ক্যাটাগরি', callback_data: `cl_srv_ed:sub:${serviceId}${cid}` }
       ],
       [
         { text: '🖼️ ছবি পরিবর্তন', callback_data: `cl_srv_ed:img:${serviceId}${cid}` },
@@ -1368,17 +1371,72 @@ function getClientSingleServiceKeyboard(serviceId: string, clientId?: string) {
 
 function getClientSocialMenuKeyboard(client: ClientRecord) {
   const rows: any[] = [];
-  client.socialLinks.forEach(s => {
-    const status = s.enabled ? '🟢' : '⚪';
+  client.socialLinks.forEach((s, idx) => {
+    const icon = s.platform === 'facebook' ? '📘'
+      : s.platform === 'telegram' ? '✈️'
+      : s.platform === 'youtube' ? '🔴'
+      : s.platform === 'instagram' ? '📸'
+      : s.platform === 'twitter' ? '✖️'
+      : s.platform === 'github' ? '🐙' : '🔗';
+    const status = s.enabled !== false ? '🟢' : '⚪ (লুকানো)';
     rows.push([
-      { text: `${status} ${s.title}`, callback_data: `cl_soc_toggle:${client.id}:${s.id}` },
-      { text: '✏️ লিংক', callback_data: `cl_soc_edit_url:${client.id}:${s.id}` }
+      { text: `${idx + 1}. ${icon} ${s.title} ${status}`, callback_data: `cl_soc_view:${client.id}:${s.id}` }
     ]);
   });
+  rows.push([
+    { text: '➕ নতুন সোশ্যাল লিংক যোগ', callback_data: `cl_soc_add:${client.id}` }
+  ]);
   rows.push([
     { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
   ]);
   return { inline_keyboard: rows };
+}
+
+function getClientSingleSocialKeyboard(clientId: string, linkId: string, isEnabled: boolean) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '🔗 লিংক পরিবর্তন', callback_data: `cl_soc_edit_url:${clientId}:${linkId}` },
+        { text: '📌 নাম পরিবর্তন', callback_data: `cl_soc_edit_title:${clientId}:${linkId}` }
+      ],
+      [
+        { text: '🏷️ সাব-টাইটেল', callback_data: `cl_soc_edit_sub:${clientId}:${linkId}` },
+        { text: '🔘 বাটন টেক্সট', callback_data: `cl_soc_edit_btn:${clientId}:${linkId}` }
+      ],
+      [
+        { text: isEnabled ? '👁️ হাইড করুন' : '🟢 অন করুন', callback_data: `cl_soc_toggle:${clientId}:${linkId}` },
+        { text: '🗑️ মুছে ফেলুন', callback_data: `cl_soc_del:${clientId}:${linkId}` }
+      ],
+      [
+        { text: '🔙 সোশ্যাল মেন্যু', callback_data: `cl_social:${clientId}` }
+      ]
+    ]
+  };
+}
+
+function getClientSocialPlatformKeyboard(clientId: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '📘 Facebook', callback_data: `cl_soc_plat:facebook:${clientId}` },
+        { text: '✈️ Telegram', callback_data: `cl_soc_plat:telegram:${clientId}` }
+      ],
+      [
+        { text: '🔴 YouTube', callback_data: `cl_soc_plat:youtube:${clientId}` },
+        { text: '📸 Instagram', callback_data: `cl_soc_plat:instagram:${clientId}` }
+      ],
+      [
+        { text: '✖️ Twitter / X', callback_data: `cl_soc_plat:twitter:${clientId}` },
+        { text: '🐙 GitHub', callback_data: `cl_soc_plat:github:${clientId}` }
+      ],
+      [
+        { text: '🔗 অন্যান্য / Custom লিংক', callback_data: `cl_soc_plat:custom:${clientId}` }
+      ],
+      [
+        { text: '🔙 সোশ্যাল মেন্যু', callback_data: `cl_social:${clientId}` }
+      ]
+    ]
+  };
 }
 
 function getClientContactMenuKeyboard(client?: ClientRecord) {
@@ -1752,16 +1810,105 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
     updateClientData(client.id, c => {
       const s = c.services.find(item => item.id === serviceId);
       if (s && field) {
-        if (field === 'linkUrl') s.linkUrl = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
+        if (field === 'linkUrl' || field === 'lnk') s.linkUrl = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
         else if (field === 'title') s.title = trimmed;
-        else if (field === 'subtitle') s.subtitle = trimmed;
-        else if (field === 'imageUrl') s.imageUrl = trimmed;
+        else if (field === 'subtitle' || field === 'sub') s.subtitle = trimmed;
+        else if (field === 'imageUrl' || field === 'img') s.imageUrl = trimmed;
       }
     });
     userStates[chatId] = { step: 'idle' };
     const updated = getClientById(client.id) || client;
     const reply = `✅ <b>সাভিস তথ্য সফলভাবে আপডেট হয়েছে!</b>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientServicesMenuKeyboard(updated) });
+    return reply;
+  }
+
+  // Client Social Handlers
+  if (state.step === 'client_social_url') {
+    const linkId = state.tempData?.linkId;
+    const isAdding = state.tempData?.isAdding;
+    let url = trimmed;
+    const platform = state.tempData?.platform || 'custom';
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      if (platform === 'telegram') {
+        url = 'https://t.me/' + url.replace(/^@/, '');
+      } else {
+        url = 'https://' + url;
+      }
+    }
+
+    if (isAdding) {
+      const title = state.tempData?.title || 'Social Profile';
+      const subtitle = state.tempData?.subtitle || 'কানেক্ট থাকুন';
+      const buttonText = state.tempData?.buttonText || 'যুক্ত হোন';
+      const newSocial: SocialLink = {
+        id: 'cl_' + Date.now(),
+        platform: platform as SocialLink['platform'],
+        title,
+        url,
+        subtitle,
+        buttonText,
+        enabled: true
+      };
+      updateClientData(client.id, c => { c.socialLinks.push(newSocial); });
+      userStates[chatId] = { step: 'idle' };
+      const updated = getClientById(client.id) || client;
+      const reply = `🎉 <b>নতুন সোশ্যাল লিঙ্ক সফলভাবে যুক্ত হয়েছে!</b>\n\n📌 <b>নাম:</b> ${escapeHtml(newSocial.title)}\n🔗 <b>লিংক:</b> ${escapeHtml(newSocial.url)}\n🏷️ <b>বিবরণ:</b> ${escapeHtml(newSocial.subtitle)}\n🔘 <b>বাটন:</b> [${escapeHtml(newSocial.buttonText)}]\n\n<i>আপনার ওয়েবসাইটে তাৎক্ষণিকভাবে লাইভ সিঙ্ক হয়ে গেছে!</i>`;
+      await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, newSocial.id, true) });
+      return reply;
+    } else {
+      updateClientData(client.id, c => {
+        const l = c.socialLinks.find(item => item.id === linkId);
+        if (l) l.url = url;
+      });
+      userStates[chatId] = { step: 'idle' };
+      const updated = getClientById(client.id) || client;
+      const l = updated.socialLinks.find(item => item.id === linkId);
+      const reply = `✅ <b>সোশ্যাল লিংক সফলভাবে পরিবর্তন হয়েছে!</b>\n\n🔗 <b>নতুন লিংক:</b> ${escapeHtml(url)}`;
+      await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
+      return reply;
+    }
+  }
+
+  if (state.step === 'client_social_title') {
+    const linkId = state.tempData?.linkId;
+    updateClientData(client.id, c => {
+      const l = c.socialLinks.find(item => item.id === linkId);
+      if (l) l.title = trimmed;
+    });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const l = updated.socialLinks.find(item => item.id === linkId);
+    const reply = `✅ <b>সোশ্যাল নাম/টাইটেল সফলভাবে আপডেট হয়েছে!</b>\n\n📌 <b>নতুন নাম:</b> ${escapeHtml(trimmed)}`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
+    return reply;
+  }
+
+  if (state.step === 'client_social_subtitle') {
+    const linkId = state.tempData?.linkId;
+    updateClientData(client.id, c => {
+      const l = c.socialLinks.find(item => item.id === linkId);
+      if (l) l.subtitle = trimmed;
+    });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const l = updated.socialLinks.find(item => item.id === linkId);
+    const reply = `✅ <b>সাব-টাইটেল সফলভাবে আপডেট হয়েছে!</b>\n\n🏷️ <b>নতুন সাব-টাইটেল:</b> ${escapeHtml(trimmed)}`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
+    return reply;
+  }
+
+  if (state.step === 'client_social_button') {
+    const linkId = state.tempData?.linkId;
+    updateClientData(client.id, c => {
+      const l = c.socialLinks.find(item => item.id === linkId);
+      if (l) l.buttonText = trimmed;
+    });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(client.id) || client;
+    const l = updated.socialLinks.find(item => item.id === linkId);
+    const reply = `✅ <b>বাটন টেক্সট সফলভাবে আপডেট হয়েছে!</b>\n\n🔘 <b>নতুন বাটন:</b> [${escapeHtml(trimmed)}]`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true) });
     return reply;
   }
 
@@ -3284,7 +3431,116 @@ async function handleCallbackQuery(cb: any) {
     return;
   }
 
-  // Social Management
+  // Client Social Management
+  if (data.startsWith('cl_soc_view:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    const link = client.socialLinks.find(l => l.id === linkId);
+    if (!link) return;
+
+    const statusText = link.enabled !== false ? '🟢 সক্রিয় (Active)' : '⚪ লুকানো (Hidden)';
+    const text = `🌐 <b>সোশ্যাল অ্যাকাউন্ট বিস্তারিত:</b>\n\n`
+      + `• 📌 <b>নাম:</b> ${escapeHtml(link.title)}\n`
+      + `• 🔗 <b>লিংক:</b> ${escapeHtml(link.url)}\n`
+      + `• 🏷️ <b>সাব-টাইটেল:</b> ${escapeHtml(link.subtitle || '-')}\n`
+      + `• 🔘 <b>বাটন টেক্সট:</b> [${escapeHtml(link.buttonText || '-')}]\n`
+      + `• 👁️ <b>অবস্থা:</b> ${statusText}\n\n`
+      + `<i>কী পরিবর্তন করতে চান নির্বাচন করুন:</i>`;
+
+    await sendTelegramMessage(chatId, text, { reply_markup: getClientSingleSocialKeyboard(client.id, link.id, link.enabled !== false) });
+    return;
+  }
+
+  if (data.startsWith('cl_soc_add') || data === 'cl_soc_add') {
+    const clientId = data.includes(':') ? data.split(':')[1] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    if (!client) return;
+    await sendTelegramMessage(
+      chatId,
+      `➕ <b>নতুন সোশ্যাল লিঙ্ক যোগ করুন</b>\n\n📌 অনুগ্রহ করে প্ল্যাটফর্ম নির্বাচন করুন:`,
+      { reply_markup: getClientSocialPlatformKeyboard(client.id) }
+    );
+    return;
+  }
+
+  if (data.startsWith('cl_soc_plat:')) {
+    const parts = data.split(':');
+    const platform = parts[1] as SocialLink['platform'];
+    const clientId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+
+    const defaultTitles: Record<string, { title: string; subtitle: string; btn: string }> = {
+      facebook: { title: 'Facebook Profile / Page', subtitle: 'অফিসিয়াল ফেসবুক প্রোফাইল', btn: 'যুক্ত হোন' },
+      telegram: { title: 'Telegram Channel / Group', subtitle: 'টেলিগ্রাম চ্যানেল', btn: 'যুক্ত হোন' },
+      youtube: { title: 'YouTube Channel', subtitle: 'অফিসিয়াল ইউটিউব চ্যানেল', btn: 'সাবস্ক্রাইব' },
+      instagram: { title: 'Instagram Profile', subtitle: 'ইনস্টাগ্রাম ফটো ও রিলস', btn: 'ফলো করুন' },
+      twitter: { title: 'X (Twitter) Profile', subtitle: '乂 প্রোফাইল', btn: 'ফলো করুন' },
+      github: { title: 'GitHub Profile', subtitle: 'ওপেন সোর্স প্রজেক্ট', btn: 'ফলো করুন' },
+      custom: { title: 'Social Link', subtitle: 'কানেক্ট থাকুন', btn: 'ভিজিট করুন' }
+    };
+    const def = defaultTitles[platform] || defaultTitles.custom;
+
+    userStates[chatId] = {
+      step: 'client_social_url',
+      tempData: {
+        clientId: client?.id,
+        platform,
+        title: def.title,
+        subtitle: def.subtitle,
+        buttonText: def.btn,
+        isAdding: true
+      }
+    };
+    await sendTelegramMessage(
+      chatId,
+      `🔗 <b>আপনার ${platform} এর সম্পূর্ণ লিঙ্ক (URL) লিখে পাঠান:</b>\n\n<i>(যেমন: https://... বা username)</i>`
+    );
+    return;
+  }
+
+  if (data.startsWith('cl_soc_edit_url:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    userStates[chatId] = { step: 'client_social_url', tempData: { clientId: client?.id, linkId, isAdding: false } };
+    await sendTelegramMessage(chatId, `🔗 <b>নতুন সোশ্যাল লিঙ্ক (URL) লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_soc_edit_title:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    userStates[chatId] = { step: 'client_social_title', tempData: { clientId: client?.id, linkId } };
+    await sendTelegramMessage(chatId, `📌 <b>নতুন সোশ্যাল নাম বা টাইটেল লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_soc_edit_sub:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    userStates[chatId] = { step: 'client_social_subtitle', tempData: { clientId: client?.id, linkId } };
+    await sendTelegramMessage(chatId, `🏷️ <b>নতুন সাব-টাইটেল বা বিবরণ লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('cl_soc_edit_btn:')) {
+    const parts = data.split(':');
+    const clientId = parts[1];
+    const linkId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId);
+    userStates[chatId] = { step: 'client_social_button', tempData: { clientId: client?.id, linkId } };
+    await sendTelegramMessage(chatId, `🔘 <b>নতুন বাটন টেক্সট লিখে পাঠান:</b>\n<i>(যেমন: "যুক্ত হোন", "সাবস্ক্রাইব", "ফলো করুন")</i>`);
+    return;
+  }
+
   if (data.startsWith('cl_soc_toggle:')) {
     const parts = data.split(':');
     const clientId = parts[1];
@@ -3296,20 +3552,29 @@ async function handleCallbackQuery(cb: any) {
         if (l) l.enabled = l.enabled === false ? true : false;
       });
       const updated = getClientById(client.id) || client;
-      await sendTelegramMessage(chatId, `✅ <b>সোশ্যাল লিংকের অবস্থা পরিবর্তন সম্পন্ন!</b>`, {
-        reply_markup: getClientSocialMenuKeyboard(updated)
+      const l = updated.socialLinks.find(item => item.id === linkId);
+      const st = l && l.enabled !== false ? 'অন করা হয়েছে 🟢' : 'হাইড করা হয়েছে ⚪';
+      await sendTelegramMessage(chatId, `✅ <b>সোশ্যাল লিংকের অবস্থা ${st}!</b>`, {
+        reply_markup: getClientSingleSocialKeyboard(updated.id, linkId, l ? l.enabled !== false : true)
       });
     }
     return;
   }
 
-  if (data.startsWith('cl_soc_edit_url:')) {
+  if (data.startsWith('cl_soc_del:')) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
     const client = getClientById(clientId) || getClientByChatId(chatId);
-    userStates[chatId] = { step: 'client_social_url', tempData: { clientId: client?.id, linkId } };
-    await sendTelegramMessage(chatId, `🔗 <b>নতুন সোশ্যাল লিংক লিখে পাঠান:</b>`);
+    if (client) {
+      updateClientData(client.id, c => {
+        c.socialLinks = c.socialLinks.filter(l => l.id !== linkId);
+      });
+      const updated = getClientById(client.id) || client;
+      await sendTelegramMessage(chatId, `🗑️ <b>সোশ্যাল লিঙ্কটি সফলভাবে মুছে ফেলা হয়েছে!</b>`, {
+        reply_markup: getClientSocialMenuKeyboard(updated)
+      });
+    }
     return;
   }
 
