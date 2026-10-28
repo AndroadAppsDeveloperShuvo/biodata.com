@@ -279,6 +279,31 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       border-radius: 2rem !important;
       color: #1e3323 !important;
     }
+    [data-theme="organic_nature"] .profile-banner-container {
+      background-color: #c0d1be !important;
+    }
+    [data-theme="organic_nature"] .profile-banner-overlay {
+      background: linear-gradient(to top, #e2ece0 0%, rgba(226, 236, 224, 0.5) 55%, transparent 100%) !important;
+    }
+    [data-theme="organic_nature"] #profileName {
+      color: #1a2e1f !important;
+      background: none !important;
+      -webkit-text-fill-color: #1a2e1f !important;
+    }
+    [data-theme="organic_nature"] #profileHandle {
+      background: #c8dac6 !important;
+      border: 1px solid #9bb198 !important;
+      color: #2b4530 !important;
+    }
+    [data-theme="organic_nature"] #profileTitle {
+      color: #2e4533 !important;
+    }
+    [data-theme="organic_nature"] #profileLocationWrapper {
+      color: #4a634e !important;
+    }
+    [data-theme="organic_nature"] #profileBio {
+      color: #233b28 !important;
+    }
     [data-theme="organic_nature"] h1, 
     [data-theme="organic_nature"] h2, 
     [data-theme="organic_nature"] h3, 
@@ -289,13 +314,15 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       color: #2d4231 !important;
     }
     [data-theme="organic_nature"] .glass-card {
-      background: rgba(255, 255, 255, 0.75) !important;
+      background: rgba(255, 255, 255, 0.8) !important;
       backdrop-filter: blur(12px) !important;
       border: 1px solid rgba(142, 168, 140, 0.5) !important;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.04) !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
     }
     [data-theme="organic_nature"] .avatar-glow {
-      box-shadow: 0 0 0 3px #e2ece0, 0 0 0 6px #597762, 0 8px 20px rgba(89, 119, 98, 0.3) !important;
+      box-shadow: 0 0 0 3px #e2ece0, 0 0 0 6px #597762, 0 10px 25px rgba(89, 119, 98, 0.3) !important;
+      background-color: #e2ece0 !important;
+      border-color: #597762 !important;
     }
     [data-theme="organic_nature"] #badgesContainer span {
       background: #cddecd !important;
@@ -315,15 +342,55 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       color: #ffffff !important;
     }
     [data-theme="organic_nature"] #socialLinksContainer > a {
-      background: #f0f5ee !important;
+      background: #ffffff !important;
       border: 1px solid #b2c4b0 !important;
       color: #1a2d1d !important;
+      box-shadow: 0 4px 14px rgba(45, 68, 48, 0.06) !important;
     }
     [data-theme="organic_nature"] #socialLinksContainer > a h3 {
       color: #1a2d1d !important;
     }
     [data-theme="organic_nature"] #socialLinksContainer > a p {
       color: #48614a !important;
+    }
+    [data-theme="organic_nature"] #socialLinksContainer > a span {
+      background: #597762 !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(89, 119, 98, 0.35) !important;
+    }
+    [data-theme="organic_nature"] #socialLinksContainer > a:hover span {
+      background: #476350 !important;
+      color: #ffffff !important;
+    }
+    [data-theme="organic_nature"] #btnShareProfile > div {
+      background: #ffffff !important;
+      border: 1px solid #b2c4b0 !important;
+      box-shadow: 0 4px 14px rgba(45, 68, 48, 0.08) !important;
+    }
+    [data-theme="organic_nature"] #btnShareProfile h3,
+    [data-theme="organic_nature"] #btnShareProfile h4 {
+      color: #1a2d1d !important;
+    }
+    [data-theme="organic_nature"] #btnShareProfile p {
+      color: #48614a !important;
+    }
+    [data-theme="organic_nature"] #btnShareProfile span {
+      background: linear-gradient(135deg, #597762, #476350) !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(89, 119, 98, 0.3) !important;
+    }
+    [data-theme="organic_nature"] #btnShareProfile svg {
+      color: #597762 !important;
+    }
+    [data-theme="organic_nature"] #btnShareProfile span svg {
+      color: #ffffff !important;
+    }
+    [data-theme="organic_nature"] #contactContainer {
+      background: #ffffff !important;
+      border: 1px solid #b2c4b0 !important;
+    }
+    [data-theme="organic_nature"] #contactContainer h3 {
+      color: #2b4530 !important;
     }
     [data-theme="organic_nature"] #contactContainer a:first-child {
       background: linear-gradient(135deg, #597762, #476350) !important;
@@ -339,6 +406,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       font-weight: 700 !important;
       box-shadow: 0 4px 12px rgba(192, 147, 103, 0.3) !important;
     }
+    [data-theme="organic_nature"] footer p {
+      color: #4a634e !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950">
@@ -351,9 +421,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24">
     
     <!-- Profile Banner & Header -->
-    <div class="relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900">
+    <div class="profile-banner-container relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900">
       <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || 'https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg')}" alt="Banner" class="w-full h-full object-cover opacity-80" onerror="this.src='https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'" />
-      <div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
+      <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
     </div>
 
     <!-- Profile Info Box -->

@@ -54,3 +54,158 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #0284c7;
 }
+
+/* Cyberpunk Neon Theme Rules */
+[data-theme="cyberpunk_neon"] {
+  background-color: #030712 !important;
+}
+[data-theme="cyberpunk_neon"] main {
+  background: #080d1e !important;
+  border: 2px solid rgba(34, 211, 238, 0.8) !important;
+  box-shadow: 0 0 35px rgba(34, 211, 238, 0.35), inset 0 0 25px rgba(147, 51, 234, 0.15) !important;
+  border-radius: 1.5rem !important;
+}
+
+/* Organic Nature Theme Rules */
+[data-theme="organic_nature"] {
+  background-color: #dce6d8 !important;
+  background-image: radial-gradient(circle at 10% 20%, rgba(107, 142, 115, 0.2), transparent 50%),
+                    radial-gradient(circle at 90% 80%, rgba(201, 155, 112, 0.2), transparent 50%) !important;
+  color: #1e3323 !important;
+}
+[data-theme="organic_nature"] main {
+  background: #e2ece0 !important;
+  border: 1px solid #9cb09a !important;
+  box-shadow: 0 20px 40px rgba(45, 68, 48, 0.15) !important;
+  border-radius: 2rem !important;
+  color: #1e3323 !important;
+}
+
+/* Header Banner Blend Fix for Organic Nature */
+[data-theme="organic_nature"] .profile-banner-container {
+  background-color: #c0d1be !important;
+}
+[data-theme="organic_nature"] .profile-banner-overlay {
+  background: linear-gradient(to top, #e2ece0 0%, rgba(226, 236, 224, 0.5) 55%, transparent 100%) !important;
+}
+[data-theme="organic_nature"] .avatar-glow {
+  box-shadow: 0 0 0 3px #e2ece0, 0 0 0 6px #597762, 0 10px 25px rgba(89, 119, 98, 0.3) !important;
+  background-color: #e2ece0 !important;
+  border-color: #597762 !important;
+}
+
+/* Header Typography & Badges */
+[data-theme="organic_nature"] .profile-name-text {
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #1a2e1f !important;
+  color: #1a2e1f !important;
+}
+[data-theme="organic_nature"] .profile-handle {
+  background: #c8dac6 !important;
+  border: 1px solid #9bb198 !important;
+  color: #2b4530 !important;
+}
+[data-theme="organic_nature"] .profile-title {
+  color: #2e4533 !important;
+}
+[data-theme="organic_nature"] .profile-location {
+  color: #4a634e !important;
+}
+[data-theme="organic_nature"] .bio-card {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(142, 168, 140, 0.5) !important;
+  color: #1e3323 !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+}
+[data-theme="organic_nature"] .bio-card p {
+  color: #233b28 !important;
+}
+[data-theme="organic_nature"] #badgesContainer span,
+[data-theme="organic_nature"] .badge-pill {
+  background: #cddecd !important;
+  border: 1px solid #8ca28a !important;
+  color: #1a2d1d !important;
+}
+
+/* Social Links High Contrast Join Button Fix */
+[data-theme="organic_nature"] .social-link-card,
+[data-theme="organic_nature"] #socialLinksContainer > a {
+  background: #ffffff !important;
+  border: 1px solid #b2c4b0 !important;
+  box-shadow: 0 4px 14px rgba(45, 68, 48, 0.06) !important;
+}
+[data-theme="organic_nature"] .social-link-card h3,
+[data-theme="organic_nature"] #socialLinksContainer > a h3 {
+  color: #1a2d1d !important;
+}
+[data-theme="organic_nature"] .social-link-card p,
+[data-theme="organic_nature"] #socialLinksContainer > a p {
+  color: #48614a !important;
+}
+[data-theme="organic_nature"] .social-btn-badge,
+[data-theme="organic_nature"] #socialLinksContainer > a span {
+  background: #597762 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(89, 119, 98, 0.35) !important;
+}
+[data-theme="organic_nature"] .social-link-card:hover .social-btn-badge,
+[data-theme="organic_nature"] #socialLinksContainer > a:hover span {
+  background: #476350 !important;
+  color: #ffffff !important;
+}
+
+/* Services Grid Odd/Even Gradients */
+[data-theme="organic_nature"] #servicesGrid > div:nth-child(odd),
+[data-theme="organic_nature"] .service-card-odd {
+  background: linear-gradient(135deg, #597762, #476350) !important;
+  border: 1px solid #718f7a !important;
+}
+[data-theme="organic_nature"] #servicesGrid > div:nth-child(even),
+[data-theme="organic_nature"] .service-card-even {
+  background: linear-gradient(135deg, #c09367, #a87e55) !important;
+  border: 1px solid #d4a97f !important;
+}
+
+/* Share Profile Card High Contrast Fix */
+[data-theme="organic_nature"] .share-profile-card,
+[data-theme="organic_nature"] #btnShareProfile > div {
+  background: #ffffff !important;
+  border: 1px solid #b2c4b0 !important;
+  box-shadow: 0 4px 14px rgba(45, 68, 48, 0.08) !important;
+}
+[data-theme="organic_nature"] .share-title,
+[data-theme="organic_nature"] #btnShareProfile h3,
+[data-theme="organic_nature"] #btnShareProfile h4 {
+  color: #1a2d1d !important;
+}
+[data-theme="organic_nature"] .share-sub,
+[data-theme="organic_nature"] #btnShareProfile p {
+  color: #48614a !important;
+}
+[data-theme="organic_nature"] .share-action-btn,
+[data-theme="organic_nature"] #btnShareProfile span {
+  background: linear-gradient(135deg, #597762, #476350) !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(89, 119, 98, 0.3) !important;
+}
+[data-theme="organic_nature"] .share-profile-card svg,
+[data-theme="organic_nature"] #btnShareProfile svg {
+  color: #597762 !important;
+}
+[data-theme="organic_nature"] .share-action-btn svg,
+[data-theme="organic_nature"] #btnShareProfile span svg {
+  color: #ffffff !important;
+}
+
+/* Contact Container Fix */
+[data-theme="organic_nature"] .contact-card,
+[data-theme="organic_nature"] #contactContainer {
+  background: #ffffff !important;
+  border: 1px solid #b2c4b0 !important;
+}
+[data-theme="organic_nature"] .contact-card h3,
+[data-theme="organic_nature"] #contactContainer h3 {
+  color: #2b4530 !important;
+}
+

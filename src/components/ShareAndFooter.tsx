@@ -42,12 +42,12 @@ export const ShareAndFooter: React.FC<Props> = ({ onShowToast }) => {
   return (
     <div className="space-y-4">
       {/* Share Box */}
-      <div className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 flex items-center justify-between gap-3 shadow-md">
+      <div id="btnShareProfile" className="share-profile-card p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 flex items-center justify-between gap-3 shadow-md">
         <div className="space-y-0.5 min-w-0 flex-1">
-          <h4 className="text-xs font-bold text-white truncate">
+          <h4 className="share-title text-xs font-bold text-white truncate">
             বন্ধুদের সাথে শেয়ার করুন
           </h4>
-          <p className="text-[11px] text-slate-400 truncate">
+          <p className="share-sub text-[11px] text-slate-400 truncate">
             এই বায়ো পেজের লিংক এক ক্লিকে কপি করুন
           </p>
           <p className="text-[10px] font-mono text-cyan-400 truncate opacity-85">
@@ -58,7 +58,7 @@ export const ShareAndFooter: React.FC<Props> = ({ onShowToast }) => {
         <button
           type="button"
           onClick={handleCopy}
-          className={`px-3 py-1.5 active:scale-95 border text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
+          className={`share-action-btn px-3 py-1.5 active:scale-95 border text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
             copied
               ? 'bg-emerald-600 border-emerald-500 text-white'
               : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white'

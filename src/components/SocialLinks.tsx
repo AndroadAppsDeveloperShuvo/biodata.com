@@ -61,7 +61,7 @@ export const SocialLinks: React.FC<Props> = ({ links }) => {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl neon-border"
+            className="social-link-card group w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl neon-border"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
@@ -78,7 +78,7 @@ export const SocialLinks: React.FC<Props> = ({ links }) => {
             </div>
 
             <div className="shrink-0 pl-2">
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-xl bg-white/10 group-hover:bg-cyan-500 group-hover:text-slate-950 text-white transition-all shadow-sm">
+              <span className="social-btn-badge inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-xl bg-white/10 group-hover:bg-cyan-500 group-hover:text-slate-950 text-white transition-all shadow-sm">
                 <span>{link.buttonText}</span>
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </span>

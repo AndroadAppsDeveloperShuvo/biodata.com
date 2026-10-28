@@ -10,7 +10,7 @@ export const DirectContact: React.FC<Props> = ({ contact }) => {
   if (!contact || !contact.enabled) return null;
 
   return (
-    <div className="p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 space-y-3 shadow-lg">
+    <div id="contactContainer" className="contact-card p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 space-y-3 shadow-lg">
       <div className="flex items-center justify-between">
         <h3 className="text-xs font-bold text-cyan-400 uppercase tracking-wider">
           সরাসরি যোগাযোগ করুন

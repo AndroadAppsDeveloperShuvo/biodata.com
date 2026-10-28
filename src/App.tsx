@@ -230,15 +230,18 @@ export default function App() {
       </div>
 
       {/* Main Responsive Bio Container */}
-      <main className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
-        isOrganic
-          ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
-          : isCyber
-          ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
-          : isGlass
-          ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'
-          : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
-      }`}>
+      <main
+        data-theme={themeStyle}
+        className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
+          isOrganic
+            ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
+            : isCyber
+            ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
+            : isGlass
+            ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'
+            : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
+        }`}
+      >
         {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
         <BioHeader profile={profile} badges={badges} />
 

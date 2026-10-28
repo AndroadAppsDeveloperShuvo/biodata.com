@@ -27,7 +27,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
   return (
     <div>
       {/* Banner Cover */}
-      <div className="relative h-36 sm:h-44 w-full bg-slate-900 overflow-hidden">
+      <div className="profile-banner-container relative h-36 sm:h-44 w-full bg-slate-900 overflow-hidden">
         {profile.bannerUrl && (
           <img
             src={profile.bannerUrl}
@@ -36,7 +36,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
             className="w-full h-full object-cover opacity-80"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40" />
+        <div className="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40" />
 
         {/* Top Active Status */}
         <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
@@ -51,7 +51,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
       <div className="px-5 pt-0 pb-4 relative -mt-14 flex flex-col items-center text-center">
         {/* Avatar */}
         <div className="relative group">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl">
+          <div className="avatar-glow w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl">
             <img
               src={profile.avatarUrl || 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
               alt={profile.name || 'User'}
@@ -72,27 +72,27 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
 
         {/* Names & Title */}
         {profile.name && (
-          <h1 className="text-xl sm:text-2xl font-bold mt-2.5 text-white tracking-tight flex items-center gap-1.5 justify-center">
-            <span className="font-tech bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+          <h1 className="text-xl sm:text-2xl font-bold mt-2.5 tracking-tight flex items-center gap-1.5 justify-center">
+            <span className="profile-name-text font-tech bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
               {profile.name}
             </span>
           </h1>
         )}
         
         {profile.handle && (
-          <p className="text-xs font-mono text-cyan-400 font-semibold mt-0.5 tracking-wide">
+          <p className="profile-handle text-xs font-mono text-cyan-400 font-semibold mt-0.5 tracking-wide px-2.5 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-800/40">
             {profile.handle}
           </p>
         )}
         
         {profile.title && (
-          <p className="text-xs text-slate-300 font-medium mt-1 max-w-sm leading-relaxed">
+          <p className="profile-title text-xs text-slate-300 font-medium mt-1 max-w-sm leading-relaxed">
             {profile.title}
           </p>
         )}
         
         {profile.location && (
-          <p className="text-[11px] text-slate-400 mt-1 flex items-center gap-1 justify-center">
+          <p className="profile-location text-[11px] text-slate-400 mt-1 flex items-center gap-1 justify-center">
             <MapPin className="w-3 h-3 text-cyan-400" />
             <span>{profile.location}</span>
           </p>
@@ -100,7 +100,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
 
         {/* Bio Text */}
         {profile.bio && (
-          <div className="text-xs text-slate-300 bg-slate-900/70 border border-slate-800/90 px-3.5 py-2.5 rounded-xl mt-3 leading-relaxed text-center max-w-sm shadow-inner">
+          <div className="bio-card text-xs text-slate-300 bg-slate-900/70 border border-slate-800/90 px-3.5 py-2.5 rounded-xl mt-3 leading-relaxed text-center max-w-sm shadow-inner">
             <p>{profile.bio}</p>
           </div>
         )}
