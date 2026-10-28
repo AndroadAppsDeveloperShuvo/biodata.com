@@ -461,9 +461,13 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       box-shadow: 4px 4px 0px #000000 !important;
     }
     [data-theme="bold_flat_popart"] .avatar-glow {
-      box-shadow: 4px 4px 0px #000000 !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
       background-color: #ffffff !important;
-      border: 4px solid #000000 !important;
+      border: 3px solid #000000 !important;
+      border-radius: 9999px !important;
+    }
+    [data-theme="bold_flat_popart"] .avatar-glow img {
+      border-radius: 9999px !important;
     }
     [data-theme="bold_flat_popart"] #badgesContainer span {
       background: #38bdf8 !important;
@@ -513,12 +517,31 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     [data-theme="bold_flat_popart"] #btnShareProfile p {
       color: #000000 !important;
     }
-    [data-theme="bold_flat_popart"] #btnShareProfile span {
+    [data-theme="bold_flat_popart"] .share-action-btn {
       background: #2563eb !important;
       border: 2px solid #000000 !important;
       color: #ffffff !important;
-      font-weight: 800 !important;
-      box-shadow: 2px 2px 0px #000000 !important;
+      font-weight: 700 !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+    [data-theme="bold_flat_popart"] #btnShareProfile > div > div:last-child > span {
+      background: #2563eb !important;
+      border: 2px solid #000000 !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+    [data-theme="bold_flat_popart"] .share-action-btn span,
+    [data-theme="bold_flat_popart"] #btnShareProfile span span {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      color: #ffffff !important;
+      font-weight: 700 !important;
+      text-shadow: none !important;
+      -webkit-text-stroke: 0px !important;
     }
     [data-theme="bold_flat_popart"] #contactContainer {
       background: #ffffff !important;
