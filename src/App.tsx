@@ -53,6 +53,7 @@ export default function App() {
   const [services, setServices] = useState<HighlightService[]>(initialCache?.services || []);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
   const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
+  const [themeStyle, setThemeStyle] = useState<string>('classic_dark');
   const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -73,6 +74,9 @@ export default function App() {
   // Apply fetched data to state & cache
   const applyData = useCallback((data: any) => {
     if (!data) return;
+    if (data.themeStyle) {
+      setThemeStyle(data.themeStyle);
+    }
     if (data.profile) {
       setProfile(data.profile);
     }
@@ -170,8 +174,20 @@ export default function App() {
     };
   }, [fetchData]);
 
+  const isGlass = themeStyle === 'dark_glassmorphism';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black">
+    <div className={`min-h-screen text-slate-100 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black relative overflow-hidden transition-colors duration-500 ${isGlass ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black'}`}>
+      
+      {/* Ambient Glassmorphism Glow Orbs */}
+      {isGlass && (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
+          <div className="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
+        </div>
+      )}
+
       {/* Toast Notification */}
       <div
         className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white border border-cyan-400 px-4 py-2 rounded-2xl text-xs sm:text-sm font-semibold shadow-2xl backdrop-blur-md transition-all duration-300 flex items-center gap-2 ${
@@ -184,7 +200,7 @@ export default function App() {
       </div>
 
       {/* Main Responsive Bio Container */}
-      <main className="w-full max-w-[480px] bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 relative">
+      <main className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${isGlass ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]' : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'}`}>
         {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
         <BioHeader profile={profile} badges={badges} />
 

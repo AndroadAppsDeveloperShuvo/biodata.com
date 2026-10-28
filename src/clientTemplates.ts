@@ -41,6 +41,7 @@ export interface ClientRecord {
     customNote: string;
   };
   layoutStyle?: 'social_first' | 'services_first';
+  themeStyle?: 'classic_dark' | 'dark_glassmorphism' | string;
 }
 
 function escapeHtml(text: string): string {
@@ -596,15 +597,45 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       }
     }
 
+    function applyThemeStyle(theme) {
+      var themeClass = theme || 'classic_dark';
+      document.body.setAttribute('data-theme', themeClass);
+      var mainEl = document.querySelector('main');
+      var glassBg = document.getElementById('glassmorphismMeshBg');
+
+      if (themeClass === 'dark_glassmorphism') {
+        if (!glassBg) {
+          glassBg = document.createElement('div');
+          glassBg.id = 'glassmorphismMeshBg';
+          glassBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
+          glassBg.innerHTML = '<div class="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>'
+            + '<div class="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>'
+            + '<div class="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style="animation-delay: 3s;"></div>';
+          document.body.insertBefore(glassBg, document.body.firstChild);
+        }
+        glassBg.style.display = 'block';
+        if (mainEl) {
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-slate-900/60 backdrop-blur-2xl border-x border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)] relative pb-24 z-10';
+        }
+      } else {
+        if (glassBg) glassBg.style.display = 'none';
+        if (mainEl) {
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24';
+        }
+      }
+    }
+
     var lastUpdatedSig = '';
     function applyAllData(data, shouldToast) {
       if (!data || typeof data !== 'object') return;
       var currentLayout = data.layoutStyle || 'social_first';
-      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
+      var currentTheme = data.themeStyle || 'classic_dark';
+      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + currentTheme + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
       if (sig === lastUpdatedSig) return;
       lastUpdatedSig = sig;
 
       applyLayoutStyle(currentLayout);
+      applyThemeStyle(currentTheme);
       if (data.profile) renderProfile(data.profile);
       if (data.badges) renderBadges(data.badges);
       if (data.services) renderServices(data.services);

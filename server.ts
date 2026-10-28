@@ -382,7 +382,32 @@ async function pullFromFirebase() {
 function getClients(): ClientRecord[] {
   try {
     const data = JSON.parse(fs.readFileSync(CLIENTS_FILE, 'utf-8'));
-    return Array.isArray(data) ? data : Object.values(data);
+    const list: ClientRecord[] = Array.isArray(data) ? data : Object.values(data);
+    return list.map(c => ({
+      ...c,
+      badges: Array.isArray(c.badges) ? c.badges : [],
+      services: Array.isArray(c.services) ? c.services : [],
+      socialLinks: Array.isArray(c.socialLinks) ? c.socialLinks : [],
+      profile: c.profile || {
+        name: c.appName || 'My Bio',
+        handle: '@official',
+        title: 'Digital Creator',
+        location: 'Bangladesh',
+        bio: 'স্বাগতম আমার অফিসিয়াল বায়ো পেজে!',
+        avatarUrl: c.logoUrl || '',
+        bannerUrl: ''
+      },
+      layoutStyle: c.layoutStyle || 'social_first',
+      themeStyle: c.themeStyle || 'classic_dark',
+      contact: c.contact || {
+        enabled: true,
+        whatsappNumber: '+8801700000000',
+        whatsappMessage: 'Hello!',
+        email: 'client@gmail.com',
+        telegramUsername: '',
+        customNote: ''
+      }
+    }));
   } catch {
     return [];
   }
@@ -1237,18 +1262,22 @@ function getAdminSingleClientKeyboard(clientId: string) {
 function getClientMainMenuKeyboard(client: ClientRecord) {
   const isServicesFirst = client.layoutStyle === 'services_first';
   const layoutLabel = isServicesFirst ? '🛠️ লেআউট: সার্ভিস আগে' : '🌐 লেআউট: সোশ্যাল আগে (Admin)';
+  const badgesCount = (client.badges || []).length;
+  const socialCount = (client.socialLinks || []).length;
+  const servicesCount = (client.services || []).length;
+
   return {
     inline_keyboard: [
       [
         { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: `cl_prof:${client.id}` },
-        { text: `🏷️ ব্যাজ সমূহ (${client.badges.length}টি)`, callback_data: `cl_badges:${client.id}` }
+        { text: `🏷️ ব্যাজ সমূহ (${badgesCount}টি)`, callback_data: `cl_badges:${client.id}` }
       ],
       [
-        { text: `🌐 সোশ্যাল মিডিয়া (${client.socialLinks.length}টি)`, callback_data: `cl_social:${client.id}` },
+        { text: `🌐 সোশ্যাল মিডিয়া (${socialCount}টি)`, callback_data: `cl_social:${client.id}` },
         { text: '📞 সরাসরি যোগাযোগ', callback_data: `cl_contact:${client.id}` }
       ],
       [
-        { text: `🛠️ সাভিস সমূহ (${client.services.length}টি)`, callback_data: `cl_services:${client.id}` },
+        { text: `🛠️ সাভিস সমূহ (${servicesCount}টি)`, callback_data: `cl_services:${client.id}` },
         { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: `cl_preview:${client.id}` }
       ],
       [
@@ -1286,8 +1315,12 @@ function getClientProfileMenuKeyboard(client?: ClientRecord) {
 
 function getClientLayoutKeyboard(client: ClientRecord) {
   const isServicesFirst = client.layoutStyle === 'services_first';
+  const theme = client.themeStyle || 'classic_dark';
   return {
     inline_keyboard: [
+      [
+        { text: '📐 --- লেআউট সাজানো (Section Order) ---', callback_data: `cl_noop` }
+      ],
       [
         {
           text: (isServicesFirst ? '⚪ ' : '🟢 ') + '১. সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)',
@@ -1301,6 +1334,21 @@ function getClientLayoutKeyboard(client: ClientRecord) {
         }
       ],
       [
+        { text: '🎨 --- ওয়েবসাইট কালার থিম (UI Theme) ---', callback_data: `cl_noop` }
+      ],
+      [
+        {
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ১. ক্লাসিক ডার্ক (Classic Dark)',
+          callback_data: `cl_set_theme:classic_dark:${client.id}`
+        }
+      ],
+      [
+        {
+          text: (theme === 'dark_glassmorphism' ? '🟢 ' : '⚪ ') + '💎 ২. ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)',
+          callback_data: `cl_set_theme:dark_glassmorphism:${client.id}`
+        }
+      ],
+      [
         { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
       ]
     ]
@@ -1309,7 +1357,8 @@ function getClientLayoutKeyboard(client: ClientRecord) {
 
 function getClientBadgesMenuKeyboard(client: ClientRecord) {
   const rows: any[] = [];
-  client.badges.forEach((b, idx) => {
+  const badges = client.badges || [];
+  badges.forEach((b, idx) => {
     rows.push([
       { text: `${idx + 1}. ${b.text}`, callback_data: `cl_noop` },
       { text: '🗑️ মুছুন', callback_data: `cl_badge_del:${client.id}:${b.id}` }
@@ -1326,7 +1375,8 @@ function getClientBadgesMenuKeyboard(client: ClientRecord) {
 
 function getClientServicesMenuKeyboard(client: ClientRecord) {
   const rows: any[] = [];
-  client.services.forEach((s, idx) => {
+  const services = client.services || [];
+  services.forEach((s, idx) => {
     rows.push([
       { text: `#${idx + 1}. 🛠️ ${s.title.substring(0, 22)}`, callback_data: `cl_srv_view:${client.id}:${s.id}` },
       { text: '🗑️ মুছুন', callback_data: `cl_srv_del:${client.id}:${s.id}` }
@@ -1365,7 +1415,8 @@ function getClientSingleServiceKeyboard(serviceId: string, clientId?: string) {
 
 function getClientSocialMenuKeyboard(client: ClientRecord) {
   const rows: any[] = [];
-  client.socialLinks.forEach((s, idx) => {
+  const socialLinks = client.socialLinks || [];
+  socialLinks.forEach((s, idx) => {
     const icon = s.platform === 'facebook' ? '📘'
       : s.platform === 'telegram' ? '✈️'
       : s.platform === 'youtube' ? '🔴'
@@ -3297,6 +3348,27 @@ async function handleCallbackQuery(cb: any) {
       await sendTelegramMessage(
         chatId,
         `✅ <b>লেআউট সফলভাবে পরিবর্তন হয়েছে!</b>\n\n🎨 বর্তমান স্টাইল: <b>${styleName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই লেআউট কার্যকর হয়ে গেছে! 🚀</i>`,
+        { reply_markup: getClientMainMenuKeyboard(updated) }
+      );
+    }
+    return;
+  }
+
+  // 10. Client Set Theme Choice
+  if (data.startsWith('cl_set_theme:')) {
+    const parts = data.split(':');
+    const themeStyle = parts[1];
+    const clientId = parts[2];
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    if (client) {
+      updateClientData(client.id, c => {
+        c.themeStyle = themeStyle;
+      });
+      const updated = getClientById(client.id) || client;
+      const themeName = themeStyle === 'dark_glassmorphism' ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)' : '🕶️ ক্লাসিক ডার্ক (Classic Dark)';
+      await sendTelegramMessage(
+        chatId,
+        `🎨 <b>ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`,
         { reply_markup: getClientMainMenuKeyboard(updated) }
       );
     }
