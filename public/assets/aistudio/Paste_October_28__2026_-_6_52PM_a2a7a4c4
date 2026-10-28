@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD SHUVO P.K. | Premium Bio-Data</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        base: '#09090b', /* Zinc 950 */
+                        surface: '#18181b', /* Zinc 900 */
+                        accent: {
+                            cyan: '#22d3ee',
+                            violet: '#a855f7',
+                            fuchsia: '#d946ef'
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 12s linear infinite',
+                        'spin-reverse': 'spin 8s linear infinite reverse',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient-x': 'gradient-x 3s ease infinite',
+                        'shimmer': 'shimmer 2s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        'pulse-glow': {
+                            '0%, 100%': { opacity: 1, filter: 'brightness(1)' },
+                            '50%': { opacity: .7, filter: 'brightness(1.5)' },
+                        },
+                        'gradient-x': {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        shimmer: {
+                            from: { backgroundPosition: '200% 0' },
+                            to: { backgroundPosition: '-200% 0' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #09090b;
+            color: #fafafa;
+            overflow-x: hidden;
+        }
+
+        /* Technical Grid Background */
+        .bg-grid {
+            background-size: 40px 40px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+            -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+        }
+
+        /* Ultra Premium Glassmorphism */
+        .glass-premium {
+            background: linear-gradient(145deg, rgba(24, 24, 27, 0.7) 0%, rgba(9, 9, 11, 0.7) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 20px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .glass-premium::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .glass-premium:hover::before {
+            background: linear-gradient(45deg, rgba(168, 85, 247, 0.5), rgba(34, 211, 238, 0.5), rgba(217, 70, 239, 0.5));
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #09090b; }
+        ::-webkit-scrollbar-thumb { 
+            background: #27272a; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
+        /* Smooth Reveal System */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Shimmer Button */
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-shimmer::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+        .btn-shimmer:hover::after {
+            transform: translateX(100%);
+            transition: transform 0.5s ease;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative selection:bg-accent-cyan/30 selection:text-accent-cyan flex flex-col items-center">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 bg-grid pointer-events-none -z-20"></div>
+    
+    <!-- Glowing Orbs -->
+    <div class="fixed top-[-10%] left-[-5%] w-[40vw] h-[40vw] rounded-full bg-accent-violet/10 blur-[120px] pointer-events-none -z-10 animate-pulse-glow"></div>
+    <div class="fixed bottom-[-10%] right-[-5%] w-[35vw] h-[35vw] rounded-full bg-accent-cyan/10 blur-[120px] pointer-events-none -z-10 animate-float" style="animation-delay: 1s;"></div>
+    <div class="fixed top-[40%] left-[20%] w-[30vw] h-[30vw] rounded-full bg-accent-fuchsia/5 blur-[100px] pointer-events-none -z-10 animate-float" style="animation-delay: 2s;"></div>
+
+    <div class="w-full max-w-6xl px-4 py-12 md:py-20 flex flex-col gap-10">
+        
+        <!-- Hero Section (ID Card Style) -->
+        <header class="glass-premium rounded-[2rem] p-8 md:p-14 flex flex-col md:flex-row items-center gap-10 reveal active">
+            
+            <!-- Hire Me Badge -->
+            <div class="absolute top-6 right-6 lg:top-8 lg:right-8 flex items-center gap-2.5 bg-surface/50 backdrop-blur-md border border-white/10 px-4 py-2 rounded-full text-xs font-bold tracking-widest text-zinc-300 shadow-xl z-20 hover:border-accent-cyan/50 transition-colors cursor-pointer">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                OPEN TO WORK
+            </div>
+
+            <!-- Complex Animated Avatar -->
+            <div class="relative shrink-0 mt-6 md:mt-0 group">
+                <!-- Outer decorative spinning ring -->
+                <div class="absolute inset-[-15px] rounded-full border border-dashed border-accent-cyan/30 animate-spin-slow"></div>
+                <div class="absolute inset-[-25px] rounded-full border border-accent-violet/20 animate-spin-reverse"></div>
+                
+                <div class="relative w-44 h-44 md:w-52 md:h-52 rounded-full p-1 bg-gradient-to-br from-accent-cyan via-accent-violet to-accent-fuchsia animate-gradient-x shadow-[0_0_50px_rgba(34,211,238,0.2)] group-hover:shadow-[0_0_60px_rgba(168,85,247,0.4)] transition-shadow duration-500">
+                    <div class="w-full h-full rounded-full bg-base p-1 overflow-hidden relative z-10">
+                        <img src="https://placehold.co/400x400/18181b/22d3ee?text=SP" alt="MD SHUVO P.K." class="w-full h-full rounded-full object-cover scale-100 group-hover:scale-110 transition-transform duration-700 ease-out">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Typography & Info -->
+            <div class="text-center md:text-left flex-1 z-10">
+                <p class="text-accent-cyan font-semibold tracking-widest text-sm mb-2 uppercase flex items-center justify-center md:justify-start gap-2">
+                    <i class="fa-solid fa-terminal text-xs"></i> Hello World, I am
+                </p>
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan via-white to-accent-violet animate-gradient-x pb-2">
+                    MD SHUVO P.K.
+                </h1>
+                
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-8">
+                    <span class="bg-accent-cyan/10 text-accent-cyan border border-accent-cyan/20 px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+                        <i class="fa-solid fa-code"></i> Frontend Dev
+                    </span>
+                    <span class="text-zinc-600 hidden md:block"><i class="fa-solid fa-xmark text-xs"></i></span>
+                    <span class="bg-accent-fuchsia/10 text-accent-fuchsia border border-accent-fuchsia/20 px-4 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 shadow-[0_0_15px_rgba(217,70,239,0.1)]">
+                        <i class="fa-solid fa-leaf"></i> Poultry Manager
+                    </span>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                    <button class="btn-shimmer bg-white text-black hover:bg-zinc-200 px-6 py-3 rounded-xl font-bold text-sm transition-colors flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                        <i class="fa-solid fa-download"></i> Download CV
+                    </button>
+                    <a href="mailto:contact@example.com" class="glass-premium hover:bg-white/5 px-6 py-3 rounded-xl font-semibold text-sm text-zinc-300 transition-all flex items-center gap-2">
+                        <i class="fa-regular fa-envelope text-accent-cyan"></i> Let's Talk
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Highlights -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 reveal">
+            <!-- Stat 1 -->
+            <div class="glass-premium rounded-2xl p-6 text-center group cursor-default">
+                <div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-white mb-2 group-hover:scale-110 transition-transform">3+</div>
+                <p class="text-xs text-zinc-400 uppercase tracking-widest font-semibold">Years Exp.</p>
+            </div>
+            <!-- Stat 2 -->
+            <div class="glass-premium rounded-2xl p-6 text-center group cursor-default">
+                <div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-violet to-white mb-2 group-hover:scale-110 transition-transform">15+</div>
+                <p class="text-xs text-zinc-400 uppercase tracking-widest font-semibold">Projects</p>
+            </div>
+            <!-- Stat 3 -->
+            <div class="glass-premium rounded-2xl p-6 text-center group cursor-default">
+                <div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-accent-fuchsia to-white mb-2 group-hover:scale-110 transition-transform">5K+</div>
+                <p class="text-xs text-zinc-400 uppercase tracking-widest font-semibold">Poultry Cap.</p>
+            </div>
+            <!-- Stat 4 -->
+            <div class="glass-premium rounded-2xl p-6 text-center group cursor-default">
+                <div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-white mb-2 group-hover:scale-110 transition-transform">100%</div>
+                <p class="text-xs text-zinc-400 uppercase tracking-widest font-semibold">Dedication</p>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Side (Takes 7 cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-8">
+                
+                <!-- About Me -->
+                <section class="glass-premium rounded-[2rem] p-8 md:p-10 reveal delay-100 group relative overflow-hidden">
+                    <!-- Decorative background gradient for card -->
+                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-accent-cyan/10 rounded-full blur-3xl group-hover:bg-accent-cyan/20 transition-colors duration-700"></div>
+                    
+                    <div class="flex items-center gap-4 mb-6 relative z-10">
+                        <div class="w-12 h-12 rounded-2xl bg-surface border border-white/10 flex items-center justify-center shadow-lg group-hover:border-accent-cyan/50 transition-colors">
+                            <i class="fa-solid fa-fingerprint text-xl text-accent-cyan"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-wide">About Me</h2>
+                    </div>
+                    
+                    <p class="text-zinc-300 leading-relaxed text-lg font-light relative z-10">
+                        I am MD SHUVO P.K., a multidisciplinary professional hailing from Natore. My journey is defined by a fascinating duality: the logical precision of <strong class="text-white font-medium">technology</strong> and the nurturing patience of <strong class="text-white font-medium">agriculture</strong>. 
+                        <br><br>
+                        By day, I architect pixel-perfect, highly responsive frontend interfaces that bring ideas to life. Concurrently, I manage a thriving poultry farm, optimizing operations and applying real-world management skills. I thrive on solving complex problems, whether debugging code or streamlining farm logistics.
+                    </p>
+                </section>
+
+                <!-- Dual Passions -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Passion 1 -->
+                    <div class="tilt-card glass-premium rounded-[2rem] p-8 text-center cursor-crosshair reveal delay-200 group">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-surface border border-white/10 flex items-center justify-center text-3xl mb-6 shadow-xl group-hover:scale-110 group-hover:border-accent-cyan/50 transition-all duration-300">
+                            <i class="fa-solid fa-laptop-code text-accent-cyan drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Frontend Engineer</h3>
+                        <p class="text-sm text-zinc-400 leading-relaxed">Crafting immersive digital experiences with clean code, modern frameworks, and a keen eye for design.</p>
+                    </div>
+
+                    <!-- Passion 2 -->
+                    <div class="tilt-card glass-premium rounded-[2rem] p-8 text-center cursor-crosshair reveal delay-300 group">
+                        <div class="w-20 h-20 mx-auto rounded-full bg-surface border border-white/10 flex items-center justify-center text-3xl mb-6 shadow-xl group-hover:scale-110 group-hover:border-accent-fuchsia/50 transition-all duration-300">
+                            <i class="fa-solid fa-egg text-accent-fuchsia drop-shadow-[0_0_10px_rgba(217,70,239,0.5)]"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Poultry Manager</h3>
+                        <p class="text-sm text-zinc-400 leading-relaxed">Executing daily farm operations, focusing on health metrics, yield optimization, and supply chain management.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side (Takes 5 cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-8">
+                
+                <!-- Skills Stack -->
+                <section class="glass-premium rounded-[2rem] p-8 reveal delay-200 group">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-surface border border-white/10 flex items-center justify-center shadow-lg group-hover:border-accent-violet/50 transition-colors">
+                                <i class="fa-solid fa-layer-group text-xl text-accent-violet"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-white tracking-wide">Tech Stack</h2>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col gap-4">
+                        <!-- Skill Item -->
+                        <div class="bg-surface/50 border border-white/5 p-4 rounded-2xl flex items-center gap-4 hover:bg-surface hover:border-orange-500/30 transition-all">
+                            <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500"><i class="fa-brands fa-html5 text-xl"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-white font-semibold text-sm">HTML5 / CSS3</h4>
+                                <div class="w-full bg-zinc-800 h-1.5 rounded-full mt-2"><div class="bg-orange-500 h-1.5 rounded-full" style="width: 95%"></div></div>
+                            </div>
+                        </div>
+                        <!-- Skill Item -->
+                        <div class="bg-surface/50 border border-white/5 p-4 rounded-2xl flex items-center gap-4 hover:bg-surface hover:border-cyan-500/30 transition-all">
+                            <div class="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center text-cyan-500"><i class="fa-brands fa-css3-alt text-xl"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-white font-semibold text-sm">Tailwind CSS</h4>
+                                <div class="w-full bg-zinc-800 h-1.5 rounded-full mt-2"><div class="bg-cyan-500 h-1.5 rounded-full" style="width: 90%"></div></div>
+                            </div>
+                        </div>
+                        <!-- Skill Item -->
+                        <div class="bg-surface/50 border border-white/5 p-4 rounded-2xl flex items-center gap-4 hover:bg-surface hover:border-yellow-400/30 transition-all">
+                            <div class="w-10 h-10 rounded-full bg-yellow-400/10 flex items-center justify-center text-yellow-400"><i class="fa-brands fa-js text-xl"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-white font-semibold text-sm">JavaScript (ES6+)</h4>
+                                <div class="w-full bg-zinc-800 h-1.5 rounded-full mt-2"><div class="bg-yellow-400 h-1.5 rounded-full" style="width: 85%"></div></div>
+                            </div>
+                        </div>
+                        <!-- Skill Item -->
+                        <div class="bg-surface/50 border border-white/5 p-4 rounded-2xl flex items-center gap-4 hover:bg-surface hover:border-amber-500/30 transition-all">
+                            <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500"><i class="fa-solid fa-fire text-xl"></i></div>
+                            <div class="flex-1">
+                                <h4 class="text-white font-semibold text-sm">Firebase Cloud</h4>
+                                <div class="w-full bg-zinc-800 h-1.5 rounded-full mt-2"><div class="bg-amber-500 h-1.5 rounded-full" style="width: 80%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Interests -->
+                <section class="glass-premium rounded-[2rem] p-8 reveal delay-300 group">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-2xl bg-surface border border-white/10 flex items-center justify-center shadow-lg group-hover:border-rose-500/50 transition-colors">
+                            <i class="fa-solid fa-gamepad text-xl text-rose-500"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-white tracking-wide">Interests</h2>
+                    </div>
+                    
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface/40 border border-white/5 hover:bg-surface hover:border-rose-500/30 transition-all cursor-default">
+                            <i class="fa-solid fa-crosshairs text-2xl text-rose-500/70"></i>
+                            <div>
+                                <h4 class="font-bold text-zinc-200">Free Fire</h4>
+                                <p class="text-xs text-zinc-500 mt-0.5">Esports & Tactical Gaming</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 p-4 rounded-2xl bg-surface/40 border border-white/5 hover:bg-surface hover:border-emerald-500/30 transition-all cursor-default">
+                            <i class="fa-solid fa-wand-magic-sparkles text-2xl text-emerald-500/70"></i>
+                            <div>
+                                <h4 class="font-bold text-zinc-200">UI/UX Tweaking</h4>
+                                <p class="text-xs text-zinc-500 mt-0.5">Perfecting visual aesthetics</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="w-full text-center pt-8 pb-4 mt-8 border-t border-white/10 reveal relative">
+            <p class="text-zinc-500 text-sm font-medium tracking-wide">
+                Engineered with <i class="fa-solid fa-bolt text-accent-cyan mx-1"></i> by <span class="text-zinc-300 font-bold">MD SHUVO P.K.</span> &copy; 2026
+            </p>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Smooth Scroll Reveal
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach((element) => {
+                observer.observe(element);
+            });
+
+            // Advanced 3D Tilt Effect
+            const tiltCards = document.querySelectorAll('.tilt-card');
+            
+            tiltCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    // Smoother calculation for premium feel
+                    const rotateX = ((y - centerY) / centerY) * -8; 
+                    const rotateY = ((x - centerX) / centerX) * 8;
+
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                });
+
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

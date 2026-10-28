@@ -178,9 +178,10 @@ export default function App() {
   const isCyber = themeStyle === 'cyberpunk_neon';
   const isOrganic = themeStyle === 'organic_nature';
   const isPopArt = themeStyle === 'bold_flat_popart';
+  const isUltraGlass = themeStyle === 'ultra_cyber_glass';
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-yellow-400 selection:text-black relative overflow-hidden ${
+    <div className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
       isPopArt
         ? 'bg-[#facc15] text-black'
         : isOrganic
@@ -189,9 +190,21 @@ export default function App() {
         ? 'bg-[#030712] text-slate-100 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,211,238,0.25),rgba(3,7,18,0.98))]'
         : isGlass
         ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950 text-slate-100'
+        : isUltraGlass
+        ? 'bg-[#09090b] text-slate-100'
         : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
     }`}>
       
+      {/* Ultra Cyber Glass Ambient Grid Background & Glowing Orbs */}
+      {isUltraGlass && (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="fixed inset-0 bg-grid opacity-80" />
+          <div className="fixed top-[-10%] left-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-purple-600/15 blur-[120px] animate-pulse-glow-orb" />
+          <div className="fixed bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-cyan-400/15 blur-[120px] animate-float-orb" style={{ animationDelay: '1s' }} />
+          <div className="fixed top-[40%] left-[20%] w-[35vw] h-[35vw] max-w-[350px] max-h-[350px] rounded-full bg-fuchsia-500/10 blur-[100px] animate-float-orb" style={{ animationDelay: '2s' }} />
+        </div>
+      )}
+
       {/* Pop Art Comic Dots Ambient Background */}
       {isPopArt && (
         <div className="fixed inset-0 pointer-events-none z-0 opacity-15 bg-[radial-gradient(#000000_12%,transparent_12%)] [background-size:16px_16px]" />
@@ -241,7 +254,9 @@ export default function App() {
       <main
         data-theme={themeStyle}
         className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
-          isPopArt
+          isUltraGlass
+            ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]'
+            : isPopArt
             ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000]'
             : isOrganic
             ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
@@ -253,7 +268,7 @@ export default function App() {
         }`}
       >
         {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
-        <BioHeader profile={profile} badges={badges} />
+        <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
 
         {/* Content Sections */}
         <div className="px-4 sm:px-5 pb-6 space-y-5">

@@ -39,6 +39,24 @@
   animation: pulseGlow 2.5s infinite;
 }
 
+/* Hover Scale Interactions */
+.social-link-card,
+#socialLinksContainer > a,
+.service-card,
+#servicesGrid > div {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+}
+
+.social-link-card:hover,
+#socialLinksContainer > a:hover {
+  transform: scale(1.025) translateY(-2px) !important;
+}
+
+.service-card:hover,
+#servicesGrid > div:hover {
+  transform: scale(1.03) !important;
+}
+
 /* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -491,5 +509,215 @@
   color: #000000 !important;
   font-weight: 700 !important;
 }
+
+/* ==========================================
+   ULTRA CYBER GLASS (3D TILT & GLOW) THEME
+   ========================================== */
+
+/* Technical Grid Background */
+.bg-grid {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  mask-image: radial-gradient(circle at center, black, transparent 80%);
+  -webkit-mask-image: radial-gradient(circle at center, black, transparent 80%);
+}
+
+/* Ultra Premium Glassmorphism */
+.glass-premium {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.75) 0%, rgba(9, 9, 11, 0.75) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 20px 40px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+}
+
+.glass-premium::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.2), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  transition: all 0.5s ease;
+}
+
+.glass-premium:hover::before {
+  background: linear-gradient(45deg, rgba(168, 85, 247, 0.6), rgba(34, 211, 238, 0.6), rgba(217, 70, 239, 0.6));
+}
+
+/* Shimmer Button */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.5s ease;
+}
+.btn-shimmer:hover::after {
+  transform: translateX(100%);
+  transition: transform 0.5s ease;
+}
+
+/* Custom Keyframe Animations */
+@keyframes spinSlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spinReverse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulseGlowOrb {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  50% { opacity: 0.7; filter: brightness(1.5); }
+}
+
+@keyframes gradientX {
+  0%, 100% {
+    background-size: 200% 200%;
+    background-position: left center;
+  }
+  50% {
+    background-size: 200% 200%;
+    background-position: right center;
+  }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+.animate-spin-reverse {
+  animation: spinReverse 8s linear infinite;
+}
+
+.animate-float-orb {
+  animation: floatOrb 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow-orb {
+  animation: pulseGlowOrb 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-gradient-x {
+  animation: gradientX 3.5s ease infinite;
+}
+
+/* 3D Tilt Card Container */
+.tilt-card {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+/* Theme Rules: ultra_cyber_glass */
+[data-theme="ultra_cyber_glass"] {
+  background-color: #09090b !important;
+  color: #fafafa !important;
+}
+
+[data-theme="ultra_cyber_glass"] main {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 0 50px rgba(34, 211, 238, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2rem !important;
+}
+
+[data-theme="ultra_cyber_glass"] .profile-name-text {
+  background: linear-gradient(to right, #22d3ee, #ffffff, #a855f7) !important;
+  background-size: 200% 200% !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  animation: gradientX 3.5s ease infinite !important;
+}
+
+[data-theme="ultra_cyber_glass"] .profile-handle {
+  background: rgba(34, 211, 238, 0.1) !important;
+  border: 1px solid rgba(34, 211, 238, 0.3) !important;
+  color: #22d3ee !important;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15) !important;
+}
+
+[data-theme="ultra_cyber_glass"] .bio-card {
+  background: rgba(24, 24, 27, 0.7) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #d4d4d8 !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="ultra_cyber_glass"] .social-link-card,
+[data-theme="ultra_cyber_glass"] #socialLinksContainer > a {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.8) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="ultra_cyber_glass"] .social-link-card:hover,
+[data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover {
+  border-color: rgba(34, 211, 238, 0.5) !important;
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.25) !important;
+}
+
+[data-theme="ultra_cyber_glass"] .social-btn-badge,
+[data-theme="ultra_cyber_glass"] #socialLinksContainer > a span {
+  background: linear-gradient(135deg, #22d3ee, #0284c7) !important;
+  color: #000000 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4) !important;
+}
+
+[data-theme="ultra_cyber_glass"] #servicesGrid > div,
+[data-theme="ultra_cyber_glass"] .service-card {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(15, 15, 18, 0.85) 100%) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+[data-theme="ultra_cyber_glass"] #servicesGrid > div:hover,
+[data-theme="ultra_cyber_glass"] .service-card:hover {
+  border-color: rgba(168, 85, 247, 0.5) !important;
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.25) !important;
+}
+
+[data-theme="ultra_cyber_glass"] .contact-card,
+[data-theme="ultra_cyber_glass"] #contactContainer {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.8) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-theme="ultra_cyber_glass"] .share-profile-card,
+[data-theme="ultra_cyber_glass"] #btnShareProfile > div {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
 
 

@@ -61,7 +61,7 @@ export const SocialLinks: React.FC<Props> = ({ links }) => {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="social-link-card group w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl neon-border"
+            className="social-link-card group w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300 ease-out hover:scale-[1.025] hover:-translate-y-0.5 hover:shadow-xl neon-border active:scale-[0.98]"
           >
             <div className="flex items-center gap-3 min-w-0">
               <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">

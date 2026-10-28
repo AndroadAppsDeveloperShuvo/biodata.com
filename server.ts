@@ -1236,12 +1236,10 @@ function getAdminClientsListKeyboard() {
 }
 
 function getAdminSingleClientKeyboard(clientId: string) {
-  const client = getClientById(clientId);
-  const layoutLabel = client?.layoutStyle === 'services_first' ? '🛠️ সার্ভিস আগে' : '🌐 সোশ্যাল আগে (Admin)';
   return {
     inline_keyboard: [
       [
-        { text: `🎨 লেআউট বদলান (${layoutLabel})`, callback_data: `admin_toggle_layout:${clientId}` }
+        { text: '🎨 লেআউট & থিম', callback_data: `cl_layout_theme_main:${clientId}` }
       ],
       [
         { text: '📁 ৩টি ফাইল পুনরায় পাঠান', callback_data: `admin_dl_client:${clientId}` }
@@ -1260,8 +1258,6 @@ function getAdminSingleClientKeyboard(clientId: string) {
 // CLIENT SELF-MANAGEMENT KEYBOARDS & HELPERS
 // ==========================================
 function getClientMainMenuKeyboard(client: ClientRecord) {
-  const isServicesFirst = client.layoutStyle === 'services_first';
-  const layoutLabel = isServicesFirst ? '🛠️ লেআউট: সার্ভিস আগে' : '🌐 লেআউট: সোশ্যাল আগে (Admin)';
   const badgesCount = (client.badges || []).length;
   const socialCount = (client.socialLinks || []).length;
   const servicesCount = (client.services || []).length;
@@ -1281,7 +1277,7 @@ function getClientMainMenuKeyboard(client: ClientRecord) {
         { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: `cl_preview:${client.id}` }
       ],
       [
-        { text: `🎨 ${layoutLabel}`, callback_data: `cl_layout:${client.id}` }
+        { text: '🎨 লেআউট & থিম', callback_data: `cl_layout_theme_main:${client.id}` }
       ]
     ]
   };
@@ -1313,9 +1309,22 @@ function getClientProfileMenuKeyboard(client?: ClientRecord) {
   };
 }
 
-function getClientLayoutKeyboard(client: ClientRecord) {
+function getClientLayoutThemeSubMenuKeyboard(client: ClientRecord) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '📐 লেআউট (Section Order)', callback_data: `cl_sub_layout:${client.id}` },
+        { text: '🎨 থিম (Color Themes)', callback_data: `cl_sub_theme:${client.id}` }
+      ],
+      [
+        { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
+      ]
+    ]
+  };
+}
+
+function getClientLayoutOnlyKeyboard(client: ClientRecord) {
   const isServicesFirst = client.layoutStyle === 'services_first';
-  const theme = client.themeStyle || 'classic_dark';
   return {
     inline_keyboard: [
       [
@@ -1334,7 +1343,19 @@ function getClientLayoutKeyboard(client: ClientRecord) {
         }
       ],
       [
-        { text: '🎨 --- ওয়েবসাইট কালার থিম (UI Theme) ---', callback_data: `cl_noop` }
+        { text: '🔙 লেআউট & থিম মেন্যু', callback_data: `cl_layout_theme_main:${client.id}` },
+        { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
+      ]
+    ]
+  };
+}
+
+function getClientThemeOnlyKeyboard(client: ClientRecord) {
+  const theme = client.themeStyle || 'classic_dark';
+  return {
+    inline_keyboard: [
+      [
+        { text: '🎨 --- ওয়েবসাইট কালার থিম (UI Themes) ---', callback_data: `cl_noop` }
       ],
       [
         {
@@ -1367,6 +1388,13 @@ function getClientLayoutKeyboard(client: ClientRecord) {
         }
       ],
       [
+        {
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৬. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          callback_data: `cl_set_theme:ultra_cyber_glass:${client.id}`
+        }
+      ],
+      [
+        { text: '🔙 লেআউট & থিম মেন্যু', callback_data: `cl_layout_theme_main:${client.id}` },
         { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
       ]
     ]
@@ -1605,17 +1633,46 @@ async function sendClientContactMenu(chatId: string, client: ClientRecord) {
   return msg;
 }
 
-async function sendClientLayoutMenu(chatId: string, client: ClientRecord) {
+async function sendClientLayoutThemeMainMenu(chatId: string, client: ClientRecord) {
+  userStates[chatId] = { step: 'idle' };
+  const text = `🎨 <b>লেআউট & থিম কন্ট্রোল প্যানেল:</b>\n\n`
+    + `নিচের অপশন থেকে বেছে নিন:\n\n`
+    + `১️⃣ <b>📐 লেআউট</b>: সেকশনসমূহের ক্রম (সোশ্যাল আগে নাকি সার্ভিস আগে) পরিবর্তন করতে।\n\n`
+    + `২️⃣ <b>🎨 থিম</b>: কালার থিম ও ভিজ্যুয়াল স্টাইল (Classic Dark, Dark Glass, Cyberpunk, Organic, Pop Art) পরিবর্তন করতে।`;
+  await sendTelegramMessage(chatId, text, { reply_markup: getClientLayoutThemeSubMenuKeyboard(client) });
+  return text;
+}
+
+async function sendClientLayoutOnlyMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
   const isServicesFirst = client.layoutStyle === 'services_first';
-  const text = `🎨 <b>ওয়েবসাইটের লেআউট স্টাইল নির্বাচন:</b>\n\n`
-    + `বর্তমান স্টাইল: <b>${isServicesFirst ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)'}</b>\n\n`
-    + `<b>স্টাইল অপশনসমূহ:</b>\n`
-    + `১️⃣ <b>সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)</b>: প্রোফাইল ➔ সোশ্যাল লিংক ➔ সার্ভিস সমূহ ➔ যোগাযোগ\n`
-    + `<i>(আপনার নিজস্ব মূল বায়ো সাইটের মতোই)</i>\n\n`
-    + `২️⃣ <b>সার্ভিস ও টুলস আগে (সার্ভিস স্টাইল)</b>: প্রোফাইল ➔ সার্ভিস সমূহ ➔ সোশ্যাল লিংক ➔ যোগাযোগ\n\n`
-    + `<i>যে স্টাইলটি সেট করতে চান নিচে চাপুন (লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে পরিবর্তন হবে):</i>`;
-  await sendTelegramMessage(chatId, text, { reply_markup: getClientLayoutKeyboard(client) });
+  const text = `📐 <b>ওয়েবসাইটের সেকশন লেআউট সাজানো:</b>\n\n`
+    + `বর্তমান লেআউট: <b>${isServicesFirst ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)'}</b>\n\n`
+    + `<b>লেআউট অপশনসমূহ:</b>\n`
+    + `১️⃣ <b>সোশ্যাল মিডিয়া আগে</b>: প্রোফাইল ➔ সোশ্যাল লিংক ➔ সার্ভিস সমূহ ➔ যোগাযোগ\n\n`
+    + `২️⃣ <b>সার্ভিস ও টুলস আগে</b>: প্রোফাইল ➔ সার্ভিস সমূহ ➔ সোশ্যাল লিংক ➔ যোগাযোগ\n\n`
+    + `<i>নিচের অপশন থেকে নির্বাচন করুন (লাইভ ওয়েবসাইটে সাথে সাথে পরিবর্তন হবে):</i>`;
+  await sendTelegramMessage(chatId, text, { reply_markup: getClientLayoutOnlyKeyboard(client) });
+  return text;
+}
+
+async function sendClientThemeOnlyMenu(chatId: string, client: ClientRecord) {
+  userStates[chatId] = { step: 'idle' };
+  const theme = client.themeStyle || 'classic_dark';
+  const themeName = theme === 'bold_flat_popart'
+    ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+    : theme === 'organic_nature'
+    ? '🍃 অর্গানিক নেচার (Organic Nature)'
+    : theme === 'cyberpunk_neon'
+    ? '⚡ সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)'
+    : theme === 'dark_glassmorphism'
+    ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)'
+    : '🕶️ ক্লাসিক ডার্ক (Classic Dark)';
+
+  const text = `🎨 <b>ওয়েবসাইট কালার থিম নির্বাচন:</b>\n\n`
+    + `বর্তমান থিম: <b>${themeName}</b>\n\n`
+    + `<i>পছন্দের থিম বাটনে চাপুন (লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে সুন্দর নতুন রঙে বদলে যাবে):</i>`;
+  await sendTelegramMessage(chatId, text, { reply_markup: getClientThemeOnlyKeyboard(client) });
   return text;
 }
 
@@ -1679,8 +1736,8 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 
   // Support button text / reply keyboard messages & quick commands
   if (state.step === 'idle') {
-    if (trimmed === '/layout' || trimmed.includes('লেআউট') || trimmed.toLowerCase().includes('layout')) {
-      return await sendClientLayoutMenu(chatId, client);
+    if (trimmed === '/layout' || trimmed === '/theme' || trimmed.includes('লেআউট') || trimmed.includes('থিম') || trimmed.toLowerCase().includes('layout') || trimmed.toLowerCase().includes('theme')) {
+      return await sendClientLayoutThemeMainMenu(chatId, client);
     }
     if (trimmed === '/profile' || trimmed.includes('প্রোফাইল') || trimmed.toLowerCase().includes('profile')) {
       return await sendClientProfileMenu(chatId, client);
@@ -3341,12 +3398,30 @@ async function handleCallbackQuery(cb: any) {
     return;
   }
 
-  // 8. Client Layout Menu
-  if (data === 'cl_menu_layout' || data === 'cl_layout' || data.startsWith('cl_layout:') || data.startsWith('cl_menu_layout')) {
+  // 8. Client Layout & Theme Sub-Menus
+  if (data === 'cl_menu_layout' || data === 'cl_layout' || data.startsWith('cl_layout:') || data.startsWith('cl_menu_layout') || data.startsWith('cl_layout_theme_main:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
     const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
     if (client) {
-      await sendClientLayoutMenu(chatId, client);
+      await sendClientLayoutThemeMainMenu(chatId, client);
+    }
+    return;
+  }
+
+  if (data === 'cl_sub_layout' || data.startsWith('cl_sub_layout:')) {
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    if (client) {
+      await sendClientLayoutOnlyMenu(chatId, client);
+    }
+    return;
+  }
+
+  if (data === 'cl_sub_theme' || data.startsWith('cl_sub_theme:')) {
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    if (client) {
+      await sendClientThemeOnlyMenu(chatId, client);
     }
     return;
   }
@@ -3365,8 +3440,8 @@ async function handleCallbackQuery(cb: any) {
       const styleName = style === 'services_first' ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)';
       await sendTelegramMessage(
         chatId,
-        `✅ <b>লেআউট সফলভাবে পরিবর্তন হয়েছে!</b>\n\n🎨 বর্তমান স্টাইল: <b>${styleName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই লেআউট কার্যকর হয়ে গেছে! 🚀</i>`,
-        { reply_markup: getClientMainMenuKeyboard(updated) }
+        `✅ <b>লেআউট সফলভাবে পরিবর্তন হয়েছে!</b>\n\n📐 বর্তমান সাজানো: <b>${styleName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই লেআউট কার্যকর হয়ে গেছে! 🚀</i>`,
+        { reply_markup: getClientLayoutOnlyKeyboard(updated) }
       );
     }
     return;
@@ -3383,7 +3458,9 @@ async function handleCallbackQuery(cb: any) {
         c.themeStyle = themeStyle;
       });
       const updated = getClientById(client.id) || client;
-      const themeName = themeStyle === 'bold_flat_popart'
+      const themeName = themeStyle === 'ultra_cyber_glass'
+        ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
+        : themeStyle === 'bold_flat_popart'
         ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
         : themeStyle === 'organic_nature'
         ? '🍃 অর্গানিক নেচার (Organic Nature)'
@@ -3395,7 +3472,7 @@ async function handleCallbackQuery(cb: any) {
       await sendTelegramMessage(
         chatId,
         `🎨 <b>ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`,
-        { reply_markup: getClientMainMenuKeyboard(updated) }
+        { reply_markup: getClientThemeOnlyKeyboard(updated) }
       );
     }
     return;

@@ -28,7 +28,7 @@ export const HighlightsServices: React.FC<Props> = ({ services }) => {
           return (
             <div
               key={service.id}
-              className="group relative rounded-xl overflow-hidden aspect-square border border-slate-800/90 hover:border-cyan-400/80 transition-all duration-300 bg-slate-900 shadow-md"
+              className="service-card group relative rounded-xl overflow-hidden aspect-square border border-slate-800/90 hover:border-cyan-400/80 transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] bg-slate-900 shadow-md hover:shadow-cyan-500/20"
             >
               {/* Target Link Wrapper */}
               <a

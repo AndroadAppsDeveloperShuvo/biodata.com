@@ -223,6 +223,21 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     .animate-pulse-slow {
       animation: pulseSlow 3s ease-in-out infinite;
     }
+    /* Hover Scale Interactions */
+    .social-link-card,
+    #socialLinksContainer > a,
+    .service-card,
+    #servicesGrid > div {
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
+    }
+    .social-link-card:hover,
+    #socialLinksContainer > a:hover {
+      transform: scale(1.025) translateY(-2px) !important;
+    }
+    .service-card:hover,
+    #servicesGrid > div:hover {
+      transform: scale(1.03) !important;
+    }
     /* Cyberpunk Neon Theme Rules */
     [data-theme="cyberpunk_neon"] {
       background-color: #030712 !important;
@@ -853,7 +868,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var activeLinks = raw.filter(function(l) { return l && l.enabled !== false; });
       var html = '';
       activeLinks.forEach(function(link) {
-        html += '<a href="' + link.url + '" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl group">'
+        html += '<a href="' + link.url + '" target="_blank" rel="noopener noreferrer" class="social-link-card w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 ease-out hover:scale-[1.025] hover:-translate-y-0.5 hover:shadow-xl group">'
           + '<div class="flex items-center gap-3 min-w-0">'
           + '<div class="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700/60 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">'
           + getSocialIconSvg(link.platform)
@@ -881,7 +896,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var html = '';
       list.forEach(function(service, index) {
         var numBn = toBengaliNumber(index + 1);
-        html += '<div class="group relative rounded-xl overflow-hidden aspect-square border border-zinc-800 hover:border-cyan-400/80 transition-all duration-300 bg-zinc-900 shadow-md">'
+        html += '<div class="service-card group relative rounded-xl overflow-hidden aspect-square border border-zinc-800 hover:border-cyan-400/80 transition-all duration-300 ease-out hover:scale-[1.03] bg-zinc-900 shadow-md">'
           + '<a href="' + service.linkUrl + '" target="_blank" rel="noopener noreferrer" class="w-full h-full block cursor-pointer" title="' + service.title + '">'
           + '<img src="' + service.imageUrl + '" alt="' + service.title + '" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" onerror="this.src=\\'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10\\'" />'
           + '<div class="absolute top-0 left-0 bg-gradient-to-br from-cyan-500 via-sky-600 to-blue-700 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-br-xl shadow-md border-b border-r border-cyan-300/40 font-tech tracking-wider pointer-events-none z-10 flex items-center justify-center min-w-[24px]">'

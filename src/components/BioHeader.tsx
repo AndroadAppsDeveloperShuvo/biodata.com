@@ -5,9 +5,12 @@ import { PersonalInfo, Badge } from '../types/bio';
 interface Props {
   profile: PersonalInfo | null;
   badges: Badge[];
+  themeStyle?: string;
 }
 
-export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
+export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
+  const isUltraGlass = themeStyle === 'ultra_cyber_glass';
+
   if (!profile) {
     return (
       <div>
@@ -40,29 +43,48 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
 
         {/* Top Active Status */}
         <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-          <span className="bg-emerald-500/90 text-white text-[11px] font-medium px-2.5 py-0.5 rounded-full flex items-center gap-1 shadow-md backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-            Active
+          <span className={`${
+            isUltraGlass
+              ? 'bg-zinc-900/80 text-cyan-300 border border-cyan-400/30'
+              : 'bg-emerald-500/90 text-white'
+          } text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xl backdrop-blur-md tracking-wider`}>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+            </span>
+            {isUltraGlass ? 'OPEN TO WORK' : 'Active'}
           </span>
         </div>
       </div>
 
       {/* Profile Header & Avatar */}
       <div className="px-5 pt-0 pb-4 relative -mt-14 flex flex-col items-center text-center">
-        {/* Avatar */}
-        <div className="relative group">
-          <div className="avatar-glow w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl">
+        {/* Avatar Container */}
+        <div className="relative group my-1">
+          {/* Outer Decorative Spinning Rings for Ultra Cyber Glass */}
+          {isUltraGlass && (
+            <>
+              <div className="absolute inset-[-10px] rounded-full border border-dashed border-cyan-400/40 animate-spin-slow pointer-events-none" />
+              <div className="absolute inset-[-18px] rounded-full border border-purple-500/30 animate-spin-reverse pointer-events-none" />
+            </>
+          )}
+
+          <div className={`avatar-glow ${
+            isUltraGlass
+              ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 animate-gradient-x shadow-[0_0_35px_rgba(34,211,238,0.35)]'
+              : 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl overflow-hidden'
+          }`}>
             <img
               src={profile.avatarUrl || 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
               alt={profile.name || 'User'}
               referrerPolicy="no-referrer"
-              className="w-full h-full object-cover rounded-xl"
+              className={`w-full h-full object-cover ${isUltraGlass ? 'rounded-full' : 'rounded-xl'}`}
             />
           </div>
 
           {profile.verifiedBadge && (
             <div
-              className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full shadow-md border-2 border-slate-950 flex items-center justify-center"
+              className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full shadow-md border-2 border-slate-950 flex items-center justify-center z-20"
               title="Verified Creator"
             >
               <ShieldCheck className="w-4 h-4 fill-white text-blue-500" />
@@ -73,20 +95,24 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
         {/* Names & Title */}
         {profile.name && (
           <h1 className="text-xl sm:text-2xl font-bold mt-2.5 tracking-tight flex items-center gap-1.5 justify-center">
-            <span className="profile-name-text font-tech bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+            <span className={`profile-name-text font-tech ${
+              isUltraGlass
+                ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-purple-500 animate-gradient-x font-extrabold'
+                : 'bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent'
+            }`}>
               {profile.name}
             </span>
           </h1>
         )}
         
         {profile.handle && (
-          <p className="profile-handle text-xs font-mono text-cyan-400 font-semibold mt-0.5 tracking-wide px-2.5 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-800/40">
+          <p className="profile-handle text-xs font-mono text-cyan-400 font-semibold mt-1 tracking-wide px-3 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-800/40 shadow-sm">
             {profile.handle}
           </p>
         )}
         
         {profile.title && (
-          <p className="profile-title text-xs text-slate-300 font-medium mt-1 max-w-sm leading-relaxed">
+          <p className="profile-title text-xs text-slate-300 font-medium mt-1.5 max-w-sm leading-relaxed">
             {profile.title}
           </p>
         )}
@@ -111,8 +137,8 @@ export const BioHeader: React.FC<Props> = ({ profile, badges }) => {
             {badges.map((badge) => (
               <span
                 key={badge.id}
-                className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-800/90 text-zinc-200 border border-zinc-700/80 flex items-center gap-1 hover:border-zinc-500 transition-colors shadow-sm"
-                style={badge.color ? { borderColor: `${badge.color}40` } : undefined}
+                className="badge-pill text-[11px] font-semibold px-3 py-1 rounded-full bg-zinc-900/80 text-zinc-200 border border-zinc-700/80 flex items-center gap-1.5 hover:border-cyan-400/50 transition-colors shadow-sm"
+                style={badge.color ? { borderColor: `${badge.color}60` } : undefined}
               >
                 {badge.color && (
                   <span
