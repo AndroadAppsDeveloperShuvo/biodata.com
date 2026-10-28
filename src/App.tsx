@@ -177,10 +177,13 @@ export default function App() {
   const isGlass = themeStyle === 'dark_glassmorphism';
   const isCyber = themeStyle === 'cyberpunk_neon';
   const isOrganic = themeStyle === 'organic_nature';
+  const isPopArt = themeStyle === 'bold_flat_popart';
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black relative overflow-hidden ${
-      isOrganic
+    <div className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-yellow-400 selection:text-black relative overflow-hidden ${
+      isPopArt
+        ? 'bg-[#facc15] text-black'
+        : isOrganic
         ? 'bg-[#dce6d8] text-[#1e3323]'
         : isCyber
         ? 'bg-[#030712] text-slate-100 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,211,238,0.25),rgba(3,7,18,0.98))]'
@@ -189,6 +192,11 @@ export default function App() {
         : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
     }`}>
       
+      {/* Pop Art Comic Dots Ambient Background */}
+      {isPopArt && (
+        <div className="fixed inset-0 pointer-events-none z-0 opacity-15 bg-[radial-gradient(#000000_12%,transparent_12%)] [background-size:16px_16px]" />
+      )}
+
       {/* Organic Nature Ambient Leaf Silhouettes */}
       {isOrganic && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -233,7 +241,9 @@ export default function App() {
       <main
         data-theme={themeStyle}
         className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
-          isOrganic
+          isPopArt
+            ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000]'
+            : isOrganic
             ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
             : isCyber
             ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'

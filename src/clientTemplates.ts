@@ -409,6 +409,143 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     [data-theme="organic_nature"] footer p {
       color: #4a634e !important;
     }
+    /* Bold Flat (Pop Art) Theme Rules */
+    [data-theme="bold_flat_popart"] {
+      background-color: #facc15 !important;
+      background-image: radial-gradient(#000000 12%, transparent 12%) !important;
+      background-size: 16px 16px !important;
+      color: #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] main {
+      background-color: #fef08a !important;
+      border: 4px solid #000000 !important;
+      box-shadow: 8px 8px 0px #000000 !important;
+      border-radius: 1.5rem !important;
+      color: #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] .profile-banner-container {
+      background: linear-gradient(115deg, #ef4444 50%, #2563eb 50%) !important;
+      border-bottom: 4px solid #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] .profile-banner-overlay {
+      background: linear-gradient(to top, #fef08a 0%, transparent 80%) !important;
+    }
+    [data-theme="bold_flat_popart"] #profileName {
+      color: #000000 !important;
+      font-weight: 900 !important;
+      text-shadow: 2px 2px 0px #facc15 !important;
+    }
+    [data-theme="bold_flat_popart"] #profileHandle {
+      background: #fde047 !important;
+      border: 2px solid #000000 !important;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      box-shadow: 2px 2px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #profileTitle,
+    [data-theme="bold_flat_popart"] #profileLocationWrapper,
+    [data-theme="bold_flat_popart"] #profileBio {
+      color: #000000 !important;
+      font-weight: 700 !important;
+    }
+    [data-theme="bold_flat_popart"] h1, 
+    [data-theme="bold_flat_popart"] h2, 
+    [data-theme="bold_flat_popart"] h3, 
+    [data-theme="bold_flat_popart"] h4,
+    [data-theme="bold_flat_popart"] p {
+      color: #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] .glass-card {
+      background: #ffffff !important;
+      border: 3px solid #000000 !important;
+      box-shadow: 4px 4px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] .avatar-glow {
+      box-shadow: 4px 4px 0px #000000 !important;
+      background-color: #ffffff !important;
+      border: 4px solid #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #badgesContainer span {
+      background: #38bdf8 !important;
+      border: 2px solid #000000 !important;
+      color: #000000 !important;
+      font-weight: 800 !important;
+      box-shadow: 2px 2px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #servicesGrid > div {
+      border: 3px solid #000000 !important;
+      box-shadow: 4px 4px 0px #000000 !important;
+      border-radius: 1rem !important;
+    }
+    [data-theme="bold_flat_popart"] #servicesGrid > div:nth-child(3n+1) { background: #ef4444 !important; }
+    [data-theme="bold_flat_popart"] #servicesGrid > div:nth-child(3n+2) { background: #3b82f6 !important; }
+    [data-theme="bold_flat_popart"] #servicesGrid > div:nth-child(3n+3) { background: #eab308 !important; }
+    [data-theme="bold_flat_popart"] #servicesGrid h4,
+    [data-theme="bold_flat_popart"] #servicesGrid p {
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      text-shadow: 1px 1px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #socialLinksContainer > a {
+      background: #ffffff !important;
+      border: 3px solid #000000 !important;
+      color: #000000 !important;
+      box-shadow: 4px 4px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #socialLinksContainer > a h3,
+    [data-theme="bold_flat_popart"] #socialLinksContainer > a p {
+      color: #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #socialLinksContainer > a span {
+      background: #ef4444 !important;
+      border: 2px solid #000000 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      box-shadow: 2px 2px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #btnShareProfile > div {
+      background: #ffffff !important;
+      border: 3px solid #000000 !important;
+      box-shadow: 4px 4px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #btnShareProfile h3,
+    [data-theme="bold_flat_popart"] #btnShareProfile h4,
+    [data-theme="bold_flat_popart"] #btnShareProfile p {
+      color: #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #btnShareProfile span {
+      background: #2563eb !important;
+      border: 2px solid #000000 !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      box-shadow: 2px 2px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #contactContainer {
+      background: #ffffff !important;
+      border: 3px solid #000000 !important;
+      box-shadow: 4px 4px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #contactContainer h3 {
+      color: #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #contactContainer a:first-child {
+      background: #22c55e !important;
+      color: #000000 !important;
+      border: 2px solid #000000 !important;
+      font-weight: 800 !important;
+      box-shadow: 3px 3px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] #contactContainer a:last-child {
+      background: #38bdf8 !important;
+      color: #000000 !important;
+      border: 2px solid #000000 !important;
+      font-weight: 800 !important;
+      box-shadow: 3px 3px 0px #000000 !important;
+    }
+    [data-theme="bold_flat_popart"] footer p {
+      color: #000000 !important;
+      font-weight: 700 !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950">
@@ -791,7 +928,13 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
 
       var organicBg = document.getElementById('organicLeafBg');
 
-      if (themeClass === 'organic_nature') {
+      if (themeClass === 'bold_flat_popart') {
+        if (glassBg) glassBg.style.display = 'none';
+        if (organicBg) organicBg.style.display = 'none';
+        if (mainEl) {
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
+        }
+      } else if (themeClass === 'organic_nature') {
         if (glassBg) glassBg.style.display = 'none';
         if (!organicBg) {
           organicBg = document.createElement('div');

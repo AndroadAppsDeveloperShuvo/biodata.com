@@ -1361,6 +1361,12 @@ function getClientLayoutKeyboard(client: ClientRecord) {
         }
       ],
       [
+        {
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          callback_data: `cl_set_theme:bold_flat_popart:${client.id}`
+        }
+      ],
+      [
         { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
       ]
     ]
@@ -3377,7 +3383,9 @@ async function handleCallbackQuery(cb: any) {
         c.themeStyle = themeStyle;
       });
       const updated = getClientById(client.id) || client;
-      const themeName = themeStyle === 'organic_nature'
+      const themeName = themeStyle === 'bold_flat_popart'
+        ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+        : themeStyle === 'organic_nature'
         ? '🍃 অর্গানিক নেচার (Organic Nature)'
         : themeStyle === 'cyberpunk_neon'
         ? '⚡ সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)'
