@@ -223,6 +223,48 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     .animate-pulse-slow {
       animation: pulseSlow 3s ease-in-out infinite;
     }
+    /* Cyberpunk Neon Theme Rules */
+    [data-theme="cyberpunk_neon"] {
+      background-color: #030712 !important;
+      background-image: radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.2), transparent 70%),
+                        linear-gradient(to bottom, rgba(147, 51, 234, 0.15), rgba(3, 7, 18, 0.98)) !important;
+    }
+    [data-theme="cyberpunk_neon"] main {
+      background: #080d1e !important;
+      border: 2px solid rgba(34, 211, 238, 0.8) !important;
+      box-shadow: 0 0 35px rgba(34, 211, 238, 0.35), inset 0 0 25px rgba(147, 51, 234, 0.15) !important;
+      border-radius: 1.5rem !important;
+    }
+    [data-theme="cyberpunk_neon"] .glass-card {
+      background: rgba(12, 19, 44, 0.85) !important;
+      border: 1px solid rgba(34, 211, 238, 0.5) !important;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.2), inset 0 0 15px rgba(34, 211, 238, 0.1) !important;
+    }
+    [data-theme="cyberpunk_neon"] .avatar-glow {
+      box-shadow: 0 0 0 3px #080d1e, 0 0 0 6px #22d3ee, 0 0 25px #22d3ee !important;
+    }
+    [data-theme="cyberpunk_neon"] #servicesGrid > div {
+      background: #0b1329 !important;
+      border: 1px solid rgba(34, 211, 238, 0.6) !important;
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.25) !important;
+    }
+    [data-theme="cyberpunk_neon"] #socialLinksContainer > a {
+      background: rgba(11, 19, 41, 0.9) !important;
+      border: 1px solid rgba(34, 211, 238, 0.4) !important;
+      box-shadow: 0 0 12px rgba(34, 211, 238, 0.15) !important;
+    }
+    [data-theme="cyberpunk_neon"] #contactContainer a:first-child {
+      background: linear-gradient(135deg, #10b981, #34d399) !important;
+      color: #020617 !important;
+      font-weight: 800 !important;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important;
+    }
+    [data-theme="cyberpunk_neon"] #contactContainer a:last-child {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4) !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950">
@@ -603,7 +645,12 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var mainEl = document.querySelector('main');
       var glassBg = document.getElementById('glassmorphismMeshBg');
 
-      if (themeClass === 'dark_glassmorphism') {
+      if (themeClass === 'cyberpunk_neon') {
+        if (glassBg) glassBg.style.display = 'none';
+        if (mainEl) {
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_35px_rgba(34,211,238,0.4)] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
+        }
+      } else if (themeClass === 'dark_glassmorphism') {
         if (!glassBg) {
           glassBg = document.createElement('div');
           glassBg.id = 'glassmorphismMeshBg';

@@ -175,9 +175,16 @@ export default function App() {
   }, [fetchData]);
 
   const isGlass = themeStyle === 'dark_glassmorphism';
+  const isCyber = themeStyle === 'cyberpunk_neon';
 
   return (
-    <div className={`min-h-screen text-slate-100 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black relative overflow-hidden transition-colors duration-500 ${isGlass ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950' : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black'}`}>
+    <div className={`min-h-screen text-slate-100 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black relative overflow-hidden transition-colors duration-500 ${
+      isCyber
+        ? 'bg-[#030712] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,211,238,0.25),rgba(3,7,18,0.98))]'
+        : isGlass
+        ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950'
+        : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black'
+    }`}>
       
       {/* Ambient Glassmorphism Glow Orbs */}
       {isGlass && (
@@ -185,6 +192,14 @@ export default function App() {
           <div className="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
           <div className="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
           <div className="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
+        </div>
+      )}
+
+      {/* Cyberpunk Glow Orbs */}
+      {isCyber && (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-cyan-500/15 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-10 -right-20 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl" />
         </div>
       )}
 
@@ -200,7 +215,13 @@ export default function App() {
       </div>
 
       {/* Main Responsive Bio Container */}
-      <main className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${isGlass ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]' : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'}`}>
+      <main className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
+        isCyber
+          ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
+          : isGlass
+          ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'
+          : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
+      }`}>
         {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
         <BioHeader profile={profile} badges={badges} />
 

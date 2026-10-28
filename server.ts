@@ -1349,6 +1349,12 @@ function getClientLayoutKeyboard(client: ClientRecord) {
         }
       ],
       [
+        {
+          text: (theme === 'cyberpunk_neon' ? '🟢 ' : '⚪ ') + '⚡ ৩. সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)',
+          callback_data: `cl_set_theme:cyberpunk_neon:${client.id}`
+        }
+      ],
+      [
         { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
       ]
     ]
@@ -3365,7 +3371,11 @@ async function handleCallbackQuery(cb: any) {
         c.themeStyle = themeStyle;
       });
       const updated = getClientById(client.id) || client;
-      const themeName = themeStyle === 'dark_glassmorphism' ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)' : '🕶️ ক্লাসিক ডার্ক (Classic Dark)';
+      const themeName = themeStyle === 'cyberpunk_neon'
+        ? '⚡ সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)'
+        : themeStyle === 'dark_glassmorphism'
+        ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)'
+        : '🕶️ ক্লাসিক ডার্ক (Classic Dark)';
       await sendTelegramMessage(
         chatId,
         `🎨 <b>ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`,
