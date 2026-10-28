@@ -1355,6 +1355,12 @@ function getClientLayoutKeyboard(client: ClientRecord) {
         }
       ],
       [
+        {
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
+          callback_data: `cl_set_theme:organic_nature:${client.id}`
+        }
+      ],
+      [
         { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
       ]
     ]
@@ -3371,7 +3377,9 @@ async function handleCallbackQuery(cb: any) {
         c.themeStyle = themeStyle;
       });
       const updated = getClientById(client.id) || client;
-      const themeName = themeStyle === 'cyberpunk_neon'
+      const themeName = themeStyle === 'organic_nature'
+        ? '🍃 অর্গানিক নেচার (Organic Nature)'
+        : themeStyle === 'cyberpunk_neon'
         ? '⚡ সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)'
         : themeStyle === 'dark_glassmorphism'
         ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)'

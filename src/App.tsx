@@ -176,16 +176,31 @@ export default function App() {
 
   const isGlass = themeStyle === 'dark_glassmorphism';
   const isCyber = themeStyle === 'cyberpunk_neon';
+  const isOrganic = themeStyle === 'organic_nature';
 
   return (
-    <div className={`min-h-screen text-slate-100 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black relative overflow-hidden transition-colors duration-500 ${
-      isCyber
-        ? 'bg-[#030712] bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,211,238,0.25),rgba(3,7,18,0.98))]'
+    <div className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-500 selection:text-black relative overflow-hidden ${
+      isOrganic
+        ? 'bg-[#dce6d8] text-[#1e3323]'
+        : isCyber
+        ? 'bg-[#030712] text-slate-100 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,211,238,0.25),rgba(3,7,18,0.98))]'
         : isGlass
-        ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950'
-        : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black'
+        ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950 text-slate-100'
+        : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
     }`}>
       
+      {/* Organic Nature Ambient Leaf Silhouettes */}
+      {isOrganic && (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+          <svg className="absolute -top-10 -left-10 w-72 h-72 text-[#597762]/20 transform rotate-12" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/>
+          </svg>
+          <svg className="absolute -bottom-10 -right-10 w-80 h-80 text-[#c09367]/20 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/>
+          </svg>
+        </div>
+      )}
+
       {/* Ambient Glassmorphism Glow Orbs */}
       {isGlass && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -216,7 +231,9 @@ export default function App() {
 
       {/* Main Responsive Bio Container */}
       <main className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
-        isCyber
+        isOrganic
+          ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
+          : isCyber
           ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
           : isGlass
           ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'

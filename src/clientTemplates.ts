@@ -265,6 +265,80 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       font-weight: 800 !important;
       box-shadow: 0 0 20px rgba(6, 182, 212, 0.4) !important;
     }
+    /* Organic Nature Theme Rules */
+    [data-theme="organic_nature"] {
+      background-color: #dce6d8 !important;
+      background-image: radial-gradient(circle at 10% 20%, rgba(107, 142, 115, 0.2), transparent 50%),
+                        radial-gradient(circle at 90% 80%, rgba(201, 155, 112, 0.2), transparent 50%) !important;
+      color: #1e3323 !important;
+    }
+    [data-theme="organic_nature"] main {
+      background: #e2ece0 !important;
+      border: 1px solid #9cb09a !important;
+      box-shadow: 0 20px 40px rgba(45, 68, 48, 0.15) !important;
+      border-radius: 2rem !important;
+      color: #1e3323 !important;
+    }
+    [data-theme="organic_nature"] h1, 
+    [data-theme="organic_nature"] h2, 
+    [data-theme="organic_nature"] h3, 
+    [data-theme="organic_nature"] h4 {
+      color: #1a2e1f !important;
+    }
+    [data-theme="organic_nature"] p {
+      color: #2d4231 !important;
+    }
+    [data-theme="organic_nature"] .glass-card {
+      background: rgba(255, 255, 255, 0.75) !important;
+      backdrop-filter: blur(12px) !important;
+      border: 1px solid rgba(142, 168, 140, 0.5) !important;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.04) !important;
+    }
+    [data-theme="organic_nature"] .avatar-glow {
+      box-shadow: 0 0 0 3px #e2ece0, 0 0 0 6px #597762, 0 8px 20px rgba(89, 119, 98, 0.3) !important;
+    }
+    [data-theme="organic_nature"] #badgesContainer span {
+      background: #cddecd !important;
+      border: 1px solid #8ca28a !important;
+      color: #1a2d1d !important;
+    }
+    [data-theme="organic_nature"] #servicesGrid > div:nth-child(odd) {
+      background: linear-gradient(135deg, #597762, #476350) !important;
+      border: 1px solid #718f7a !important;
+    }
+    [data-theme="organic_nature"] #servicesGrid > div:nth-child(even) {
+      background: linear-gradient(135deg, #c09367, #a87e55) !important;
+      border: 1px solid #d4a97f !important;
+    }
+    [data-theme="organic_nature"] #servicesGrid h4,
+    [data-theme="organic_nature"] #servicesGrid p {
+      color: #ffffff !important;
+    }
+    [data-theme="organic_nature"] #socialLinksContainer > a {
+      background: #f0f5ee !important;
+      border: 1px solid #b2c4b0 !important;
+      color: #1a2d1d !important;
+    }
+    [data-theme="organic_nature"] #socialLinksContainer > a h3 {
+      color: #1a2d1d !important;
+    }
+    [data-theme="organic_nature"] #socialLinksContainer > a p {
+      color: #48614a !important;
+    }
+    [data-theme="organic_nature"] #contactContainer a:first-child {
+      background: linear-gradient(135deg, #597762, #476350) !important;
+      color: #ffffff !important;
+      border-radius: 9999px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 12px rgba(89, 119, 98, 0.3) !important;
+    }
+    [data-theme="organic_nature"] #contactContainer a:last-child {
+      background: linear-gradient(135deg, #c09367, #a87e55) !important;
+      color: #ffffff !important;
+      border-radius: 9999px !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 12px rgba(192, 147, 103, 0.3) !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950">
@@ -645,12 +719,31 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var mainEl = document.querySelector('main');
       var glassBg = document.getElementById('glassmorphismMeshBg');
 
-      if (themeClass === 'cyberpunk_neon') {
+      var organicBg = document.getElementById('organicLeafBg');
+
+      if (themeClass === 'organic_nature') {
         if (glassBg) glassBg.style.display = 'none';
+        if (!organicBg) {
+          organicBg = document.createElement('div');
+          organicBg.id = 'organicLeafBg';
+          organicBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
+          organicBg.innerHTML = 
+            '<svg class="absolute -top-10 -left-10 w-72 h-72 text-[#597762]/20 transform rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>' +
+            '<svg class="absolute -bottom-10 -right-10 w-80 h-80 text-[#c09367]/20 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>';
+          document.body.insertBefore(organicBg, document.body.firstChild);
+        }
+        organicBg.style.display = 'block';
+        if (mainEl) {
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#e2ece0] border-x border-[#9cb09a] shadow-2xl relative pb-24 text-[#1e3323] z-10';
+        }
+      } else if (themeClass === 'cyberpunk_neon') {
+        if (glassBg) glassBg.style.display = 'none';
+        if (organicBg) organicBg.style.display = 'none';
         if (mainEl) {
           mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_35px_rgba(34,211,238,0.4)] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
         }
       } else if (themeClass === 'dark_glassmorphism') {
+        if (organicBg) organicBg.style.display = 'none';
         if (!glassBg) {
           glassBg = document.createElement('div');
           glassBg.id = 'glassmorphismMeshBg';
@@ -666,6 +759,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         }
       } else {
         if (glassBg) glassBg.style.display = 'none';
+        if (organicBg) organicBg.style.display = 'none';
         if (mainEl) {
           mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24';
         }
