@@ -10,7 +10,7 @@ export interface HighlightService {
 
 export interface SocialLink {
   id: string;
-  platform: 'facebook' | 'telegram' | 'youtube' | 'instagram' | 'twitter' | 'github' | 'custom';
+  platform: 'facebook' | 'telegram' | 'youtube' | 'instagram' | 'tiktok' | 'snapchat' | 'twitter' | 'github' | 'custom';
   title: string;
   url: string;
   username?: string;

@@ -69,7 +69,7 @@ export interface HighlightService {
 
 export interface SocialLink {
   id: string;
-  platform: 'facebook' | 'telegram' | 'youtube' | 'instagram' | 'twitter' | 'github' | 'custom';
+  platform: 'facebook' | 'telegram' | 'youtube' | 'instagram' | 'tiktok' | 'snapchat' | 'twitter' | 'github' | 'custom';
   title: string;
   url: string;
   username?: string;
@@ -1048,6 +1048,8 @@ function getSocialMenuKeyboard() {
       : l.platform === 'telegram' ? '✈️'
       : l.platform === 'youtube' ? '🔴'
       : l.platform === 'instagram' ? '📸'
+      : l.platform === 'tiktok' ? '🎵'
+      : l.platform === 'snapchat' ? '👻'
       : l.platform === 'twitter' ? '✖️'
       : l.platform === 'github' ? '🐙' : '🔗';
     const status = l.enabled !== false ? '🟢' : '⚪ (লুকানো)';
@@ -1467,6 +1469,8 @@ function getClientSocialMenuKeyboard(client: ClientRecord) {
       : s.platform === 'telegram' ? '✈️'
       : s.platform === 'youtube' ? '🔴'
       : s.platform === 'instagram' ? '📸'
+      : s.platform === 'tiktok' ? '🎵'
+      : s.platform === 'snapchat' ? '👻'
       : s.platform === 'twitter' ? '✖️'
       : s.platform === 'github' ? '🐙' : '🔗';
     const status = s.enabled !== false ? '🟢' : '⚪ (লুকানো)';
@@ -1515,6 +1519,10 @@ function getClientSocialPlatformKeyboard(clientId: string) {
       [
         { text: '🔴 YouTube', callback_data: `cl_soc_plat:youtube:${clientId}` },
         { text: '📸 Instagram', callback_data: `cl_soc_plat:instagram:${clientId}` }
+      ],
+      [
+        { text: '🎵 TikTok', callback_data: `cl_soc_plat:tiktok:${clientId}` },
+        { text: '👻 Snapchat', callback_data: `cl_soc_plat:snapchat:${clientId}` }
       ],
       [
         { text: '✖️ Twitter / X', callback_data: `cl_soc_plat:twitter:${clientId}` },
@@ -3670,6 +3678,8 @@ async function handleCallbackQuery(cb: any) {
       telegram: { title: 'Telegram Channel / Group', subtitle: 'টেলিগ্রাম চ্যানেল', btn: 'যুক্ত হোন' },
       youtube: { title: 'YouTube Channel', subtitle: 'অফিসিয়াল ইউটিউব চ্যানেল', btn: 'সাবস্ক্রাইব' },
       instagram: { title: 'Instagram Profile', subtitle: 'ইনস্টাগ্রাম ফটো ও রিলস', btn: 'ফলো করুন' },
+      tiktok: { title: 'TikTok Profile', subtitle: 'ভাইরাল শর্ট ভিডিও', btn: 'ফলো করুন' },
+      snapchat: { title: 'Snapchat Profile', subtitle: 'স্ন্যাপ ও স্টোরিজ', btn: 'অ্যাড করুন' },
       twitter: { title: 'X (Twitter) Profile', subtitle: '乂 প্রোফাইল', btn: 'ফলো করুন' },
       github: { title: 'GitHub Profile', subtitle: 'ওপেন সোর্স প্রজেক্ট', btn: 'ফলো করুন' },
       custom: { title: 'Social Link', subtitle: 'কানেক্ট থাকুন', btn: 'ভিজিট করুন' }
