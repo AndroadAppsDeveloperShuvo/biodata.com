@@ -41,6 +41,7 @@ const BADGES_FILE = path.join(DATA_DIR, 'badges.json');
 const FIREBASE_FILE = path.join(DATA_DIR, 'firebase.json');
 const LOGS_FILE = path.join(DATA_DIR, 'logs.json');
 const CLIENTS_FILE = path.join(DATA_DIR, 'clients.json');
+const THEME_FILE = path.join(DATA_DIR, 'theme.json');
 
 export interface ProfileInfo {
   name: string;
@@ -308,9 +309,43 @@ function initDataStore() {
   if (!fs.existsSync(CLIENTS_FILE)) {
     fs.writeFileSync(CLIENTS_FILE, JSON.stringify([], null, 2), 'utf-8');
   }
+  if (!fs.existsSync(THEME_FILE)) {
+    fs.writeFileSync(THEME_FILE, JSON.stringify({ themeStyle: 'ultra_cyber_glass', layoutStyle: 'social_first' }, null, 2), 'utf-8');
+  }
 }
 
 initDataStore();
+
+function getThemeConfig(): { themeStyle: string; layoutStyle: string } {
+  try {
+    if (fs.existsSync(THEME_FILE)) {
+      const raw = JSON.parse(fs.readFileSync(THEME_FILE, 'utf-8'));
+      return {
+        themeStyle: raw.themeStyle || 'ultra_cyber_glass',
+        layoutStyle: raw.layoutStyle || 'social_first'
+      };
+    }
+  } catch {}
+  return { themeStyle: 'ultra_cyber_glass', layoutStyle: 'social_first' };
+}
+
+function saveThemeConfig(themeStyle?: string, layoutStyle?: string) {
+  try {
+    const current = getThemeConfig();
+    const updated = {
+      themeStyle: themeStyle || current.themeStyle,
+      layoutStyle: layoutStyle || current.layoutStyle
+    };
+    fs.writeFileSync(THEME_FILE, JSON.stringify(updated, null, 2), 'utf-8');
+    notifySSE({ type: 'theme_updated', data: updated.themeStyle });
+    notifySSE({ type: 'layout_updated', data: updated.layoutStyle });
+    syncToFirebase();
+    return true;
+  } catch (err) {
+    console.error('Error saving theme config:', err);
+    return false;
+  }
+}
 
 function getFirebaseConfig(): { url: string } {
   try {
@@ -718,13 +753,16 @@ app.post('/api/sync', async (req, res) => {
 });
 
 app.get('/api/data', (req, res) => {
+  const themeCfg = getThemeConfig();
   res.json({
     success: true,
     profile: getProfileInfo(),
     badges: getBadges(),
     services: getServices(),
     socialLinks: getSocialLinks(),
-    contact: getContactInfo()
+    contact: getContactInfo(),
+    themeStyle: themeCfg.themeStyle,
+    layoutStyle: themeCfg.layoutStyle
   });
 });
 
@@ -3445,6 +3483,7 @@ async function handleCallbackQuery(cb: any) {
         c.layoutStyle = style;
       });
       const updated = getClientById(client.id) || client;
+      saveThemeConfig(updated.themeStyle, style);
       const styleName = style === 'services_first' ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)';
       await sendTelegramMessage(
         chatId,
@@ -3466,6 +3505,7 @@ async function handleCallbackQuery(cb: any) {
         c.themeStyle = themeStyle;
       });
       const updated = getClientById(client.id) || client;
+      saveThemeConfig(themeStyle, updated.layoutStyle);
       const themeName = themeStyle === 'ultra_cyber_glass'
         ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
         : themeStyle === 'bold_flat_popart'

@@ -53,7 +53,7 @@ export default function App() {
   const [services, setServices] = useState<HighlightService[]>(initialCache?.services || []);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
   const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
-  const [themeStyle, setThemeStyle] = useState<string>('classic_dark');
+  const [themeStyle, setThemeStyle] = useState<string>('ultra_cyber_glass');
   const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -158,6 +158,8 @@ export default function App() {
           } else if (payload.type === 'contact_updated' && payload.data) {
             setContact(payload.data);
             setLocalCache({ contact: payload.data });
+          } else if (payload.type === 'theme_updated' && payload.data) {
+            setThemeStyle(payload.data);
           }
         } catch (e) {
           console.error('Error parsing SSE event:', e);

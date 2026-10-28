@@ -64,8 +64,8 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           {/* Outer Decorative Spinning Rings for Ultra Cyber Glass */}
           {isUltraGlass && (
             <>
-              <div className="absolute inset-[-10px] rounded-full border border-dashed border-cyan-400/40 animate-spin-slow pointer-events-none" />
-              <div className="absolute inset-[-18px] rounded-full border border-purple-500/30 animate-spin-reverse pointer-events-none" />
+              <div className="absolute -inset-3 sm:-inset-4 rounded-full border-2 border-dashed border-cyan-400/80 animate-spin-slow pointer-events-none shadow-[0_0_15px_rgba(34,211,238,0.5)] z-0" />
+              <div className="absolute -inset-5 sm:-inset-6 rounded-full border-2 border-purple-500/70 animate-spin-reverse pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.4)] z-0" />
             </>
           )}
 
