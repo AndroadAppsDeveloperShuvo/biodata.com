@@ -10,6 +10,7 @@ interface Props {
 
 export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
   const isUltraGlass = themeStyle === 'ultra_cyber_glass';
+  const isGlass = themeStyle === 'dark_glassmorphism';
 
   if (!profile) {
     return (
@@ -46,6 +47,8 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           <span className={`${
             isUltraGlass
               ? 'bg-zinc-900/80 text-cyan-300 border border-cyan-400/30'
+              : isGlass
+              ? 'bg-emerald-500/90 text-white shadow-md'
               : 'bg-emerald-500/90 text-white'
           } text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xl backdrop-blur-md tracking-wider`}>
             <span className="relative flex h-2 w-2">
@@ -85,6 +88,8 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
             className={`avatar-glow relative z-10 ${
               isUltraGlass
                 ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)]'
+                : isGlass
+                ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-amber-300 to-pink-400 shadow-xl overflow-hidden'
                 : 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl overflow-hidden'
             }`}
             style={isUltraGlass ? { animation: 'gradientX 3.5s ease infinite', backgroundSize: '200% 200%' } : undefined}
@@ -112,8 +117,10 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           <h1 className="text-xl sm:text-2xl font-bold mt-2.5 tracking-tight flex items-center gap-1.5 justify-center">
             <span className={`profile-name-text font-tech ${
               isUltraGlass
-                ? 'text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-purple-500 animate-gradient-x font-extrabold'
-                : 'bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent'
+                ? 'text-white font-extrabold drop-shadow-[0_0_12px_rgba(34,211,238,0.7)]'
+                : isGlass
+                ? 'text-slate-900 font-extrabold'
+                : 'text-white font-extrabold drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]'
             }`}>
               {profile.name}
             </span>
@@ -121,27 +128,39 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
         )}
         
         {profile.handle && (
-          <p className="profile-handle text-xs font-mono text-cyan-400 font-semibold mt-1 tracking-wide px-3 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-800/40 shadow-sm">
+          <p className={`profile-handle text-xs font-mono font-semibold mt-1 tracking-wide px-3 py-0.5 rounded-full shadow-sm ${
+            isGlass
+              ? 'bg-sky-100/90 border border-sky-300/80 text-sky-700 font-bold'
+              : 'text-cyan-400 bg-cyan-950/40 border border-cyan-800/40'
+          }`}>
             {profile.handle}
           </p>
         )}
         
         {profile.title && (
-          <p className="profile-title text-xs text-slate-300 font-medium mt-1.5 max-w-sm leading-relaxed">
+          <p className={`profile-title text-xs font-medium mt-1.5 max-w-sm leading-relaxed ${
+            isGlass ? 'text-slate-700 font-semibold' : 'text-slate-300'
+          }`}>
             {profile.title}
           </p>
         )}
         
         {profile.location && (
-          <p className="profile-location text-[11px] text-slate-400 mt-1 flex items-center gap-1 justify-center">
-            <MapPin className="w-3 h-3 text-cyan-400" />
+          <p className={`profile-location text-[11px] mt-1 flex items-center gap-1 justify-center ${
+            isGlass ? 'text-slate-600' : 'text-slate-400'
+          }`}>
+            <MapPin className={`w-3 h-3 ${isGlass ? 'text-sky-600' : 'text-cyan-400'}`} />
             <span>{profile.location}</span>
           </p>
         )}
 
         {/* Bio Text */}
         {profile.bio && (
-          <div className="bio-card text-xs text-slate-300 bg-slate-900/70 border border-slate-800/90 px-3.5 py-2.5 rounded-xl mt-3 leading-relaxed text-center max-w-sm shadow-inner">
+          <div className={`bio-card text-xs px-3.5 py-2.5 rounded-xl mt-3 leading-relaxed text-center max-w-sm shadow-sm ${
+            isGlass
+              ? 'bg-white/70 backdrop-blur-md border border-amber-200/80 text-slate-800 font-medium'
+              : 'text-slate-300 bg-slate-900/70 border border-slate-800/90 shadow-inner'
+          }`}>
             <p>{profile.bio}</p>
           </div>
         )}
@@ -152,8 +171,12 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
             {badges.map((badge) => (
               <span
                 key={badge.id}
-                className="badge-pill text-[11px] font-semibold px-3 py-1 rounded-full bg-zinc-900/80 text-zinc-200 border border-zinc-700/80 flex items-center gap-1.5 hover:border-cyan-400/50 transition-colors shadow-sm"
-                style={badge.color ? { borderColor: `${badge.color}60` } : undefined}
+                className={`badge-pill text-[11px] font-semibold px-3 py-1 rounded-full flex items-center gap-1.5 transition-colors shadow-sm ${
+                  isGlass
+                    ? 'bg-white/85 text-slate-800 border border-slate-200/90 hover:bg-white'
+                    : 'bg-zinc-900/80 text-zinc-200 border border-zinc-700/80 hover:border-cyan-400/50'
+                }`}
+                style={badge.color && !isGlass ? { borderColor: `${badge.color}60` } : undefined}
               >
                 {badge.color && (
                   <span

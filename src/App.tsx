@@ -200,7 +200,7 @@ export default function App() {
         : isCyber
         ? 'bg-[#030712] text-slate-100 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,211,238,0.25),rgba(3,7,18,0.98))]'
         : isGlass
-        ? 'bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950 text-slate-100'
+        ? 'bg-gradient-to-br from-sky-100 via-amber-50 via-pink-100 to-purple-100 text-slate-900'
         : isUltraGlass
         ? 'bg-[#09090b] text-slate-100'
         : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
@@ -236,9 +236,9 @@ export default function App() {
       {/* Ambient Glassmorphism Glow Orbs */}
       {isGlass && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
-          <div className="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '3s' }} />
+          <div className="absolute top-10 -left-10 w-72 h-72 bg-sky-300/35 rounded-full blur-2xl animate-float-orb" />
+          <div className="absolute top-1/3 -right-10 w-80 h-80 bg-pink-300/30 rounded-full blur-2xl animate-float-orb" style={{ animationDelay: '2s' }} />
+          <div className="absolute -bottom-10 left-1/4 w-72 h-72 bg-amber-300/30 rounded-full blur-2xl animate-float-orb" style={{ animationDelay: '4s' }} />
         </div>
       )}
 
@@ -274,7 +274,7 @@ export default function App() {
             : isCyber
             ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
             : isGlass
-            ? 'bg-slate-900/60 backdrop-blur-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)]'
+            ? 'bg-white/75 backdrop-blur-2xl border-2 border-white/90 shadow-[0_25px_60px_rgba(100,116,139,0.2)] text-slate-900'
             : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
         }`}
       >

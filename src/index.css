@@ -903,6 +903,25 @@ main[data-theme="dark_glassmorphism"] .service-card:hover {
 }
 
 /* WhatsApp & Contact Buttons in dark_glassmorphism */
+[data-theme="dark_glassmorphism"] .contact-card,
+[data-theme="dark_glassmorphism"] #contactContainer,
+main[data-theme="dark_glassmorphism"] .contact-card,
+main[data-theme="dark_glassmorphism"] #contactContainer {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 10px 25px rgba(148, 163, 184, 0.12) !important;
+  border-radius: 1.25rem !important;
+}
+
+[data-theme="dark_glassmorphism"] .contact-card h3,
+[data-theme="dark_glassmorphism"] #contactContainer h3,
+main[data-theme="dark_glassmorphism"] .contact-card h3,
+main[data-theme="dark_glassmorphism"] #contactContainer h3 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
 [data-theme="dark_glassmorphism"] #contactContainer a:first-child,
 main[data-theme="dark_glassmorphism"] #contactContainer a:first-child {
   background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
@@ -921,6 +940,35 @@ main[data-theme="dark_glassmorphism"] #contactContainer a:last-child {
   border: none !important;
   box-shadow: 0 10px 25px rgba(100, 116, 139, 0.35) !important;
   border-radius: 9999px !important;
+}
+
+[data-theme="dark_glassmorphism"] .share-profile-card,
+[data-theme="dark_glassmorphism"] #btnShareProfile > div,
+main[data-theme="dark_glassmorphism"] .share-profile-card,
+main[data-theme="dark_glassmorphism"] #btnShareProfile > div {
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 10px 25px rgba(148, 163, 184, 0.12) !important;
+  border-radius: 1.25rem !important;
+  color: #0f172a !important;
+}
+
+[data-theme="dark_glassmorphism"] .share-title,
+[data-theme="dark_glassmorphism"] #btnShareProfile h3,
+[data-theme="dark_glassmorphism"] #btnShareProfile h4 {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+}
+
+[data-theme="dark_glassmorphism"] .share-sub,
+[data-theme="dark_glassmorphism"] #btnShareProfile p {
+  color: #334155 !important;
+}
+
+[data-theme="dark_glassmorphism"] footer p {
+  color: #475569 !important;
+  font-weight: 600 !important;
 }
 
 
