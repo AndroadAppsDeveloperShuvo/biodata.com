@@ -4398,12 +4398,17 @@ async function startTelegramPolling() {
   botState.isPolling = true;
 
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, { method: 'POST' });
+    const webhookUrl = `https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/api/telegram-webhook`;
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: webhookUrl, allowed_updates: ['message', 'callback_query'], drop_pending_updates: true })
+    });
     const meRes = await telegramRequest('getMe', {});
     if (meRes.ok) {
       botState.botUsername = meRes.result.username;
       botState.botFirstName = meRes.result.first_name;
-      console.log(`🤖 Telegram Bot connected as @${botState.botUsername} (${botState.botFirstName})`);
+      console.log(`🤖 Telegram Bot connected as @${botState.botUsername} (${botState.botFirstName}) via Webhook`);
     }
   } catch (err) {
     console.error('Telegram bot init error:', err);

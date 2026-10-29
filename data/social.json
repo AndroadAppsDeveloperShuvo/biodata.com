@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "buttonText": "যুক্ত হোন",
+    "enabled": true,
+    "id": "s_1793007777906",
+    "platform": "facebook",
+    "subtitle": "অফিসিয়াল ফেসবুক প্রোফাইল",
+    "title": "Facebook Profile",
+    "url": "https://www.facebook.com/share/1c63KeYHxt/"
+  },
+  {
+    "buttonText": "যুক্ত হোন",
+    "enabled": true,
+    "id": "s_1793007904903",
+    "platform": "telegram",
+    "subtitle": "টেলিগ্রাম চ্যানেল",
+    "title": "Telegram Channel / Group",
+    "url": "https://t.me/djhakar007ff"
+  },
+  {
+    "buttonText": "সাবস্ক্রাইব",
+    "enabled": true,
+    "id": "s_1793007949112",
+    "platform": "youtube",
+    "subtitle": "অফিসিয়াল ইউটিউব চ্যানেল",
+    "title": "YouTube Channel",
+    "url": "https://youtube.com/@lovewithsong"
+  },
+  {
+    "buttonText": "ফলো করুন",
+    "enabled": true,
+    "id": "s_1793008025035",
+    "platform": "instagram",
+    "subtitle": "ইনস্টাগ্রাম ফটো ও রিলস",
+    "title": "Instagram Profile",
+    "url": "https://instagram.com/fbuser0007"
+  },
+  {
+    "buttonText": "ফলো করুন",
+    "enabled": true,
+    "id": "s_1793008118885",
+    "platform": "github",
+    "subtitle": "ওপেন সোর্স প্রজেক্ট",
+    "title": "GitHub Profile",
+    "url": "https://github.com/AndroadAppsDeveloperShuvo"
+  },
+  {
+    "buttonText": "ফলো করুন",
+    "enabled": true,
+    "id": "s_1793008376426",
+    "platform": "twitter",
+    "subtitle": "乂 প্রোফাইল",
+    "title": "X (Twitter) Profile",
+    "url": "https://x.com/XSHUVOxxx"
+  }
+]
