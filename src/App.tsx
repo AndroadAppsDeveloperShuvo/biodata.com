@@ -176,6 +176,13 @@ export default function App() {
     };
   }, [fetchData]);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.body.setAttribute('data-theme', themeStyle);
+      document.documentElement.setAttribute('data-theme', themeStyle);
+    }
+  }, [themeStyle]);
+
   const isGlass = themeStyle === 'dark_glassmorphism';
   const isCyber = themeStyle === 'cyberpunk_neon';
   const isOrganic = themeStyle === 'organic_nature';
@@ -183,7 +190,9 @@ export default function App() {
   const isUltraGlass = themeStyle === 'ultra_cyber_glass';
 
   return (
-    <div className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
+    <div
+      data-theme={themeStyle}
+      className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
       isPopArt
         ? 'bg-[#facc15] text-black'
         : isOrganic
@@ -200,10 +209,10 @@ export default function App() {
       {/* Ultra Cyber Glass Ambient Grid Background & Glowing Orbs */}
       {isUltraGlass && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="fixed inset-0 bg-grid opacity-80" />
-          <div className="fixed top-[-10%] left-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-purple-600/15 blur-[120px] animate-pulse-glow-orb" />
-          <div className="fixed bottom-[-10%] right-[-5%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-cyan-400/15 blur-[120px] animate-float-orb" style={{ animationDelay: '1s' }} />
-          <div className="fixed top-[40%] left-[20%] w-[35vw] h-[35vw] max-w-[350px] max-h-[350px] rounded-full bg-fuchsia-500/10 blur-[100px] animate-float-orb" style={{ animationDelay: '2s' }} />
+          <div className="fixed inset-0 bg-grid opacity-100" />
+          <div className="fixed top-[-10%] left-[-5%] w-[50vw] h-[50vw] max-w-[550px] max-h-[550px] rounded-full bg-purple-600/35 blur-[120px] animate-pulse-glow-orb" />
+          <div className="fixed bottom-[-10%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-cyan-400/35 blur-[120px] animate-float-orb" style={{ animationDelay: '1s' }} />
+          <div className="fixed top-[35%] left-[15%] w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] rounded-full bg-fuchsia-500/25 blur-[100px] animate-float-orb" style={{ animationDelay: '2s' }} />
         </div>
       )}
 

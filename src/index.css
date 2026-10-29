@@ -518,19 +518,17 @@
 .bg-grid {
   background-size: 36px 36px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
-  mask-image: radial-gradient(circle at center, black 70%, transparent 100%);
-  -webkit-mask-image: radial-gradient(circle at center, black 70%, transparent 100%);
+    linear-gradient(to right, rgba(34, 211, 238, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(34, 211, 238, 0.2) 1px, transparent 1px);
 }
 
 /* Ultra Premium Glassmorphism */
 .glass-premium {
-  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.9) 100%);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(34, 211, 238, 0.15);
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.88) 100%) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(34, 211, 238, 0.3) !important;
   position: relative;
   z-index: 1;
 }
@@ -541,7 +539,7 @@
   inset: 0;
   border-radius: inherit;
   padding: 1.5px;
-  background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.2), transparent);
+  background: linear-gradient(45deg, transparent, rgba(34, 211, 238, 0.3), transparent);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -550,7 +548,7 @@
 }
 
 .glass-premium:hover::before {
-  background: linear-gradient(45deg, rgba(168, 85, 247, 0.6), rgba(34, 211, 238, 0.6), rgba(217, 70, 239, 0.6));
+  background: linear-gradient(45deg, rgba(168, 85, 247, 0.7), rgba(34, 211, 238, 0.7), rgba(217, 70, 239, 0.7));
 }
 
 /* Shimmer Button */
@@ -576,13 +574,13 @@
 
 /* Custom Keyframe Animations */
 @keyframes spinSlow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @keyframes spinReverse {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(-360deg); }
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
 }
 
 @keyframes floatOrb {
@@ -592,7 +590,7 @@
 
 @keyframes pulseGlowOrb {
   0%, 100% { opacity: 1; filter: brightness(1); }
-  50% { opacity: 0.7; filter: brightness(1.5); }
+  50% { opacity: 0.6; filter: brightness(1.5); }
 }
 
 @keyframes gradientX {
@@ -607,23 +605,23 @@
 }
 
 .animate-spin-slow {
-  animation: spinSlow 12s linear infinite;
+  animation: spinSlow 12s linear infinite !important;
 }
 
 .animate-spin-reverse {
-  animation: spinReverse 8s linear infinite;
+  animation: spinReverse 8s linear infinite !important;
 }
 
 .animate-float-orb {
-  animation: floatOrb 6s ease-in-out infinite;
+  animation: floatOrb 6s ease-in-out infinite !important;
 }
 
 .animate-pulse-glow-orb {
-  animation: pulseGlowOrb 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation: pulseGlowOrb 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite !important;
 }
 
 .animate-gradient-x {
-  animation: gradientX 3.5s ease infinite;
+  animation: gradientX 3.5s ease infinite !important;
 }
 
 /* 3D Tilt Card Container */
@@ -633,21 +631,24 @@
 }
 
 /* Theme Rules: ultra_cyber_glass */
-[data-theme="ultra_cyber_glass"] {
+[data-theme="ultra_cyber_glass"],
+body[data-theme="ultra_cyber_glass"] {
   background-color: #09090b !important;
   color: #fafafa !important;
 }
 
-[data-theme="ultra_cyber_glass"] main {
-  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+[data-theme="ultra_cyber_glass"] main,
+main[data-theme="ultra_cyber_glass"] {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.9) 100%) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  box-shadow: 0 0 50px rgba(34, 211, 238, 0.18), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 50px rgba(34, 211, 238, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
   border-radius: 2rem !important;
 }
 
-[data-theme="ultra_cyber_glass"] .profile-name-text {
+[data-theme="ultra_cyber_glass"] .profile-name-text,
+main[data-theme="ultra_cyber_glass"] .profile-name-text {
   background: linear-gradient(to right, #22d3ee, #ffffff, #a855f7) !important;
   background-size: 200% 200% !important;
   -webkit-background-clip: text !important;
@@ -655,68 +656,85 @@
   animation: gradientX 3.5s ease infinite !important;
 }
 
-[data-theme="ultra_cyber_glass"] .profile-handle {
+[data-theme="ultra_cyber_glass"] .profile-handle,
+main[data-theme="ultra_cyber_glass"] .profile-handle {
   background: rgba(34, 211, 238, 0.1) !important;
   border: 1px solid rgba(34, 211, 238, 0.3) !important;
   color: #22d3ee !important;
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.15) !important;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.2) !important;
 }
 
-[data-theme="ultra_cyber_glass"] .bio-card {
-  background: rgba(24, 24, 27, 0.7) !important;
+[data-theme="ultra_cyber_glass"] .bio-card,
+main[data-theme="ultra_cyber_glass"] .bio-card {
+  background: rgba(24, 24, 27, 0.75) !important;
   backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   color: #d4d4d8 !important;
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 25px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="ultra_cyber_glass"] .social-link-card,
-[data-theme="ultra_cyber_glass"] #socialLinksContainer > a {
-  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.8) 100%) !important;
+[data-theme="ultra_cyber_glass"] #socialLinksContainer > a,
+main[data-theme="ultra_cyber_glass"] .social-link-card,
+main[data-theme="ultra_cyber_glass"] #socialLinksContainer > a {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
   backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="ultra_cyber_glass"] .social-link-card:hover,
-[data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover {
-  border-color: rgba(34, 211, 238, 0.5) !important;
-  box-shadow: 0 0 25px rgba(34, 211, 238, 0.25) !important;
+[data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover,
+main[data-theme="ultra_cyber_glass"] .social-link-card:hover,
+main[data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover {
+  border-color: rgba(34, 211, 238, 0.6) !important;
+  box-shadow: 0 0 25px rgba(34, 211, 238, 0.35) !important;
 }
 
 [data-theme="ultra_cyber_glass"] .social-btn-badge,
-[data-theme="ultra_cyber_glass"] #socialLinksContainer > a span {
+[data-theme="ultra_cyber_glass"] #socialLinksContainer > a span,
+main[data-theme="ultra_cyber_glass"] .social-btn-badge,
+main[data-theme="ultra_cyber_glass"] #socialLinksContainer > a span {
   background: linear-gradient(135deg, #22d3ee, #0284c7) !important;
   color: #000000 !important;
   font-weight: 700 !important;
-  box-shadow: 0 0 15px rgba(34, 211, 238, 0.4) !important;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.5) !important;
 }
 
 [data-theme="ultra_cyber_glass"] #servicesGrid > div,
-[data-theme="ultra_cyber_glass"] .service-card {
-  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(15, 15, 18, 0.85) 100%) !important;
+[data-theme="ultra_cyber_glass"] .service-card,
+main[data-theme="ultra_cyber_glass"] #servicesGrid > div,
+main[data-theme="ultra_cyber_glass"] .service-card {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(15, 15, 18, 0.9) 100%) !important;
   backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="ultra_cyber_glass"] #servicesGrid > div:hover,
-[data-theme="ultra_cyber_glass"] .service-card:hover {
-  border-color: rgba(168, 85, 247, 0.5) !important;
-  box-shadow: 0 0 25px rgba(168, 85, 247, 0.25) !important;
+[data-theme="ultra_cyber_glass"] .service-card:hover,
+main[data-theme="ultra_cyber_glass"] #servicesGrid > div:hover,
+main[data-theme="ultra_cyber_glass"] .service-card:hover {
+  border-color: rgba(168, 85, 247, 0.6) !important;
+  box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
 }
 
 [data-theme="ultra_cyber_glass"] .contact-card,
-[data-theme="ultra_cyber_glass"] #contactContainer {
-  background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.8) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+[data-theme="ultra_cyber_glass"] #contactContainer,
+main[data-theme="ultra_cyber_glass"] .contact-card,
+main[data-theme="ultra_cyber_glass"] #contactContainer {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
 [data-theme="ultra_cyber_glass"] .share-profile-card,
-[data-theme="ultra_cyber_glass"] #btnShareProfile > div {
-  background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+[data-theme="ultra_cyber_glass"] #btnShareProfile > div,
+main[data-theme="ultra_cyber_glass"] .share-profile-card,
+main[data-theme="ultra_cyber_glass"] #btnShareProfile > div {
+  background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(9, 9, 11, 0.9) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
 }
 
 

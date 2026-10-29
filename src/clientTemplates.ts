@@ -164,6 +164,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     socialLinks: client.socialLinks,
     contact: client.contact,
     layoutStyle: client.layoutStyle || 'social_first',
+    themeStyle: client.themeStyle || 'ultra_cyber_glass',
     updatedAt: client.createdAt
   });
 
@@ -584,6 +585,131 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       color: #000000 !important;
       font-weight: 700 !important;
     }
+    /* Keyframe Animations for Ultra Cyber Glass */
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes spinReverse {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes pulseGlowOrb {
+      0%, 100% { opacity: 1; filter: brightness(1); }
+      50% { opacity: 0.6; filter: brightness(1.5); }
+    }
+    @keyframes gradientX {
+      0%, 100% { background-size: 200% 200%; background-position: left center; }
+      50% { background-size: 200% 200%; background-position: right center; }
+    }
+    .animate-spin-slow { animation: spinSlow 12s linear infinite !important; }
+    .animate-spin-reverse { animation: spinReverse 8s linear infinite !important; }
+    .animate-float-orb { animation: floatOrb 6s ease-in-out infinite !important; }
+    .animate-pulse-glow-orb { animation: pulseGlowOrb 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite !important; }
+    .animate-gradient-x { animation: gradientX 3.5s ease infinite !important; }
+
+    /* Technical Grid Background */
+    .bg-grid {
+      background-size: 36px 36px;
+      background-image: 
+        linear-gradient(to right, rgba(34, 211, 238, 0.2) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(34, 211, 238, 0.2) 1px, transparent 1px);
+    }
+
+    /* Ultra Premium Glassmorphism */
+    .glass-premium {
+      background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.88) 100%) !important;
+      backdrop-filter: blur(28px) !important;
+      -webkit-backdrop-filter: blur(28px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(34, 211, 238, 0.3) !important;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Ultra Cyber Glass Theme Rules */
+    [data-theme="ultra_cyber_glass"],
+    body[data-theme="ultra_cyber_glass"] {
+      background-color: #09090b !important;
+      color: #fafafa !important;
+    }
+    [data-theme="ultra_cyber_glass"] main,
+    main[data-theme="ultra_cyber_glass"] {
+      background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.9) 100%) !important;
+      backdrop-filter: blur(28px) !important;
+      -webkit-backdrop-filter: blur(28px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.18) !important;
+      box-shadow: 0 0 50px rgba(34, 211, 238, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+      border-radius: 2.5rem !important;
+    }
+    [data-theme="ultra_cyber_glass"] #profileName,
+    main[data-theme="ultra_cyber_glass"] #profileName {
+      background: linear-gradient(to right, #22d3ee, #ffffff, #a855f7) !important;
+      background-size: 200% 200% !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      animation: gradientX 3.5s ease infinite !important;
+    }
+    [data-theme="ultra_cyber_glass"] #profileHandle,
+    main[data-theme="ultra_cyber_glass"] #profileHandle {
+      background: rgba(34, 211, 238, 0.1) !important;
+      border: 1px solid rgba(34, 211, 238, 0.3) !important;
+      color: #22d3ee !important;
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.2) !important;
+    }
+    [data-theme="ultra_cyber_glass"] .glass-card,
+    main[data-theme="ultra_cyber_glass"] .glass-card {
+      background: rgba(24, 24, 27, 0.75) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      color: #d4d4d8 !important;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    }
+    [data-theme="ultra_cyber_glass"] .social-link-card,
+    [data-theme="ultra_cyber_glass"] #socialLinksContainer > a,
+    main[data-theme="ultra_cyber_glass"] #socialLinksContainer > a {
+      background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+      backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+    [data-theme="ultra_cyber_glass"] .social-link-card:hover,
+    [data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover {
+      border-color: rgba(34, 211, 238, 0.6) !important;
+      box-shadow: 0 0 25px rgba(34, 211, 238, 0.35) !important;
+      transform: scale(1.03) translateY(-3px) !important;
+    }
+    [data-theme="ultra_cyber_glass"] #socialLinksContainer > a span {
+      background: linear-gradient(135deg, #22d3ee, #0284c7) !important;
+      color: #000000 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.5) !important;
+    }
+    [data-theme="ultra_cyber_glass"] #servicesGrid > div {
+      background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(15, 15, 18, 0.9) 100%) !important;
+      backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+    [data-theme="ultra_cyber_glass"] #servicesGrid > div:hover {
+      border-color: rgba(168, 85, 247, 0.6) !important;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
+      transform: scale(1.04) translateY(-3px) !important;
+    }
+    [data-theme="ultra_cyber_glass"] #contactContainer {
+      background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+    [data-theme="ultra_cyber_glass"] #btnShareProfile > div {
+      background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(9, 9, 11, 0.9) 100%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950">
@@ -603,12 +729,17 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
 
     <!-- Profile Info Box -->
     <div class="relative px-5 -mt-16 flex flex-col items-center text-center">
-      <!-- Avatar with Live Indicator -->
-      <div class="relative mb-3 group">
-        <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50">
+      <!-- Avatar with Live Indicator & Spinning Rings -->
+      <div id="avatarContainerWrapper" class="relative my-3 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
+        <!-- Outer Spinning Rings for Ultra Cyber Glass -->
+        <div id="avatarSpinRing1" class="hidden absolute inset-0 rounded-full border-2 border-dashed border-cyan-400 pointer-events-none z-0 shadow-[0_0_20px_rgba(34,211,238,0.7)]" style="animation: spinSlow 12s linear infinite;"></div>
+        <div id="avatarSpinRing2" class="hidden absolute -inset-3 sm:-inset-3.5 rounded-full border-2 border-dashed border-purple-500 pointer-events-none z-0 shadow-[0_0_25px_rgba(168,85,247,0.6)]" style="animation: spinReverse 8s linear infinite;"></div>
+        <div id="avatarGlowOrb" class="hidden absolute inset-2 rounded-full bg-cyan-400/20 blur-xl pointer-events-none z-0 animate-pulse"></div>
+
+        <div id="avatarImgBox" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300">
           <img id="profileAvatar" src="${escapeHtml(client.profile.avatarUrl || client.logoUrl)}" alt="Avatar" class="w-full h-full object-cover" onerror="this.src='${escapeHtml(client.logoUrl)}'" />
         </div>
-        <div class="absolute -bottom-1 -right-1 bg-emerald-500 text-zinc-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border-2 border-zinc-950 flex items-center gap-1 shadow-lg">
+        <div class="absolute bottom-0 right-0 bg-emerald-500 text-zinc-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border-2 border-zinc-950 flex items-center gap-1 shadow-lg z-20">
           <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
           <span>LIVE</span>
         </div>
@@ -967,56 +1098,102 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       document.body.setAttribute('data-theme', themeClass);
       var mainEl = document.querySelector('main');
       var glassBg = document.getElementById('glassmorphismMeshBg');
-
       var organicBg = document.getElementById('organicLeafBg');
+      var ultraBg = document.getElementById('ultraCyberGridBg');
 
-      if (themeClass === 'bold_flat_popart') {
+      var ring1 = document.getElementById('avatarSpinRing1');
+      var ring2 = document.getElementById('avatarSpinRing2');
+      var glowOrb = document.getElementById('avatarGlowOrb');
+      var avatarBox = document.getElementById('avatarImgBox');
+      var avatarImg = document.getElementById('profileAvatar');
+
+      if (themeClass === 'ultra_cyber_glass') {
         if (glassBg) glassBg.style.display = 'none';
         if (organicBg) organicBg.style.display = 'none';
+        if (!ultraBg) {
+          ultraBg = document.createElement('div');
+          ultraBg.id = 'ultraCyberGridBg';
+          ultraBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
+          ultraBg.innerHTML = '<div class="fixed inset-0 bg-grid opacity-100"></div>'
+            + '<div class="fixed top-[-10%] left-[-5%] w-[50vw] h-[50vw] max-w-[550px] max-h-[550px] rounded-full bg-purple-600/35 blur-[120px] animate-pulse-glow-orb"></div>'
+            + '<div class="fixed bottom-[-10%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-cyan-400/35 blur-[120px] animate-float-orb" style="animation-delay: 1s;"></div>'
+            + '<div class="fixed top-[35%] left-[15%] w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] rounded-full bg-fuchsia-500/25 blur-[100px] animate-float-orb" style="animation-delay: 2s;"></div>';
+          document.body.insertBefore(ultraBg, document.body.firstChild);
+        }
+        ultraBg.style.display = 'block';
+
+        if (ring1) ring1.classList.remove('hidden');
+        if (ring2) ring2.classList.remove('hidden');
+        if (glowOrb) glowOrb.classList.remove('hidden');
+        if (avatarBox) {
+          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)] relative z-10';
+        }
+        if (avatarImg) {
+          avatarImg.className = 'w-full h-full object-cover rounded-full';
+        }
         if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
-        }
-      } else if (themeClass === 'organic_nature') {
-        if (glassBg) glassBg.style.display = 'none';
-        if (!organicBg) {
-          organicBg = document.createElement('div');
-          organicBg.id = 'organicLeafBg';
-          organicBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
-          organicBg.innerHTML = 
-            '<svg class="absolute -top-10 -left-10 w-72 h-72 text-[#597762]/20 transform rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>' +
-            '<svg class="absolute -bottom-10 -right-10 w-80 h-80 text-[#c09367]/20 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>';
-          document.body.insertBefore(organicBg, document.body.firstChild);
-        }
-        organicBg.style.display = 'block';
-        if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#e2ece0] border-x border-[#9cb09a] shadow-2xl relative pb-24 text-[#1e3323] z-10';
-        }
-      } else if (themeClass === 'cyberpunk_neon') {
-        if (glassBg) glassBg.style.display = 'none';
-        if (organicBg) organicBg.style.display = 'none';
-        if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_35px_rgba(34,211,238,0.4)] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
-        }
-      } else if (themeClass === 'dark_glassmorphism') {
-        if (organicBg) organicBg.style.display = 'none';
-        if (!glassBg) {
-          glassBg = document.createElement('div');
-          glassBg.id = 'glassmorphismMeshBg';
-          glassBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
-          glassBg.innerHTML = '<div class="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>'
-            + '<div class="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>'
-            + '<div class="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style="animation-delay: 3s;"></div>';
-          document.body.insertBefore(glassBg, document.body.firstChild);
-        }
-        glassBg.style.display = 'block';
-        if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-slate-900/60 backdrop-blur-2xl border-x border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)] relative pb-24 z-10';
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col glass-premium rounded-[2.5rem] border border-white/18 shadow-[0_0_50px_rgba(34,211,238,0.25)] relative pb-24 z-10';
         }
       } else {
-        if (glassBg) glassBg.style.display = 'none';
-        if (organicBg) organicBg.style.display = 'none';
-        if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24';
+        if (ultraBg) ultraBg.style.display = 'none';
+        if (ring1) ring1.classList.add('hidden');
+        if (ring2) ring2.classList.add('hidden');
+        if (glowOrb) glowOrb.classList.add('hidden');
+        if (avatarBox) {
+          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300';
+        }
+        if (avatarImg) {
+          avatarImg.className = 'w-full h-full object-cover rounded-2xl';
+        }
+
+        if (themeClass === 'bold_flat_popart') {
+          if (glassBg) glassBg.style.display = 'none';
+          if (organicBg) organicBg.style.display = 'none';
+          if (mainEl) {
+            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
+          }
+        } else if (themeClass === 'organic_nature') {
+          if (glassBg) glassBg.style.display = 'none';
+          if (!organicBg) {
+            organicBg = document.createElement('div');
+            organicBg.id = 'organicLeafBg';
+            organicBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
+            organicBg.innerHTML = 
+              '<svg class="absolute -top-10 -left-10 w-72 h-72 text-[#597762]/20 transform rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>' +
+              '<svg class="absolute -bottom-10 -right-10 w-80 h-80 text-[#c09367]/20 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>';
+            document.body.insertBefore(organicBg, document.body.firstChild);
+          }
+          organicBg.style.display = 'block';
+          if (mainEl) {
+            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#e2ece0] border-x border-[#9cb09a] shadow-2xl relative pb-24 text-[#1e3323] z-10';
+          }
+        } else if (themeClass === 'cyberpunk_neon') {
+          if (glassBg) glassBg.style.display = 'none';
+          if (organicBg) organicBg.style.display = 'none';
+          if (mainEl) {
+            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_35px_rgba(34,211,238,0.4)] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
+          }
+        } else if (themeClass === 'dark_glassmorphism') {
+          if (organicBg) organicBg.style.display = 'none';
+          if (!glassBg) {
+            glassBg = document.createElement('div');
+            glassBg.id = 'glassmorphismMeshBg';
+            glassBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
+            glassBg.innerHTML = '<div class="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>'
+              + '<div class="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>'
+              + '<div class="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style="animation-delay: 3s;"></div>';
+            document.body.insertBefore(glassBg, document.body.firstChild);
+          }
+          glassBg.style.display = 'block';
+          if (mainEl) {
+            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-slate-900/60 backdrop-blur-2xl border-x border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)] relative pb-24 z-10';
+          }
+        } else {
+          if (glassBg) glassBg.style.display = 'none';
+          if (organicBg) organicBg.style.display = 'none';
+          if (mainEl) {
+            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24';
+          }
         }
       }
     }

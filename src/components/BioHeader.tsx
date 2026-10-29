@@ -60,20 +60,35 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
       {/* Profile Header & Avatar */}
       <div className="px-5 pt-0 pb-4 relative -mt-14 flex flex-col items-center text-center">
         {/* Avatar Container */}
-        <div className="relative group my-1">
+        <div className="relative my-3 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
           {/* Outer Decorative Spinning Rings for Ultra Cyber Glass */}
           {isUltraGlass && (
             <>
-              <div className="absolute -inset-3 sm:-inset-4 rounded-full border-2 border-dashed border-cyan-400/80 animate-spin-slow pointer-events-none shadow-[0_0_15px_rgba(34,211,238,0.5)] z-0" />
-              <div className="absolute -inset-5 sm:-inset-6 rounded-full border-2 border-purple-500/70 animate-spin-reverse pointer-events-none shadow-[0_0_20px_rgba(168,85,247,0.4)] z-0" />
+              {/* Ring 1: Clockwise Cyan Dashed Ring */}
+              <div
+                className="absolute inset-0 rounded-full border-2 border-dashed border-cyan-400 pointer-events-none z-0 shadow-[0_0_20px_rgba(34,211,238,0.7)]"
+                style={{ animation: 'spinSlow 12s linear infinite' }}
+              />
+              {/* Ring 2: Counter-Clockwise Purple/Fuchsia Ring */}
+              <div
+                className="absolute -inset-3 sm:-inset-3.5 rounded-full border-2 border-dashed border-purple-500 pointer-events-none z-0 shadow-[0_0_25px_rgba(168,85,247,0.6)]"
+                style={{ animation: 'spinReverse 8s linear infinite' }}
+              />
+              {/* Ambient Glow Behind Rings */}
+              <div
+                className="absolute inset-2 rounded-full bg-cyan-400/20 blur-xl pointer-events-none z-0 animate-pulse"
+              />
             </>
           )}
 
-          <div className={`avatar-glow ${
-            isUltraGlass
-              ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 animate-gradient-x shadow-[0_0_35px_rgba(34,211,238,0.35)]'
-              : 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl overflow-hidden'
-          }`}>
+          <div
+            className={`avatar-glow relative z-10 ${
+              isUltraGlass
+                ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)]'
+                : 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl overflow-hidden'
+            }`}
+            style={isUltraGlass ? { animation: 'gradientX 3.5s ease infinite', backgroundSize: '200% 200%' } : undefined}
+          >
             <img
               src={profile.avatarUrl || 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
               alt={profile.name || 'User'}
@@ -84,7 +99,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
 
           {profile.verifiedBadge && (
             <div
-              className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full shadow-md border-2 border-slate-950 flex items-center justify-center z-20"
+              className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full shadow-md border-2 border-slate-950 flex items-center justify-center z-20"
               title="Verified Creator"
             >
               <ShieldCheck className="w-4 h-4 fill-white text-blue-500" />

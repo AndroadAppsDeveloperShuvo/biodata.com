@@ -392,6 +392,14 @@ async function pullFromFirebase() {
         if (fbData.contact) {
           fs.writeFileSync(CONTACT_FILE, JSON.stringify(fbData.contact, null, 2), 'utf-8');
         }
+        if (fbData.themeStyle || fbData.layoutStyle) {
+          const currentTheme = getThemeConfig();
+          const newTheme = {
+            themeStyle: fbData.themeStyle || currentTheme.themeStyle,
+            layoutStyle: fbData.layoutStyle || currentTheme.layoutStyle
+          };
+          fs.writeFileSync(THEME_FILE, JSON.stringify(newTheme, null, 2), 'utf-8');
+        }
         console.log('✅ Successfully pulled and restored persistent user data from Firebase!');
       }
     }
@@ -563,12 +571,15 @@ async function syncToFirebase() {
   if (!cfg.url || !cfg.url.startsWith('http')) return;
   const baseUrl = cfg.url.replace(/\/+$/, '');
   try {
+    const themeCfg = getThemeConfig();
     const payload = {
       profile: getProfileInfo(),
       badges: getBadges(),
       services: getServices(),
       socialLinks: getSocialLinks(),
       contact: getContactInfo(),
+      themeStyle: themeCfg.themeStyle,
+      layoutStyle: themeCfg.layoutStyle,
       updatedAt: new Date().toISOString()
     };
     const res = await fetch(`${baseUrl}/bio.json`, {
