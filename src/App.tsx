@@ -20,6 +20,7 @@ interface CachedBioData {
   services?: HighlightService[];
   socialLinks?: SocialLink[];
   contact?: ContactInfo | null;
+  themeStyle?: string;
 }
 
 function getLocalCache(): CachedBioData | null {
@@ -53,7 +54,7 @@ export default function App() {
   const [services, setServices] = useState<HighlightService[]>(initialCache?.services || []);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
   const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
-  const [themeStyle, setThemeStyle] = useState<string>('ultra_cyber_glass');
+  const [themeStyle, setThemeStyle] = useState<string>(initialCache?.themeStyle || 'dark_glassmorphism');
   const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -97,7 +98,8 @@ export default function App() {
       badges: Array.isArray(data.badges) ? data.badges : undefined,
       services: Array.isArray(data.services) ? data.services : undefined,
       socialLinks: Array.isArray(data.socialLinks) ? data.socialLinks : undefined,
-      contact: data.contact
+      contact: data.contact,
+      themeStyle: data.themeStyle
     });
     setIsLoading(false);
   }, []);
@@ -160,6 +162,7 @@ export default function App() {
             setLocalCache({ contact: payload.data });
           } else if (payload.type === 'theme_updated' && payload.data) {
             setThemeStyle(payload.data);
+            setLocalCache({ themeStyle: payload.data });
           }
         } catch (e) {
           console.error('Error parsing SSE event:', e);

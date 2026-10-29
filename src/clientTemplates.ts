@@ -239,6 +239,114 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     #servicesGrid > div:hover {
       transform: scale(1.03) !important;
     }
+    /* Liquid Crystal White Glass (Theme 2: dark_glassmorphism) */
+    [data-theme="dark_glassmorphism"] {
+      background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 35%, #fce7f3 70%, #f3e8ff 100%) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] main {
+      background: rgba(255, 255, 255, 0.75) !important;
+      backdrop-filter: blur(28px) !important;
+      -webkit-backdrop-filter: blur(28px) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
+      box-shadow: 0 30px 70px rgba(100, 116, 139, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
+      border-radius: 2.5rem !important;
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #profileName {
+      color: #0f172a !important;
+      font-weight: 900 !important;
+      text-shadow: 0 2px 10px rgba(255, 255, 255, 0.8) !important;
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      -webkit-text-fill-color: initial !important;
+    }
+    [data-theme="dark_glassmorphism"] #profileHandle {
+      background: rgba(224, 242, 254, 0.85) !important;
+      border: 1px solid rgba(186, 230, 253, 0.9) !important;
+      color: #0284c7 !important;
+      font-weight: 700 !important;
+    }
+    [data-theme="dark_glassmorphism"] #profileTitle {
+      color: #334155 !important;
+      font-weight: 600 !important;
+    }
+    [data-theme="dark_glassmorphism"] #profileLocationWrapper {
+      color: #475569 !important;
+    }
+    [data-theme="dark_glassmorphism"] #profileBio,
+    [data-theme="dark_glassmorphism"] .glass-card {
+      background: rgba(255, 255, 255, 0.7) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1.5px solid rgba(254, 243, 199, 0.85) !important;
+      color: #1e293b !important;
+    }
+    [data-theme="dark_glassmorphism"] #socialLinksContainer > a {
+      background: rgba(255, 255, 255, 0.82) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+      color: #0f172a !important;
+      box-shadow: 0 10px 25px rgba(148, 163, 184, 0.12) !important;
+      border-radius: 1.25rem !important;
+    }
+    [data-theme="dark_glassmorphism"] #socialLinksContainer > a h3 {
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #socialLinksContainer > a p {
+      color: #475569 !important;
+    }
+    [data-theme="dark_glassmorphism"] #socialLinksContainer > a span {
+      background: linear-gradient(135deg, #38bdf8, #818cf8) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+    }
+    [data-theme="dark_glassmorphism"] #servicesGrid > div {
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #servicesGrid h4 {
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #servicesGrid p {
+      color: #475569 !important;
+    }
+    [data-theme="dark_glassmorphism"] #contactContainer {
+      background: rgba(255, 255, 255, 0.75) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+    }
+    [data-theme="dark_glassmorphism"] #contactContainer h3 {
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #contactContainer a:first-child {
+      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
+      color: #052e16 !important;
+      font-weight: 800 !important;
+      border: none !important;
+      border-radius: 9999px !important;
+    }
+    [data-theme="dark_glassmorphism"] #contactContainer a:last-child {
+      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%) !important;
+      color: #ffffff !important;
+      font-weight: 800 !important;
+      border: none !important;
+      border-radius: 9999px !important;
+    }
+    [data-theme="dark_glassmorphism"] #btnShareProfile > div {
+      background: rgba(255, 255, 255, 0.75) !important;
+      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #btnShareProfile h3,
+    [data-theme="dark_glassmorphism"] #btnShareProfile h4 {
+      color: #0f172a !important;
+    }
+    [data-theme="dark_glassmorphism"] #btnShareProfile p,
+    [data-theme="dark_glassmorphism"] footer p {
+      color: #475569 !important;
+    }
+
     /* Cyberpunk Neon Theme Rules */
     [data-theme="cyberpunk_neon"] {
       background-color: #030712 !important;
