@@ -767,6 +767,48 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, status: 'active', timestamp: new Date().toISOString() });
 });
 
+app.post('/api/telegram-webhook', async (req, res) => {
+  try {
+    const update = req.body;
+    console.log('🤖 Telegram Webhook Update received:', JSON.stringify(update));
+    if (update && update.callback_query) {
+      await handleCallbackQuery(update.callback_query);
+    } else if (update && update.message) {
+      const msg = update.message;
+      const chatId = String(msg.chat.id);
+      const sender = msg.from?.first_name || 'User';
+      if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
+        const state = userStates[chatId];
+        if (state && (
+          state.step === 'add_image' ||
+          state.step === 'edit_service_val' ||
+          state.step === 'prof_edit_avatar' ||
+          state.step === 'prof_edit_banner' ||
+          state.step === 'admin_wizard_logo' ||
+          state.step === 'client_srv_image' ||
+          state.step === 'client_prof_avatar' ||
+          state.step === 'client_prof_banner'
+        )) {
+          const bestPhoto = msg.photo[msg.photo.length - 1];
+          const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
+          if (fileInfo.ok && fileInfo.result?.file_path) {
+            const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
+            await handleUserMessage(chatId, directPhotoUrl, sender);
+            return res.json({ ok: true });
+          }
+        }
+      }
+      if (msg.text) {
+        await handleUserMessage(chatId, msg.text, sender);
+      }
+    }
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.status(500).json({ error: String(err) });
+  }
+});
+
 app.get('/api/data', (req, res) => {
   const themeCfg = getThemeConfig();
   res.json({
@@ -4343,7 +4385,15 @@ async function startTelegramPolling() {
   botState.isPolling = true;
 
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, { method: 'POST' });
+    const webhookUrl = `https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/api/telegram-webhook`;
+    const whRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: webhookUrl, drop_pending_updates: true })
+    });
+    const whData = await whRes.json();
+    console.log('🤖 Telegram Webhook Registered:', whData);
+
     const meRes = await telegramRequest('getMe', {});
     if (meRes.ok) {
       botState.botUsername = meRes.result.username;
