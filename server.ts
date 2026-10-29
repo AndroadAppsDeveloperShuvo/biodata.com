@@ -1032,12 +1032,6 @@ function getMainMenuKeyboard() {
   return {
     inline_keyboard: [
       [
-        {
-          text: '🚀 টেলিগ্রাম ওয়েব অ্যাপ (ড্যাশবোর্ড)',
-          web_app: { url: 'https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/' }
-        }
-      ],
-      [
         { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: 'menu_profile' },
         { text: `🏷️ ব্যাজ সমূহ (${badges.length})`, callback_data: 'menu_badges' }
       ],
@@ -1367,12 +1361,6 @@ function getClientMainMenuKeyboard(client: ClientRecord) {
 
   return {
     inline_keyboard: [
-      [
-        {
-          text: '🚀 টেলিগ্রাম ওয়েব অ্যাপ (ড্যাশবোর্ড)',
-          web_app: { url: 'https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/' }
-        }
-      ],
       [
         { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: `cl_prof:${client.id}` },
         { text: `🏷️ ব্যাজ সমূহ (${badgesCount}টি)`, callback_data: `cl_badges:${client.id}` }
@@ -4500,6 +4488,15 @@ async function startTelegramPolling() {
 }
 
 startTelegramPolling();
+
+// Watchdog timer: Automatically restarts Telegram polling if it ever stops
+setInterval(() => {
+  if (!botState.isPolling) {
+    console.log('🤖 Bot Watchdog: Polling stopped. Auto-restarting Telegram bot...');
+    globalThis.__telegram_polling_active = false;
+    startTelegramPolling();
+  }
+}, 30000);
 
 // Setup Express + Vite Server
 async function setupServer() {

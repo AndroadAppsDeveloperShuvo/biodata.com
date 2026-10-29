@@ -1,7 +1,6 @@
 [
   {
-    "appName": "SHUVO PK",
-    "layoutStyle": "social_first",
+    "appName": "SHUVO PK BIO SITE",
     "badges": [
       {
         "id": "b_1",
@@ -10,185 +9,124 @@
       {
         "id": "b_2",
         "text": "🔥 Official Creator"
+      },
+      {
+        "id": "b_1793065411347",
+        "text": "🔥 Shuvo Official"
+      },
+      {
+        "id": "b_1793065428265",
+        "text": "💻 Developer"
+      },
+      {
+        "id": "b_1793065452544",
+        "text": "🇧🇩 Bangladesh"
       }
     ],
     "chatId": "8526947150",
     "contact": {
       "customNote": "যেকোনো প্রজেক্ট, কলাবোরেশন বা প্রয়োজনে সরাসরি মেসেজ দিন।",
-      "email": "client@gmail.com",
+      "email": "pkmdshuvo488@gmail.com",
       "enabled": true,
       "telegramUsername": "",
-      "whatsappMessage": "Hello SHUVO PK, I visited your bio website and want to connect!",
-      "whatsappNumber": "+8801700000000"
+      "whatsappMessage": "হাই ডেভোলপার শুভ। \nআমি আপনার বায়ো ডাটা সাইট থেকে এসেছি 🫶 \nআমি আপনার বায়ো ডাটা সাইট এর মেম্বার সিপ হতে চাই🌸",
+      "whatsappNumber": "+8801921526301"
     },
-    "createdAt": "2026-10-26T16:12:39.278Z",
-    "id": "c_1793031159278",
-    "logoUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_0.jpg",
+    "createdAt": "2026-10-27T01:32:27.711Z",
+    "id": "c_1793064747711",
+    "layoutStyle": "services_first",
+    "logoUrl": "https://img.magnific.com/premium-vector/minimalist-pk-logo-with-dynamic-diagonal-line_997566-11312.jpg?semt=ais_hybrid&w=740&q=80",
     "profile": {
-      "avatarUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_0.jpg",
-      "bannerUrl": "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg",
+      "avatarUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_5.jpg",
+      "bannerUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_2.jpg",
       "bio": "স্বাগতম আমার অফিসিয়াল বায়ো ডাটা ও প্রোফাইল পেজে! যেকোনো প্রয়োজনে সরাসরি যোগাযোগ করুন।",
-      "handle": "@shuvopk",
-      "location": "Bangladesh",
-      "name": "SHUVO PK",
-      "title": "🌟 Digital Creator & Entrepreneur"
+      "handle": "@shuvo_pk",
+      "location": "Natore ,Bangladesh",
+      "name": "⚡ 🌸SHUVO PK 🌸 ⚡",
+      "title": "🌟 Profashonal Web & Apps Developer"
     },
     "services": [
       {
-        "createdAt": "2026-10-12T10:00:00.000Z",
-        "id": "cs_0_1793031159278",
-        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/web_image_uploader/WEB%20IMAGE%20UPLOAS.html",
-        "subtitle": "Web Image Uploader",
-        "title": "⚡ Shuvo Official image Uploader"
+        "createdAt": "2026-10-27T04:57:59.491Z",
+        "id": "cs_1793077079491",
+        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSytVg-pulYehZEEg6tAHR3-JkNYoNthyMeDHqGlTV8vJDa9y79xd_oHOY&s=10",
+        "linkUrl": "https://androadappsdevelopershuvo.github.io/biodata.com/",
+        "subtitle": "",
+        "title": "আমার মেন সাইট"
       },
       {
-        "createdAt": "2026-10-12T10:05:00.000Z",
-        "id": "cs_1_1793031159278",
-        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0WKD8w5ijwQjZ9Kud4DBymrTdPbChGcgVb1HzbEBxMw&s",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/pdf/genaratore.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "Image to PDF Converter"
+        "createdAt": "2026-10-28T09:59:53.334Z",
+        "id": "cs_1793181593334",
+        "imageUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_6.jpg",
+        "linkUrl": "https://t.me/djhaker007ff",
+        "subtitle": "x",
+        "title": "TEST"
       },
       {
-        "createdAt": "2026-10-12T10:10:00.000Z",
-        "id": "cs_2_1793031159278",
-        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjSwN7R_Sc_ICvjuSMieXu2i9HFj8mpfjfOBSI_U77GA&s",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/whatsapp/opener.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "WP Chat Opener"
+        "createdAt": "2026-10-28T10:00:48.968Z",
+        "id": "cs_1793181648968",
+        "imageUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_7.jpg",
+        "linkUrl": "https://ff.com",
+        "subtitle": "zx",
+        "title": "FREE"
       },
       {
-        "createdAt": "2026-10-12T10:15:00.000Z",
-        "id": "cs_3_1793031159278",
-        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTj0UXOpAGwxbCdVZGM7hcG5_F5WQDFrjRvfL_g_aRAAQ&s=10",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/qr/code.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "QR Code Pro Generator"
+        "createdAt": "2026-10-28T10:01:35.353Z",
+        "id": "cs_1793181695353",
+        "imageUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_8.jpg",
+        "linkUrl": "https://ffsupporthub.com",
+        "subtitle": "cv",
+        "title": "Cv"
       },
       {
-        "createdAt": "2026-10-12T10:20:00.000Z",
-        "id": "cs_4_1793031159278",
-        "imageUrl": "https://play-lh.googleusercontent.com/ZRaN_xqGeqfAHxvSOejYNJ-EQAHO0S_LpPJFrWiyDcTK3Q7GzfLv3JOmCrSpaROvegcuSMj72IocY93OH2G8Mg",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/textto/file.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "Text To File Converter"
-      },
-      {
-        "createdAt": "2026-10-12T10:25:00.000Z",
-        "id": "cs_5_1793031159278",
-        "imageUrl": "https://play-lh.googleusercontent.com/PNGH4JIH6-0Vgb2GiRygzlGWMzVhaR8LEBYslY2UerXcoL2xbp3GWFaN3-FojoPwOwA7fe5WuF5xjTtwi6zlhyU",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/zip/creatore.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "ZIP File Creator"
-      },
-      {
-        "createdAt": "2026-10-12T10:30:00.000Z",
-        "id": "cs_6_1793031159278",
-        "imageUrl": "https://www.thegreatapps.com/application/upload/Apps/2022/02/age-calculating-tool-48.png",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/age/calculator.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "AGE Calculator"
-      },
-      {
-        "createdAt": "2026-10-12T10:35:00.000Z",
-        "id": "cs_7_1793031159278",
-        "imageUrl": "https://play-lh.googleusercontent.com/hqfx_dT5atHVFFmCJ00ngqmXwqJjuf2MJG3lCZxya_w7DH_E8FQFHnPZaSrBUFNeSIzhF81YVRYeFG5tEcLqBQ",
-        "linkUrl": "https://weather-topaz-eta-99.vercel.app/",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "PK Weather"
-      },
-      {
-        "createdAt": "2026-10-12T10:40:00.000Z",
-        "id": "cs_8_1793031159278",
-        "imageUrl": "https://play-lh.googleusercontent.com/6F2FN7E9Hg841bZaqe1Vp4V9i4N0ZoQfbR9M9y3bJtx9tToET2PRh4UnOnSwn1oRVTxYymcMLFlqSI3RA5Hq9-g",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/sms/boomber.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "BULK SMS BOOMBER"
-      },
-      {
-        "createdAt": "2026-10-12T10:45:00.000Z",
-        "id": "cs_9_1793031159278",
-        "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgzCRDn58t2rmiiZR0ILPQOZWMA3EXVE8L6B7DM3BuAA&s=10",
-        "linkUrl": "https://androadappsdevelopershuvo.github.io/Drot/mail.html",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "Drot Mail Generator"
-      },
-      {
-        "createdAt": "2026-10-12T10:50:00.000Z",
-        "id": "cs_10_1793031159278",
-        "imageUrl": "https://i.ibb.co/6RRndsD1/IMG-0230.jpg",
-        "linkUrl": "https://bio-data-ochre.vercel.app/",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "Social Bio Maker"
-      },
-      {
-        "createdAt": "2026-10-12T10:55:00.000Z",
-        "id": "cs_11_1793031159278",
-        "imageUrl": "https://i.ytimg.com/vi/QHKzyKASMck/sddefault.jpg",
-        "linkUrl": "https://htmlcode-psi.vercel.app/",
-        "subtitle": "ফটো ও মেমোরিজ",
-        "title": "Html Code Runner"
+        "createdAt": "2026-10-28T13:39:09.477Z",
+        "id": "cs_1793194749477",
+        "imageUrl": "https://api.telegram.org/file/bot8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg/photos/file_9.jpg",
+        "linkUrl": "https://ff.com",
+        "subtitle": "🐸",
+        "title": "🌸🫶"
       }
     ],
-    "shortName": "PK_BIO",
+    "shortName": "PK BIO",
     "socialLinks": [
       {
         "buttonText": "যুক্ত হোন",
         "enabled": true,
-        "id": "cl_0_1793031159278",
-        "isFeatured": true,
+        "id": "cl_1793065602566",
         "platform": "facebook",
         "subtitle": "অফিসিয়াল ফেসবুক প্রোফাইল",
-        "title": "Facebook Profile / Page",
-        "url": "https://www.facebook.com/share/1c63KeYHxt/",
-        "username": "@shuvo_bhai_444"
+        "title": "Facebook Profile",
+        "url": "https://www.facebook.com/xrhakarshuvo007"
       },
       {
         "buttonText": "যুক্ত হোন",
         "enabled": true,
-        "id": "cl_1_1793031159278",
-        "isFeatured": true,
+        "id": "cl_1793065761850",
         "platform": "telegram",
-        "subtitle": "টেলিগ্রাম মেসেজ ইনবক্স",
-        "title": "Telegram Channel / Inbox",
-        "url": "https://t.me/djhakar007ff",
-        "username": "@djhakar007ff"
-      },
-      {
-        "buttonText": "সাবস্ক্রাইব",
-        "enabled": true,
-        "id": "cl_2_1793031159278",
-        "isFeatured": true,
-        "platform": "youtube",
-        "subtitle": "ডেভোলপার এর চ্যানেল সাবস্ক্রাইব করুন",
-        "title": "Youtube Channel",
-        "url": "https://youtube.com/@lovewithsong",
-        "username": "@lovewithsong"
+        "subtitle": "টেলিগ্রাম চ্যানেল",
+        "title": "Telegram Channel",
+        "url": "https://t.me/shuvo_pk"
       },
       {
         "buttonText": "ফলো করুন",
         "enabled": true,
-        "id": "cl_3_1793031159278",
-        "isFeatured": false,
+        "id": "cl_1793194896264",
         "platform": "instagram",
         "subtitle": "ইনস্টাগ্রাম ফটো ও রিলস",
-        "title": "Instagram Photos & Reels",
-        "url": "https://instagram.com/fbuser0007",
-        "username": "@fbuser0007"
+        "title": "Instagram Profile",
+        "url": "https://ff"
       },
       {
-        "buttonText": "ফলো করুন",
+        "buttonText": "অ্যাড করুন",
         "enabled": true,
-        "id": "cl_4_1793031159278",
-        "isFeatured": false,
-        "platform": "twitter",
-        "subtitle": "ডেভোলপার 乂 আইডি ফলো করুন",
-        "title": "X (Twitter) Profile",
-        "url": "https://x.com/XSHUVOxxx",
-        "username": "@XSHUVOxxx"
+        "id": "cl_1793195630752",
+        "platform": "snapchat",
+        "subtitle": "স্ন্যাপ ও স্টোরিজ",
+        "title": "Snapchat Profile",
+        "url": "https://httpshttps://ff"
       }
     ],
-    "updatedAt": "2026-10-26T16:12:39.279Z"
+    "themeStyle": "ultra_cyber_glass",
+    "updatedAt": "2026-10-29T02:03:41.784Z"
   }
 ]
