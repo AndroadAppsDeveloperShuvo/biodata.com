@@ -1032,6 +1032,12 @@ function getMainMenuKeyboard() {
   return {
     inline_keyboard: [
       [
+        {
+          text: '🚀 টেলিগ্রাম ওয়েব অ্যাপ (ড্যাশবোর্ড)',
+          web_app: { url: 'https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/' }
+        }
+      ],
+      [
         { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: 'menu_profile' },
         { text: `🏷️ ব্যাজ সমূহ (${badges.length})`, callback_data: 'menu_badges' }
       ],
@@ -1361,6 +1367,12 @@ function getClientMainMenuKeyboard(client: ClientRecord) {
 
   return {
     inline_keyboard: [
+      [
+        {
+          text: '🚀 টেলিগ্রাম ওয়েব অ্যাপ (ড্যাশবোর্ড)',
+          web_app: { url: 'https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/' }
+        }
+      ],
       [
         { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: `cl_prof:${client.id}` },
         { text: `🏷️ ব্যাজ সমূহ (${badgesCount}টি)`, callback_data: `cl_badges:${client.id}` }
@@ -4398,17 +4410,12 @@ async function startTelegramPolling() {
   botState.isPolling = true;
 
   try {
-    const webhookUrl = `https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/api/telegram-webhook`;
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: webhookUrl, allowed_updates: ['message', 'callback_query'], drop_pending_updates: true })
-    });
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, { method: 'POST' });
     const meRes = await telegramRequest('getMe', {});
     if (meRes.ok) {
       botState.botUsername = meRes.result.username;
       botState.botFirstName = meRes.result.first_name;
-      console.log(`🤖 Telegram Bot connected as @${botState.botUsername} (${botState.botFirstName}) via Webhook`);
+      console.log(`🤖 Telegram Bot connected as @${botState.botUsername} (${botState.botFirstName}) via Long Polling`);
     }
   } catch (err) {
     console.error('Telegram bot init error:', err);
