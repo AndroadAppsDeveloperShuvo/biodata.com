@@ -763,6 +763,10 @@ app.post('/api/sync', async (req, res) => {
   res.json({ success: true, message: 'Synced to Firebase' });
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({ success: true, status: 'active', timestamp: new Date().toISOString() });
+});
+
 app.get('/api/data', (req, res) => {
   const themeCfg = getThemeConfig();
   res.json({
@@ -3270,11 +3274,14 @@ async function sendFullSummary(chatId: string) {
 
 // Handle Callback Queries (Inline button clicks)
 async function handleCallbackQuery(cb: any) {
-  const chatId = String(cb.message.chat.id);
-  const data = String(cb.data);
-  const cbId = cb.id;
+  try {
+    const chatId = String(cb.message?.chat?.id || cb.from?.id || '');
+    const data = String(cb.data || '');
+    const cbId = cb.id;
 
-  await answerCallbackQuery(cbId);
+    if (!chatId) return;
+
+    await answerCallbackQuery(cbId);
 
   // ==========================================
   // ADMIN RESELLER CALLBACKS
@@ -4325,6 +4332,9 @@ async function handleCallbackQuery(cb: any) {
     );
     return;
   }
+} catch (err) {
+  console.error('Error in handleCallbackQuery:', err);
+}
 }
 
 // Telegram Long Polling Loop
@@ -4333,6 +4343,7 @@ async function startTelegramPolling() {
   botState.isPolling = true;
 
   try {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, { method: 'POST' });
     const meRes = await telegramRequest('getMe', {});
     if (meRes.ok) {
       botState.botUsername = meRes.result.username;
@@ -4347,7 +4358,7 @@ async function startTelegramPolling() {
     while (botState.isPolling) {
       try {
         const response = await fetch(
-          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${botState.offset}&timeout=25`,
+          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${botState.offset}`,
           { method: 'GET' }
         );
 
@@ -4360,43 +4371,46 @@ async function startTelegramPolling() {
         if (data.ok && Array.isArray(data.result)) {
           for (const update of data.result) {
             botState.offset = update.update_id + 1;
+            try {
+              if (update.callback_query) {
+                await handleCallbackQuery(update.callback_query);
+                continue;
+              }
 
-            if (update.callback_query) {
-              await handleCallbackQuery(update.callback_query);
-              continue;
-            }
+              if (update.message) {
+                const msg = update.message;
+                const chatId = String(msg.chat.id);
+                const sender = msg.from?.first_name || 'User';
 
-            if (update.message) {
-              const msg = update.message;
-              const chatId = String(msg.chat.id);
-              const sender = msg.from?.first_name || 'User';
-
-              // Photo support
-              if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
-                const state = userStates[chatId];
-                if (state && (
-                  state.step === 'add_image' ||
-                  state.step === 'edit_service_val' ||
-                  state.step === 'prof_edit_avatar' ||
-                  state.step === 'prof_edit_banner' ||
-                  state.step === 'admin_wizard_logo' ||
-                  state.step === 'client_srv_image' ||
-                  state.step === 'client_prof_avatar' ||
-                  state.step === 'client_prof_banner'
-                )) {
-                  const bestPhoto = msg.photo[msg.photo.length - 1];
-                  const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
-                  if (fileInfo.ok && fileInfo.result?.file_path) {
-                    const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
-                    await handleUserMessage(chatId, directPhotoUrl, sender);
-                    continue;
+                // Photo support
+                if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
+                  const state = userStates[chatId];
+                  if (state && (
+                    state.step === 'add_image' ||
+                    state.step === 'edit_service_val' ||
+                    state.step === 'prof_edit_avatar' ||
+                    state.step === 'prof_edit_banner' ||
+                    state.step === 'admin_wizard_logo' ||
+                    state.step === 'client_srv_image' ||
+                    state.step === 'client_prof_avatar' ||
+                    state.step === 'client_prof_banner'
+                  )) {
+                    const bestPhoto = msg.photo[msg.photo.length - 1];
+                    const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
+                    if (fileInfo.ok && fileInfo.result?.file_path) {
+                      const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
+                      await handleUserMessage(chatId, directPhotoUrl, sender);
+                      continue;
+                    }
                   }
                 }
-              }
 
-              if (msg.text) {
-                await handleUserMessage(chatId, msg.text, sender);
+                if (msg.text) {
+                  await handleUserMessage(chatId, msg.text, sender);
+                }
               }
+            } catch (updateErr) {
+              console.error('Error processing update item:', updateErr);
             }
           }
         }
@@ -4405,6 +4419,7 @@ async function startTelegramPolling() {
         botState.errorsCount++;
         await new Promise(r => setTimeout(r, Math.min(botState.errorsCount * 1500, 10000)));
       }
+      await new Promise(r => setTimeout(r, 1000));
     }
   })();
 }
