@@ -923,12 +923,13 @@ interface TelegramUserState {
     // Badge flows
     | 'badge_add_text'
     | 'badge_edit_text'
-    // Admin Wizard flows
+    // Admin Wizard & Broadcast flows
     | 'admin_wizard_chatid'
     | 'admin_wizard_appname'
     | 'admin_wizard_shortname'
     | 'admin_wizard_logo'
     | 'admin_wizard_layout'
+    | 'admin_broadcast_msg'
     // Client self-management flows
     | 'client_prof_name'
     | 'client_prof_handle'
@@ -1045,7 +1046,7 @@ function getMainMenuKeyboard() {
       ],
       [
         { text: `👥 ক্লায়েন্ট সেল ও ম্যানেজমেন্ট (${clients.length} জন)`, callback_data: 'admin_menu_clients' },
-        { text: '🎨 থিম পরিবর্তন করুন', callback_data: 'admin_menu_theme' }
+        { text: '📢 ক্লায়েন্ট নোটিশ পাঠান', callback_data: 'admin_menu_broadcast' }
       ],
       [
         { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
@@ -1448,7 +1449,7 @@ function getClientLayoutOnlyKeyboard(client: ClientRecord) {
 }
 
 function getClientThemeOnlyKeyboard(client: ClientRecord) {
-  const theme = client.themeStyle || 'classic_dark';
+  const theme = client.themeStyle || 'ultra_cyber_glass';
   return {
     inline_keyboard: [
       [
@@ -1456,38 +1457,26 @@ function getClientThemeOnlyKeyboard(client: ClientRecord) {
       ],
       [
         {
-          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ১. ক্লাসিক ডার্ক (Classic Dark)',
-          callback_data: `cl_set_theme:classic_dark:${client.id}`
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ১. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          callback_data: `cl_set_theme:ultra_cyber_glass:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'dark_glassmorphism' ? '🟢 ' : '⚪ ') + '💎 ২. ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)',
-          callback_data: `cl_set_theme:dark_glassmorphism:${client.id}`
-        }
-      ],
-      [
-        {
-          text: (theme === 'cyberpunk_neon' ? '🟢 ' : '⚪ ') + '⚡ ৩. সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)',
-          callback_data: `cl_set_theme:cyberpunk_neon:${client.id}`
-        }
-      ],
-      [
-        {
-          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ২. অর্গানিক নেচার (Organic Nature)',
           callback_data: `cl_set_theme:organic_nature:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৩. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
           callback_data: `cl_set_theme:bold_flat_popart:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৬. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
-          callback_data: `cl_set_theme:ultra_cyber_glass:${client.id}`
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৪. ক্লাসিক ডার্ক (Classic Dark)',
+          callback_data: `cl_set_theme:classic_dark:${client.id}`
         }
       ],
       [
@@ -1508,38 +1497,26 @@ function getAdminThemeMenuKeyboard() {
       ],
       [
         {
-          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ১. ক্লাসিক ডার্ক (Classic Dark)',
-          callback_data: `admin_set_theme:classic_dark`
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ১. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          callback_data: `admin_set_theme:ultra_cyber_glass`
         }
       ],
       [
         {
-          text: (theme === 'dark_glassmorphism' ? '🟢 ' : '⚪ ') + '💎 ২. ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)',
-          callback_data: `admin_set_theme:dark_glassmorphism`
-        }
-      ],
-      [
-        {
-          text: (theme === 'cyberpunk_neon' ? '🟢 ' : '⚪ ') + '⚡ ৩. সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)',
-          callback_data: `admin_set_theme:cyberpunk_neon`
-        }
-      ],
-      [
-        {
-          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ২. অর্গানিক নেচার (Organic Nature)',
           callback_data: `admin_set_theme:organic_nature`
         }
       ],
       [
         {
-          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৩. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
           callback_data: `admin_set_theme:bold_flat_popart`
         }
       ],
       [
         {
-          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৬. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
-          callback_data: `admin_set_theme:ultra_cyber_glass`
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৪. ক্লাসিক ডার্ক (Classic Dark)',
+          callback_data: `admin_set_theme:classic_dark`
         }
       ],
       [
@@ -1812,16 +1789,14 @@ async function sendClientLayoutOnlyMenu(chatId: string, client: ClientRecord) {
 
 async function sendClientThemeOnlyMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
-  const theme = client.themeStyle || 'classic_dark';
-  const themeName = theme === 'bold_flat_popart'
-    ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+  const theme = client.themeStyle || 'ultra_cyber_glass';
+  const themeName = theme === 'ultra_cyber_glass'
+    ? '✨ ১. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
     : theme === 'organic_nature'
-    ? '🍃 অর্গানিক নেচার (Organic Nature)'
-    : theme === 'cyberpunk_neon'
-    ? '⚡ সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)'
-    : theme === 'dark_glassmorphism'
-    ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)'
-    : '🕶️ ক্লাসিক ডার্ক (Classic Dark)';
+    ? '🍃 ২. অর্গানিক নেচার (Organic Nature)'
+    : theme === 'bold_flat_popart'
+    ? '💥 ৩. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+    : '🕶️ ৪. ক্লাসিক ডার্ক (Classic Dark)';
 
   const text = `🎨 <b>ওয়েবসাইট কালার থিম নির্বাচন:</b>\n\n`
     + `বর্তমান থিম: <b>${themeName}</b>\n\n`
@@ -2445,8 +2420,62 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     return await completeClientCreation(chatId, state.tempData, layoutStyle, senderName);
   }
 
+  // Admin Broadcast Message Step
+  if (state.step === 'admin_broadcast_msg') {
+    const broadcastText = trimmed;
+    if (!broadcastText) {
+      const err = `❌ নোটিশ টেক্সট খালি রাখা যাবে না। অনুগ্রহ করে বার্তাটি লিখে পাঠান অথবা /cancel লিখুন।`;
+      await sendTelegramMessage(chatId, err);
+      return err;
+    }
+
+    userStates[chatId] = { step: 'idle' };
+    const clients = getClients();
+    let successCount = 0;
+    let failCount = 0;
+
+    await sendTelegramMessage(chatId, `⏳ <b>${clients.length} জন ক্লায়েন্টকে নোটিশ ব্রডকাস্ট করা হচ্ছে...</b>`);
+
+    for (const c of clients) {
+      if (c.chatId) {
+        try {
+          const clientNotice = `📢 <b>অফিসিয়াল নোটিশ / বার্তা:</b>\n\n${escapeHtml(broadcastText)}\n\n— <i>মাস্টার অ্যাডমিন</i>`;
+          const res = await sendTelegramMessage(c.chatId, clientNotice);
+          if (res && res.ok) {
+            successCount++;
+          } else {
+            failCount++;
+          }
+        } catch (e) {
+          failCount++;
+        }
+      }
+    }
+
+    addLog('add', senderName, `ক্লায়েন্ট নোটিশ ব্রডকাস্ট প্রেরণ (${successCount} জন সফল)`);
+
+    const summaryMsg = `🎉 <b>ক্লায়েন্ট নোটিশ ব্রডকাস্ট সম্পন্ন হয়েছে!</b> ✅\n\n`
+      + `• 👥 মোট ক্লায়েন্ট: <b>${clients.length}</b> জন\n`
+      + `• 🟢 সফলভাবে প্রেরিত: <b>${successCount}</b> জন\n`
+      + `• 🔴 ব্যর্থ / ব্লকড: <b>${failCount}</b> জন\n\n`
+      + `📝 <b>প্রেরিত নোটিশ:</b>\n<i>"${escapeHtml(broadcastText)}"</i>`;
+
+    await sendTelegramMessage(chatId, summaryMsg, { reply_markup: getMainMenuKeyboard() });
+    return summaryMsg;
+  }
+
   // Quick Command: /start or /help or /status
-  if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
+  if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed === '/broadcast' || trimmed === '/notice' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
+    if (trimmed === '/broadcast' || trimmed === '/notice') {
+      userStates[chatId] = { step: 'admin_broadcast_msg' };
+      const clients = getClients();
+      const msg = `📢 <b>সকল নিবন্ধিত ক্লায়েন্টকে বার্তা / নোটিশ পাঠান (Broadcast Notice)</b>\n\n`
+        + `• নিবন্ধিত ক্লায়েন্ট সংখ্যা: <b>${clients.length}</b> জন\n\n`
+        + `✍️ ক্লায়েন্টদের জন্য আপনার নোটিশ বা ঘোষণা বার্তাটি লিখে পাঠান। এই বার্তাটি স্বয়ংক্রিয়ভাবে সকল নিবন্ধিত ক্লায়েন্টের টেলিগ্রাম ইনবক্সে পৌঁছে যাবে:\n\n`
+        + `🔙 বাতিল করতে /cancel লিখুন।`;
+      await sendTelegramMessage(chatId, msg);
+      return msg;
+    }
     userStates[chatId] = { step: 'idle' };
     addLog('start', senderName, '/start কমান্ড রান করা হয়েছে');
     
@@ -3403,30 +3432,14 @@ async function handleCallbackQuery(cb: any) {
     return;
   }
 
-  if (data === 'admin_menu_theme') {
-    userStates[chatId] = { step: 'idle' };
-    const themeCfg = getThemeConfig();
-    const themeName = themeCfg.themeStyle === 'ultra_cyber_glass' ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস' : themeCfg.themeStyle;
-    const msg = `🎨 <b>মাস্টার অ্যাডমিন ওয়েবসাইট থিম কন্ট্রোল:</b>\n\nবর্তমান থিম: <b>${themeName}</b>\n\nনিচের যেকোনো একটি থিম নির্বাচন করুন:`;
-    await sendTelegramMessage(chatId, msg, { reply_markup: getAdminThemeMenuKeyboard() });
-    return;
-  }
-
-  if (data.startsWith('admin_set_theme:')) {
-    const themeStyle = data.replace('admin_set_theme:', '');
-    const themeCfg = getThemeConfig();
-    saveThemeConfig(themeStyle, themeCfg.layoutStyle);
-    const themeName = themeStyle === 'ultra_cyber_glass' ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস'
-      : themeStyle === 'bold_flat_popart' ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট'
-      : themeStyle === 'organic_nature' ? '🍃 অর্গানিক নেচার'
-      : themeStyle === 'cyberpunk_neon' ? '⚡ সাইবারপাঙ্ক নিয়ন'
-      : themeStyle === 'dark_glassmorphism' ? '💎 ডার্ক গ্লাস ফ্রস্টেড'
-      : '🕶️ ক্লাসিক ডার্ক';
-
-    addLog('edit', 'Master Admin', `মাস্টার থিম পরিবর্তন: ${themeName}`);
-    await sendTelegramMessage(chatId, `✅ <b>মাস্টার ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`, {
-      reply_markup: getAdminThemeMenuKeyboard()
-    });
+  if (data === 'admin_menu_broadcast' || data === 'admin_btn_broadcast') {
+    userStates[chatId] = { step: 'admin_broadcast_msg' };
+    const clients = getClients();
+    const msg = `📢 <b>সকল নিবন্ধিত ক্লায়েন্টকে বার্তা / নোটিশ পাঠান (Broadcast Notice)</b>\n\n`
+      + `• নিবন্ধিত ক্লায়েন্ট সংখ্যা: <b>${clients.length}</b> জন\n\n`
+      + `✍️ ক্লায়েন্টদের জন্য আপনার নোটিশ বা বার্তাটি লিখে পাঠান। এই বার্তাটি স্বয়ংক্রিয়ভাবে সকল নিবন্ধিত ক্লায়েন্টের টেলিগ্রাম ইনবক্সে পৌঁছে যাবে:\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন।`;
+    await sendTelegramMessage(chatId, msg);
     return;
   }
 
@@ -3650,16 +3663,12 @@ async function handleCallbackQuery(cb: any) {
       const updated = getClientById(client.id) || client;
       saveThemeConfig(themeStyle, updated.layoutStyle);
       const themeName = themeStyle === 'ultra_cyber_glass'
-        ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
-        : themeStyle === 'bold_flat_popart'
-        ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+        ? '✨ ১. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
         : themeStyle === 'organic_nature'
-        ? '🍃 অর্গানিক নেচার (Organic Nature)'
-        : themeStyle === 'cyberpunk_neon'
-        ? '⚡ সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)'
-        : themeStyle === 'dark_glassmorphism'
-        ? '💎 ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)'
-        : '🕶️ ক্লাসিক ডার্ক (Classic Dark)';
+        ? '🍃 ২. অর্গানিক নেচার (Organic Nature)'
+        : themeStyle === 'bold_flat_popart'
+        ? '💥 ৩. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+        : '🕶️ ৪. ক্লাসিক ডার্ক (Classic Dark)';
       await sendTelegramMessage(
         chatId,
         `🎨 <b>ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`,
