@@ -634,25 +634,29 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     /* Ultra Cyber Glass Theme Rules */
     [data-theme="ultra_cyber_glass"],
     body[data-theme="ultra_cyber_glass"] {
-      background-color: #09090b !important;
-      color: #fafafa !important;
+      background-color: #030712 !important;
+      color: #f8fafc !important;
     }
     [data-theme="ultra_cyber_glass"] main,
     main[data-theme="ultra_cyber_glass"] {
-      background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.9) 100%) !important;
-      backdrop-filter: blur(28px) !important;
-      -webkit-backdrop-filter: blur(28px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.18) !important;
-      box-shadow: 0 0 50px rgba(34, 211, 238, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.1) !important;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(3, 7, 18, 0.75) 100%) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
       border-radius: 2.5rem !important;
     }
     [data-theme="ultra_cyber_glass"] #profileName,
     main[data-theme="ultra_cyber_glass"] #profileName {
-      background: linear-gradient(to right, #22d3ee, #ffffff, #a855f7) !important;
-      background-size: 200% 200% !important;
-      -webkit-background-clip: text !important;
-      -webkit-text-fill-color: transparent !important;
-      animation: gradientX 3.5s ease infinite !important;
+      color: #ffffff !important;
+      text-shadow: 0 0 25px rgba(34, 211, 238, 0.7), 0 0 10px rgba(168, 85, 247, 0.6) !important;
+      font-weight: 800 !important;
+      background: none !important;
+      -webkit-background-clip: initial !important;
+      -webkit-text-fill-color: initial !important;
+      border: none !important;
+      padding: 0 !important;
+      background-color: transparent !important;
     }
     [data-theme="ultra_cyber_glass"] #profileHandle,
     main[data-theme="ultra_cyber_glass"] #profileHandle {
