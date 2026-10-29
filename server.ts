@@ -4385,15 +4385,7 @@ async function startTelegramPolling() {
   botState.isPolling = true;
 
   try {
-    const webhookUrl = `https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app/api/telegram-webhook`;
-    const whRes = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url: webhookUrl, drop_pending_updates: true })
-    });
-    const whData = await whRes.json();
-    console.log('🤖 Telegram Webhook Registered:', whData);
-
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, { method: 'POST' });
     const meRes = await telegramRequest('getMe', {});
     if (meRes.ok) {
       botState.botUsername = meRes.result.username;
