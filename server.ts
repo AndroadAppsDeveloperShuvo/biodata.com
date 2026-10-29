@@ -4380,8 +4380,16 @@ async function handleCallbackQuery(cb: any) {
 }
 
 // Telegram Long Polling Loop
+declare global {
+  var __telegram_polling_active: boolean | undefined;
+}
+
 async function startTelegramPolling() {
-  if (botState.isPolling) return;
+  if (globalThis.__telegram_polling_active || botState.isPolling) {
+    console.log('🤖 Telegram polling already active. Skipping duplicate instance.');
+    return;
+  }
+  globalThis.__telegram_polling_active = true;
   botState.isPolling = true;
 
   try {
@@ -4400,7 +4408,7 @@ async function startTelegramPolling() {
     while (botState.isPolling) {
       try {
         const response = await fetch(
-          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${botState.offset}`,
+          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${botState.offset}&timeout=10`,
           { method: 'GET' }
         );
 
@@ -4409,6 +4417,14 @@ async function startTelegramPolling() {
         }
 
         const data = await response.json();
+
+        // Handle 409 Conflict (another instance running)
+        if (!data.ok && data.error_code === 409) {
+          console.warn('⚠️ Telegram 409 Conflict: Another bot instance is polling. Resetting offset & waiting...');
+          botState.offset = 0;
+          await new Promise(r => setTimeout(r, 4000));
+          continue;
+        }
 
         if (data.ok && Array.isArray(data.result)) {
           for (const update of data.result) {
