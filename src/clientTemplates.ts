@@ -639,21 +639,20 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     }
     [data-theme="ultra_cyber_glass"] main,
     main[data-theme="ultra_cyber_glass"] {
-      background: rgba(3, 7, 18, 0.82) !important;
-      backdrop-filter: blur(24px) !important;
-      -webkit-backdrop-filter: blur(24px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+      background: rgba(3, 7, 18, 0.88) !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8) !important;
       border-radius: 2.5rem !important;
       overflow: hidden !important;
+      transform: translateZ(0);
     }
     [data-theme="ultra_cyber_glass"] .profile-banner-overlay {
-      background: linear-gradient(to bottom, transparent 30%, rgba(3, 7, 18, 0.9) 100%) !important;
+      background: linear-gradient(to bottom, transparent 30%, rgba(3, 7, 18, 0.95) 100%) !important;
     }
     [data-theme="ultra_cyber_glass"] #profileName,
     main[data-theme="ultra_cyber_glass"] #profileName {
       color: #ffffff !important;
-      text-shadow: 0 0 25px rgba(34, 211, 238, 0.7), 0 0 10px rgba(168, 85, 247, 0.6) !important;
+      text-shadow: 0 0 20px rgba(34, 211, 238, 0.7), 0 0 10px rgba(168, 85, 247, 0.5) !important;
       font-weight: 800 !important;
       background: none !important;
       -webkit-background-clip: initial !important;
@@ -664,31 +663,31 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     }
     [data-theme="ultra_cyber_glass"] #profileHandle,
     main[data-theme="ultra_cyber_glass"] #profileHandle {
-      background: rgba(34, 211, 238, 0.1) !important;
-      border: 1px solid rgba(34, 211, 238, 0.3) !important;
+      background: rgba(34, 211, 238, 0.15) !important;
+      border: 1px solid rgba(34, 211, 238, 0.4) !important;
       color: #22d3ee !important;
-      box-shadow: 0 0 15px rgba(34, 211, 238, 0.2) !important;
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.3) !important;
     }
     [data-theme="ultra_cyber_glass"] .glass-card,
     main[data-theme="ultra_cyber_glass"] .glass-card {
-      background: rgba(24, 24, 27, 0.75) !important;
-      backdrop-filter: blur(16px) !important;
+      background: rgba(15, 23, 42, 0.75) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      color: #d4d4d8 !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+      color: #e2e8f0 !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+      transform: translateZ(0);
     }
     [data-theme="ultra_cyber_glass"] .social-link-card,
     [data-theme="ultra_cyber_glass"] #socialLinksContainer > a,
     main[data-theme="ultra_cyber_glass"] #socialLinksContainer > a {
-      background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
-      backdrop-filter: blur(20px) !important;
+      background: rgba(30, 41, 59, 0.8) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+      transform: translateZ(0);
     }
     [data-theme="ultra_cyber_glass"] .social-link-card:hover,
     [data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover {
-      border-color: rgba(34, 211, 238, 0.6) !important;
-      box-shadow: 0 0 25px rgba(34, 211, 238, 0.35) !important;
+      border-color: rgba(34, 211, 238, 0.8) !important;
+      box-shadow: 0 0 25px rgba(34, 211, 238, 0.45) !important;
       transform: scale(1.03) translateY(-3px) !important;
     }
     [data-theme="ultra_cyber_glass"] #socialLinksContainer > a span {
@@ -698,20 +697,21 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       box-shadow: 0 0 15px rgba(34, 211, 238, 0.5) !important;
     }
     [data-theme="ultra_cyber_glass"] #servicesGrid > div {
-      background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(15, 15, 18, 0.9) 100%) !important;
-      backdrop-filter: blur(20px) !important;
+      background: rgba(30, 41, 59, 0.85) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+      transform: translateZ(0);
     }
     [data-theme="ultra_cyber_glass"] #servicesGrid > div:hover {
-      border-color: rgba(168, 85, 247, 0.6) !important;
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.35) !important;
+      border-color: rgba(168, 85, 247, 0.8) !important;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.45) !important;
       transform: scale(1.04) translateY(-3px) !important;
     }
     [data-theme="ultra_cyber_glass"] #contactContainer {
-      background: linear-gradient(145deg, rgba(24, 24, 27, 0.85) 0%, rgba(9, 9, 11, 0.85) 100%) !important;
+      background: rgba(30, 41, 59, 0.8) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
+      transform: translateZ(0);
     }
     [data-theme="ultra_cyber_glass"] #btnShareProfile > div {
       background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(9, 9, 11, 0.9) 100%) !important;

@@ -1045,7 +1045,7 @@ function getMainMenuKeyboard() {
       ],
       [
         { text: `👥 ক্লায়েন্ট সেল ও ম্যানেজমেন্ট (${clients.length} জন)`, callback_data: 'admin_menu_clients' },
-        { text: '➕ নতুন ক্লায়েন্ট তৈরি', callback_data: 'admin_btn_add_client' }
+        { text: '🎨 থিম পরিবর্তন করুন', callback_data: 'admin_menu_theme' }
       ],
       [
         { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
@@ -1493,6 +1493,57 @@ function getClientThemeOnlyKeyboard(client: ClientRecord) {
       [
         { text: '🔙 লেআউট & থিম মেন্যু', callback_data: `cl_layout_theme_main:${client.id}` },
         { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
+      ]
+    ]
+  };
+}
+
+function getAdminThemeMenuKeyboard() {
+  const themeCfg = getThemeConfig();
+  const theme = themeCfg.themeStyle || 'ultra_cyber_glass';
+  return {
+    inline_keyboard: [
+      [
+        { text: '🎨 --- মাস্টার অ্যাডমিন থিম নির্বাচন ---', callback_data: `cl_noop` }
+      ],
+      [
+        {
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ১. ক্লাসিক ডার্ক (Classic Dark)',
+          callback_data: `admin_set_theme:classic_dark`
+        }
+      ],
+      [
+        {
+          text: (theme === 'dark_glassmorphism' ? '🟢 ' : '⚪ ') + '💎 ২. ডার্ক গ্লাস ফ্রস্টেড (Dark Glassmorphism)',
+          callback_data: `admin_set_theme:dark_glassmorphism`
+        }
+      ],
+      [
+        {
+          text: (theme === 'cyberpunk_neon' ? '🟢 ' : '⚪ ') + '⚡ ৩. সাইবারপাঙ্ক নিয়ন (Cyberpunk Neon)',
+          callback_data: `admin_set_theme:cyberpunk_neon`
+        }
+      ],
+      [
+        {
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
+          callback_data: `admin_set_theme:organic_nature`
+        }
+      ],
+      [
+        {
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          callback_data: `admin_set_theme:bold_flat_popart`
+        }
+      ],
+      [
+        {
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৬. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          callback_data: `admin_set_theme:ultra_cyber_glass`
+        }
+      ],
+      [
+        { text: '🔙 প্রধান মেন্যু', callback_data: 'cmd_menu' }
       ]
     ]
   };
@@ -3349,6 +3400,33 @@ async function handleCallbackQuery(cb: any) {
       + `<i>(ক্লাইন্ট টেলিগ্রামে @userinfobot এ স্টার্ট দিলে তার Chat ID পেয়ে যাবে, যেমন: <code>1234567890</code>)</i>\n\n`
       + `🔙 বাতিল করতে /cancel লিখুন`;
     await sendTelegramMessage(chatId, msg);
+    return;
+  }
+
+  if (data === 'admin_menu_theme') {
+    userStates[chatId] = { step: 'idle' };
+    const themeCfg = getThemeConfig();
+    const themeName = themeCfg.themeStyle === 'ultra_cyber_glass' ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস' : themeCfg.themeStyle;
+    const msg = `🎨 <b>মাস্টার অ্যাডমিন ওয়েবসাইট থিম কন্ট্রোল:</b>\n\nবর্তমান থিম: <b>${themeName}</b>\n\nনিচের যেকোনো একটি থিম নির্বাচন করুন:`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getAdminThemeMenuKeyboard() });
+    return;
+  }
+
+  if (data.startsWith('admin_set_theme:')) {
+    const themeStyle = data.replace('admin_set_theme:', '');
+    const themeCfg = getThemeConfig();
+    saveThemeConfig(themeStyle, themeCfg.layoutStyle);
+    const themeName = themeStyle === 'ultra_cyber_glass' ? '✨ আল্ট্রা প্রিমিয়াম সাইবার গ্লাস'
+      : themeStyle === 'bold_flat_popart' ? '💥 বোল্ড ফ্ল্যাট পপ আর্ট'
+      : themeStyle === 'organic_nature' ? '🍃 অর্গানিক নেচার'
+      : themeStyle === 'cyberpunk_neon' ? '⚡ সাইবারপাঙ্ক নিয়ন'
+      : themeStyle === 'dark_glassmorphism' ? '💎 ডার্ক গ্লাস ফ্রস্টেড'
+      : '🕶️ ক্লাসিক ডার্ক';
+
+    addLog('edit', 'Master Admin', `মাস্টার থিম পরিবর্তন: ${themeName}`);
+    await sendTelegramMessage(chatId, `✅ <b>মাস্টার ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`, {
+      reply_markup: getAdminThemeMenuKeyboard()
+    });
     return;
   }
 
