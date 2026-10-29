@@ -3322,8 +3322,13 @@ async function handleCallbackQuery(cb: any) {
     const cbId = cb.id;
 
     if (!chatId) return;
+    console.log('🔘 Button clicked (callback_query):', data, 'from chatId:', chatId);
 
-    await answerCallbackQuery(cbId);
+    try {
+      await answerCallbackQuery(cbId);
+    } catch (e) {
+      console.warn('answerCallbackQuery warning:', e);
+    }
 
   // ==========================================
   // ADMIN RESELLER CALLBACKS
