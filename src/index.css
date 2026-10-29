@@ -639,7 +639,7 @@ body[data-theme="ultra_cyber_glass"] {
 
 [data-theme="ultra_cyber_glass"] main,
 main[data-theme="ultra_cyber_glass"] {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.45) 0%, rgba(3, 7, 18, 0.65) 100%) !important;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.25) 0%, rgba(3, 7, 18, 0.75) 100%) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -649,11 +649,12 @@ main[data-theme="ultra_cyber_glass"] {
 
 [data-theme="ultra_cyber_glass"] .profile-name-text,
 main[data-theme="ultra_cyber_glass"] .profile-name-text {
-  background: linear-gradient(to right, #22d3ee, #ffffff, #c084fc) !important;
-  background-size: 200% 200% !important;
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent !important;
-  animation: gradientX 3.5s ease infinite !important;
+  color: #ffffff !important;
+  text-shadow: 0 0 25px rgba(34, 211, 238, 0.7), 0 0 10px rgba(168, 85, 247, 0.6) !important;
+  font-weight: 800 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
   border: none !important;
   padding: 0 !important;
   background-color: transparent !important;
