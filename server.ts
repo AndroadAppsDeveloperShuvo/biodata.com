@@ -914,6 +914,34 @@ app.post('/api/telegram/simulate', async (req, res) => {
   res.json({ success: true, reply });
 });
 
+// Express endpoints for Telegram Webhook Management
+app.all('/api/webhook/set', async (req, res) => {
+  let targetUrl = (req.query.url || req.body?.url) as string;
+  if (!targetUrl) {
+    const proto = req.headers['x-forwarded-proto'] || 'https';
+    const host = req.headers.host;
+    if (host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+      targetUrl = `${proto}://${host}`;
+    }
+  }
+  if (!targetUrl) {
+    return res.status(400).json({ ok: false, message: 'URL required, pass ?url=https://yourdomain.com' });
+  }
+  const result = await setTelegramWebhook(targetUrl);
+  return res.json(result);
+});
+
+app.get('/api/webhook/status', async (req, res) => {
+  const info = await getTelegramWebhookStatus();
+  return res.json({ ok: true, isPolling: botState.isPolling, info: info.result });
+});
+
+app.all('/api/webhook/delete', async (req, res) => {
+  const result = await deleteTelegramWebhook();
+  startTelegramPolling().catch(() => {});
+  return res.json(result);
+});
+
 // ==========================================
 // TELEGRAM BOT IMPLEMENTATION
 // ==========================================
@@ -985,6 +1013,7 @@ const userStates: Record<string, TelegramUserState> = {};
 
 const botState = {
   isPolling: false,
+  isWebhookMode: false,
   offset: 0,
   botUsername: '',
   botFirstName: '',
@@ -1017,6 +1046,53 @@ async function telegramRequest(method: string, body: any) {
     console.error(`Telegram ${method} failed:`, err);
     return { ok: false, error: String(err) };
   }
+}
+
+async function setTelegramWebhook(baseUrl: string) {
+  try {
+    let target = baseUrl.trim();
+    if (!target.startsWith('http://') && !target.startsWith('https://')) {
+      target = 'https://' + target;
+    }
+    const fullWebhookUrl = target.endsWith('/api/telegram-webhook')
+      ? target
+      : `${target.replace(/\/+$/, '')}/api/telegram-webhook`;
+
+    botState.isPolling = false;
+    botState.isWebhookMode = true;
+    globalThis.__telegram_polling_active = false;
+    if (currentPollAbortController) {
+      try { currentPollAbortController.abort(); } catch {}
+      currentPollAbortController = null;
+    }
+
+    const res = await telegramRequest('setWebhook', {
+      url: fullWebhookUrl,
+      drop_pending_updates: true
+    });
+
+    console.log(`🌐 Telegram Webhook set to ${fullWebhookUrl}:`, res);
+    return { ok: !!res.ok, url: fullWebhookUrl, result: res };
+  } catch (err) {
+    console.error('Failed to set webhook:', err);
+    return { ok: false, error: String(err) };
+  }
+}
+
+async function deleteTelegramWebhook() {
+  try {
+    botState.isWebhookMode = false;
+    botState.isPolling = false;
+    globalThis.__telegram_polling_active = false;
+    const res = await telegramRequest('deleteWebhook', { drop_pending_updates: true });
+    return { ok: !!res.ok, result: res };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
+async function getTelegramWebhookStatus() {
+  return await telegramRequest('getWebhookInfo', {});
 }
 
 // Send telegram message with automatic plain-text fallback if HTML parse fails
@@ -1079,6 +1155,7 @@ function getMainMenuKeyboard() {
         { text: '📢 ক্লায়েন্ট নোটিশ পাঠান', callback_data: 'admin_menu_broadcast' }
       ],
       [
+        { text: '⚡ Webhook ২৪/৭ কন্ট্রোল', callback_data: 'admin_webhook_menu' },
         { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
       ]
     ]
@@ -2535,6 +2612,46 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     return msg;
   }
 
+  // Webhook commands: /webhook or /setwebhook [url]
+  if (trimmed === '/webhook' || trimmed === '/setwebhook' || trimmed.startsWith('/setwebhook ')) {
+    const rawUrl = trimmed.replace(/^\/setwebhook\s*/, '').trim();
+    if (rawUrl && rawUrl !== '/webhook') {
+      const res = await setTelegramWebhook(rawUrl);
+      if (res.ok) {
+        const msg = `🎉 <b>Telegram Webhook সফলভাবে চালু হয়েছে!</b> ✅\n\n🌐 <b>Webhook URL:</b>\n<code>${escapeHtml(res.url)}</code>\n\n⚡ এখন থেকে আপনার বট ২৪/৭ কোনো প্রকার ডাউনলোড বা অফলাইন হওয়া ছাড়াই লাইভ কাজ করবে!`;
+        await sendTelegramMessage(chatId, msg, { reply_markup: getMainMenuKeyboard() });
+        return msg;
+      } else {
+        const err = `❌ Webhook সেট করতে সমস্যা হয়েছে: ${escapeHtml(JSON.stringify(res.error || res.result))}`;
+        await sendTelegramMessage(chatId, err);
+        return err;
+      }
+    } else {
+      const infoRes = await getTelegramWebhookStatus();
+      const info = infoRes.result || {};
+      const statusText = info.url ? `🟢 <b>অন আছে</b>\n<code>${escapeHtml(info.url)}</code>` : `⚪ <b>বন্ধ (Long Polling চালু আছে)</b>`;
+      const pending = info.pending_update_count || 0;
+      const lastErr = info.last_error_message ? `\n⚠️ <b>সর্বশেষ এরর:</b> <i>${escapeHtml(info.last_error_message)}</i>` : '';
+
+      const msg = `🌐 <b>Telegram Webhook স্ট্যাটাস & কন্ট্রোল:</b>\n\n`
+        + `• <b>Webhook স্ট্যাটাস:</b> ${statusText}\n`
+        + `• <b>পেন্ডিং রিকোয়েস্ট:</b> ${pending} টি${lastErr}\n\n`
+        + `👇 <b>কী করতে চান?</b>\n`
+        + `• যেকোনো সিকিউরড হোস্টিং লিঙ্কে Webhook সেট করতে লিখুন:\n<code>/setwebhook https://your-domain.com</code>`;
+
+      await sendTelegramMessage(chatId, msg, {
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '⚡ বর্তমান সাইটের সাথে Auto Webhook অন করুন', callback_data: 'admin_btn_autowebhook' }],
+            [{ text: '🔄 Long Polling-এ ফিরিয়ে আনুন', callback_data: 'admin_btn_delwebhook' }],
+            [{ text: '🔙 প্রধান মেন্যু', callback_data: 'cmd_menu' }]
+          ]
+        }
+      });
+      return msg;
+    }
+  }
+
   // Connect Firebase: /firebase [url] or /setfirebase [url]
   if (trimmed.startsWith('/firebase ') || trimmed.startsWith('/setfirebase ')) {
     const rawUrl = trimmed.replace(/^\/(firebase|setfirebase)\s+/, '').trim();
@@ -3443,6 +3560,62 @@ async function handleCallbackQuery(cb: any) {
   // ==========================================
   // ADMIN RESELLER CALLBACKS
   // ==========================================
+
+  if (data === 'admin_webhook_menu') {
+    userStates[chatId] = { step: 'idle' };
+    const infoRes = await getTelegramWebhookStatus();
+    const info = infoRes.result || {};
+    const isWebhookActive = !!(info.url && info.url.length > 0);
+    if (isWebhookActive) {
+      botState.isWebhookMode = true;
+      botState.isPolling = false;
+    }
+    const statusText = isWebhookActive
+      ? `🟢 <b>চালু আছে (Webhook Active)</b>\n<code>${escapeHtml(info.url)}</code>`
+      : `⚪ <b>বন্ধ (Long Polling চালু আছে)</b>`;
+    const pending = info.pending_update_count || 0;
+    const lastErr = info.last_error_message ? `\n⚠️ <b>সর্বশেষ এরর:</b> <i>${escapeHtml(info.last_error_message)}</i>` : '';
+
+    const msg = `🌐 <b>Telegram Webhook ২৪/৭ কন্ট্রোল প্যানেল:</b>\n\n`
+      + `• <b>বর্তমান স্ট্যাটাস:</b> ${statusText}\n`
+      + `• <b>পেন্ডিং মেসেজ:</b> ${pending} টি${lastErr}\n\n`
+      + `💡 <i>Webhook অন থাকলে ফ্রি সার্ভারেও ২৪/৭ বট কখনো ডাউন হবে না!</i>`;
+
+    await sendTelegramMessage(chatId, msg, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: '⚡ অটোমেটিক Webhook সেট করুন', callback_data: 'admin_btn_autowebhook' }],
+          [{ text: '🔄 Polling Mode এ নিয়ে যান', callback_data: 'admin_btn_delwebhook' }],
+          [{ text: '🔙 প্রধান মেন্যু', callback_data: 'cmd_menu' }]
+        ]
+      }
+    });
+    return;
+  }
+
+  if (data === 'admin_btn_autowebhook') {
+    userStates[chatId] = { step: 'idle' };
+    await sendTelegramMessage(chatId, `⏳ <b>Webhook লিংক সেট করা হচ্ছে...</b>`);
+    const res = await setTelegramWebhook('https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app');
+    if (res.ok) {
+      await sendTelegramMessage(chatId, `🎉 <b>Telegram Webhook সফলভাবে অন হয়েছে!</b> ✅\n\n🌐 <code>${escapeHtml(res.url)}</code>\n\nএখন থেকে আপনার বট সম্পূর্ণ ২৪/৭ অনলাইনে সক্রিয় থাকবে!`, {
+        reply_markup: getMainMenuKeyboard()
+      });
+    } else {
+      await sendTelegramMessage(chatId, `⚠️ স্বয়ংক্রিয়ভাবে Webhook সেট করতে আপনার হোস্টিং লিঙ্কের প্রয়োজন:\n\n<code>/setwebhook https://your-domain.com</code> লিখে পাঠান।`);
+    }
+    return;
+  }
+
+  if (data === 'admin_btn_delwebhook') {
+    userStates[chatId] = { step: 'idle' };
+    await deleteTelegramWebhook();
+    startTelegramPolling().catch(() => {});
+    await sendTelegramMessage(chatId, `🔄 <b>Webhook বন্ধ করে Long Polling মোড চালু করা হয়েছে।</b>`, {
+      reply_markup: getMainMenuKeyboard()
+    });
+    return;
+  }
 
   if (data === 'admin_menu_clients') {
     userStates[chatId] = { step: 'idle' };
@@ -4562,6 +4735,11 @@ app.post('/api/telegram-webhook', async (req, res) => {
 let currentPollAbortController: AbortController | null = null;
 
 async function startTelegramPolling() {
+  if (botState.isWebhookMode) {
+    console.log('🌐 Telegram Bot is in Webhook mode. Skipping long polling start.');
+    return;
+  }
+
   if (globalThis.__telegram_polling_active && botState.isPolling) {
     console.log('🤖 Telegram polling already active. Skipping duplicate instance.');
     return;
@@ -4597,7 +4775,7 @@ async function startTelegramPolling() {
   }
 
   (async () => {
-    while (botState.isPolling) {
+    while (botState.isPolling && !botState.isWebhookMode) {
       try {
         botStateInternal.lastActiveTimestamp = Date.now();
         currentPollAbortController = new AbortController();
@@ -4690,10 +4868,11 @@ async function startTelegramPolling() {
   })();
 }
 
-startTelegramPolling();
-
-// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >25s
+// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >25s (ONLY when not in Webhook mode)
 setInterval(() => {
+  if (botState.isWebhookMode) {
+    return;
+  }
   const isStale = Date.now() - botStateInternal.lastActiveTimestamp > 25000;
   if (!botState.isPolling || isStale) {
     console.log('🤖 Bot Watchdog: Polling inactive or stale (>25s). Force restarting Telegram bot...');
@@ -4729,9 +4908,23 @@ async function setupServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
+  app.listen(PORT, '0.0.0.0', async () => {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📱 Telegram Bot Master Controller Active for Admin: ${TELEGRAM_ADMIN_CHAT_ID}`);
+
+    // Check existing Webhook status on startup
+    try {
+      const webhookStatus = await getTelegramWebhookStatus();
+      if (webhookStatus.ok && webhookStatus.result?.url) {
+        botState.isWebhookMode = true;
+        botState.isPolling = false;
+        console.log(`🌐 Telegram Webhook active on startup: ${webhookStatus.result.url}`);
+      } else {
+        startTelegramPolling();
+      }
+    } catch {
+      startTelegramPolling();
+    }
   });
 }
 
