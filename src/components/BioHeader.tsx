@@ -33,6 +33,23 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
   if (isShuvoxLightning) {
     return (
       <div className="relative z-10 w-full mb-6">
+        {/* Seamless Horizontal & Vertical Blend Top Banner Cover */}
+        {profile.bannerUrl && (
+          <div className="profile-banner-container relative h-48 sm:h-56 w-full bg-[#020617] overflow-hidden rounded-2xl mb-4 shadow-2xl">
+            <img
+              src={profile.bannerUrl}
+              alt="Banner Cover"
+              className="w-full h-full object-cover opacity-80 filter brightness-105 contrast-105"
+            />
+            {/* Vertical Bottom Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent pointer-events-none" />
+            {/* Vertical Top Overlay */}
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#020617]/80 via-[#020617]/30 to-transparent pointer-events-none" />
+            {/* Horizontal Side Vignette Overlay (Left & Right Edge Blend) */}
+            <div className="profile-banner-side-overlay absolute inset-0 bg-gradient-to-r from-[#020617] via-transparent to-[#020617] pointer-events-none opacity-95" />
+          </div>
+        )}
+
         {/* Status Badge */}
         <div className="flex justify-end w-full mb-3">
           <span className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 backdrop-blur-md shadow-md">
@@ -45,15 +62,16 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
         <div className="gradient-border-wrapper shadow-[0_0_45px_rgba(168,85,247,0.25)]">
           <div className="gradient-border-inner p-6 sm:p-8 flex flex-col items-center text-center relative overflow-hidden">
             
-            {/* 50% Opacity Banner Cover Overlay */}
+            {/* 50% Opacity Inner Card Banner Cover Overlay */}
             {profile.bannerUrl && (
               <div className="absolute top-0 inset-x-0 h-36 sm:h-44 z-0 overflow-hidden pointer-events-none">
                 <img
                   src={profile.bannerUrl}
                   alt="Banner Cover"
-                  className="w-full h-full object-cover opacity-50 filter brightness-110 contrast-105"
+                  className="w-full h-full object-cover opacity-40 filter brightness-110 contrast-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/70 to-[#0f172a]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/20 via-slate-950/75 to-[#0f172a]" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[#0f172a] via-transparent to-[#0f172a] opacity-90" />
               </div>
             )}
 
