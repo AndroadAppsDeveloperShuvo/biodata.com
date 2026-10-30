@@ -2620,7 +2620,7 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     if (rawUrl && rawUrl !== '/webhook') {
       const res = await setTelegramWebhook(rawUrl);
       if (res.ok) {
-        const msg = `🎉 <b>Telegram Webhook সফলভাবে চালু হয়েছে!</b> ✅\n\n🌐 <b>Webhook URL:</b>\n<code>${escapeHtml(res.url)}</code>\n\n⚡ এখন থেকে আপনার বট ২৪/৭ কোনো প্রকার ডাউনলোড বা অফলাইন হওয়া ছাড়াই লাইভ কাজ করবে!`;
+        const msg = `🎉 <b>Telegram Webhook সফলভাবে চালু হয়েছে!</b> ✅\n\n🌐 <b>Webhook URL:</b>\n<code>${escapeHtml(res.url || '')}</code>\n\n⚡ এখন থেকে আপনার বট ২৪/৭ কোনো প্রকার ডাউনলোড বা অফলাইন হওয়া ছাড়াই লাইভ কাজ করবে!`;
         await sendTelegramMessage(chatId, msg, { reply_markup: getMainMenuKeyboard() });
         return msg;
       } else {
@@ -3600,7 +3600,7 @@ async function handleCallbackQuery(cb: any) {
     await sendTelegramMessage(chatId, `⏳ <b>Webhook লিংক সেট করা হচ্ছে...</b>`);
     const res = await setTelegramWebhook('https://ais-dev-ll677qupqrzjjnbmkbnpfl-12329983830.asia-east1.run.app');
     if (res.ok) {
-      await sendTelegramMessage(chatId, `🎉 <b>Telegram Webhook সফলভাবে অন হয়েছে!</b> ✅\n\n🌐 <code>${escapeHtml(res.url)}</code>\n\nএখন থেকে আপনার বট সম্পূর্ণ ২৪/৭ অনলাইনে সক্রিয় থাকবে!`, {
+      await sendTelegramMessage(chatId, `🎉 <b>Telegram Webhook সফলভাবে অন হয়েছে!</b> ✅\n\n🌐 <code>${escapeHtml(res.url || '')}</code>\n\nএখন থেকে আপনার বট সম্পূর্ণ ২৪/৭ অনলাইনে সক্রিয় থাকবে!`, {
         reply_markup: getMainMenuKeyboard()
       });
     } else {
