@@ -486,6 +486,23 @@ function getClientById(id: string): ClientRecord | undefined {
   return clients.find(c => c.id === id);
 }
 
+function resolveClientForChat(chatId: string | number, clientIdParam?: string): ClientRecord | undefined {
+  const cId = String(chatId).trim();
+  const isAdmin = cId === TELEGRAM_ADMIN_CHAT_ID;
+  if (clientIdParam) {
+    const c = getClientById(clientIdParam);
+    if (c) {
+      if (isAdmin || String(c.chatId).trim() === cId) {
+        return c;
+      }
+      return undefined;
+    }
+  }
+  const clientByChat = getClientByChatId(cId);
+  if (clientByChat) return clientByChat;
+  return undefined;
+}
+
 function updateClientData(clientId: string, updater: (c: ClientRecord) => void): boolean {
   const clients = getClients();
   const client = clients.find(c => c.id === clientId);
@@ -986,11 +1003,15 @@ function escapeHtml(text: string): string {
 // Telegram API Helper Functions
 async function telegramRequest(method: string, body: any) {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     return await res.json();
   } catch (err) {
     console.error(`Telegram ${method} failed:`, err);
@@ -1240,10 +1261,14 @@ async function sendTelegramDocument(
       formData.append('parse_mode', 'HTML');
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
     const res = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendDocument`, {
       method: 'POST',
-      body: formData
+      body: formData,
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     const data = await res.json();
     if (!data.ok) {
       console.warn(`Telegram sendDocument failed for ${filename}:`, data.description || data.error);
@@ -1846,7 +1871,7 @@ async function sendClientFullSummary(chatId: string, client: ClientRecord) {
 async function handleClientUserMessage(chatId: string, text: string, senderName: string, client: ClientRecord) {
   const trimmed = text.trim();
   const state = userStates[chatId] || { step: 'idle' };
-  const activeClient = getClientById(state.tempData?.clientId) || client || getClientByChatId(chatId) || getClients()[0];
+  const activeClient = resolveClientForChat(chatId, state.tempData?.clientId) || client || getClientByChatId(chatId);
 
   if (trimmed === '/start' || trimmed === '/help' || trimmed === '/status' || trimmed === '/menu' || trimmed.toLowerCase() === 'hi' || trimmed.toLowerCase() === 'hello') {
     userStates[chatId] = { step: 'idle' };
@@ -2260,15 +2285,11 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     const state = userStates[chatId] || { step: 'idle' };
 
     const isAdmin = String(chatId).trim() === TELEGRAM_ADMIN_CHAT_ID;
-    const clients = getClients();
-    let registeredClient = getClientByChatId(chatId) || clients.find(c => String(c.chatId).trim() === String(chatId).trim());
-    if (!registeredClient && clients.length > 0) {
-      registeredClient = clients[0];
-    }
+    let registeredClient = getClientByChatId(chatId);
 
     // If active user state is a client step, route to handleClientUserMessage
     if (state.step && (state.step.startsWith('client_') || state.step.startsWith('cl_'))) {
-      const targetClient = getClientById(state.tempData?.clientId) || registeredClient || clients[0];
+      const targetClient = resolveClientForChat(chatId, state.tempData?.clientId) || registeredClient;
       if (targetClient) {
         return await handleClientUserMessage(chatId, text, senderName, targetClient);
       }
@@ -3542,7 +3563,7 @@ async function handleCallbackQuery(cb: any) {
   // 1. Client Main Menu
   if (data === 'cl_menu_main' || data === 'cl_menu' || data.startsWith('cl_menu:') || data.startsWith('cl_menu_main')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientMainMenu(chatId, client);
     }
@@ -3552,7 +3573,7 @@ async function handleCallbackQuery(cb: any) {
   // 2. Client Profile Menu
   if (data === 'cl_menu_profile' || data === 'cl_prof' || data.startsWith('cl_prof:') || data.startsWith('cl_menu_profile')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientProfileMenu(chatId, client);
     }
@@ -3562,7 +3583,7 @@ async function handleCallbackQuery(cb: any) {
   // 3. Client Badges Menu
   if (data === 'cl_menu_badges' || data === 'cl_badges' || data.startsWith('cl_badges:') || data.startsWith('cl_menu_badges')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientBadgesMenu(chatId, client);
     }
@@ -3572,7 +3593,7 @@ async function handleCallbackQuery(cb: any) {
   // 4. Client Services Menu
   if (data === 'cl_menu_services' || data === 'cl_services' || data.startsWith('cl_services:') || data.startsWith('cl_menu_services')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientServicesMenu(chatId, client);
     }
@@ -3582,7 +3603,7 @@ async function handleCallbackQuery(cb: any) {
   // 5. Client Social Menu
   if (data === 'cl_menu_social' || data === 'cl_social' || data.startsWith('cl_social:') || data.startsWith('cl_menu_social')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientSocialMenu(chatId, client);
     }
@@ -3592,7 +3613,7 @@ async function handleCallbackQuery(cb: any) {
   // 6. Client Contact Menu
   if (data === 'cl_menu_contact' || data === 'cl_contact' || data.startsWith('cl_contact:') || data.startsWith('cl_menu_contact')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientContactMenu(chatId, client);
     }
@@ -3602,7 +3623,7 @@ async function handleCallbackQuery(cb: any) {
   // 7. Client Full Preview / Summary
   if (data === 'cl_cmd_summary' || data === 'cl_preview' || data.startsWith('cl_preview:') || data.startsWith('cl_cmd_summary')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientFullSummary(chatId, client);
     }
@@ -3612,7 +3633,7 @@ async function handleCallbackQuery(cb: any) {
   // 8. Client Layout & Theme Sub-Menus
   if (data === 'cl_menu_layout' || data === 'cl_layout' || data.startsWith('cl_layout:') || data.startsWith('cl_menu_layout') || data.startsWith('cl_layout_theme_main:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientLayoutThemeMainMenu(chatId, client);
     }
@@ -3621,7 +3642,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_sub_layout' || data.startsWith('cl_sub_layout:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientLayoutOnlyMenu(chatId, client);
     }
@@ -3630,7 +3651,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_sub_theme' || data.startsWith('cl_sub_theme:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       await sendClientThemeOnlyMenu(chatId, client);
     }
@@ -3642,7 +3663,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const style = parts[1] as 'social_first' | 'services_first';
     const clientId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
         c.layoutStyle = style;
@@ -3664,7 +3685,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const themeStyle = parts[1];
     const clientId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
         c.themeStyle = themeStyle;
@@ -3690,7 +3711,7 @@ async function handleCallbackQuery(cb: any) {
   // Profile Field Edit Triggers
   if (data === 'cl_prof_edit_name' || data.startsWith('cl_prof_edit_name:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_name', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `⚡ <b>নতুন নাম লিখে পাঠান:</b>\n\n<i>(ওয়েবসাইটে সাথে সাথে নাম পরিবর্তন হবে)</i>`);
     return;
@@ -3698,7 +3719,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_prof_edit_handle' || data.startsWith('cl_prof_edit_handle:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_handle', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `🔗 <b>নতুন ইউজারনেম / হ্যান্ডেল লিখে পাঠান:</b>\n<i>(যেমন: @my_name)</i>`);
     return;
@@ -3706,7 +3727,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_prof_edit_title' || data.startsWith('cl_prof_edit_title:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_title', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `💻 <b>নতুন পদবী / পেশাগত টাইটেল লিখে পাঠান:</b>`);
     return;
@@ -3714,7 +3735,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_prof_edit_loc' || data.startsWith('cl_prof_edit_loc:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_location', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📍 <b>নতুন লোকেশন লিখে পাঠান:</b>\n<i>(যেমন: Dhaka, Bangladesh)</i>`);
     return;
@@ -3722,7 +3743,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_prof_edit_bio' || data.startsWith('cl_prof_edit_bio:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_bio', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📝 <b>নতুন বায়ো বিবরণ লিখে পাঠান:</b>`);
     return;
@@ -3730,7 +3751,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_prof_edit_avatar' || data.startsWith('cl_prof_edit_avatar:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_avatar', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `🖼️ <b>প্রোফাইল ছবি পরিবর্তন</b>\n\n📷 আপনার পছন্দের ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
     return;
@@ -3738,7 +3759,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_prof_edit_banner' || data.startsWith('cl_prof_edit_banner:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_banner', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `🏞️ <b>ব্যানার ছবি পরিবর্তন</b>\n\n📷 আপনার ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
     return;
@@ -3747,7 +3768,7 @@ async function handleCallbackQuery(cb: any) {
   // Badges Management
   if (data === 'cl_badge_add' || data.startsWith('cl_badge_add:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_badge_add_text', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `➕ <b>নতুন ব্যাজ যোগ করুন:</b>\n\nব্যাজের লেখা লিখে পাঠান (যেমন: "⚡ Pro Gamer"):`);
     return;
@@ -3757,7 +3778,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const badgeId = parts[parts.length - 1];
     const clientId = parts.length >= 3 ? parts[1] : '';
-    const client = getClientById(clientId) || getClients().find(c => c.badges.some(b => b.id === badgeId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
         c.badges = c.badges.filter(b => b.id !== badgeId);
@@ -3775,7 +3796,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const serviceId = parts[parts.length - 1];
     const clientId = parts.length >= 3 ? parts[1] : '';
-    const client = getClientById(clientId) || getClients().find(c => c.services.some(s => s.id === serviceId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (!client) return;
     const s = client.services.find(item => item.id === serviceId);
     if (!s) return;
@@ -3790,7 +3811,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_srv_add' || data.startsWith('cl_srv_add:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_srv_title', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `➕ <b>নতুন সাভিস যোগ (ধাপ ১/৪)</b>\n\n📌 সাভিসের নাম (Title) লিখে পাঠান:`);
     return;
@@ -3801,7 +3822,7 @@ async function handleCallbackQuery(cb: any) {
     const field = parts[1];
     const serviceId = parts[2];
     const clientId = parts.length >= 4 ? parts[3] : '';
-    const client = getClientById(clientId) || getClients().find(c => c.services.some(s => s.id === serviceId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = {
       step: 'client_srv_edit_val',
       tempData: { clientId: client?.id, serviceId, field }
@@ -3820,7 +3841,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const serviceId = parts[parts.length - 1];
     const clientId = parts.length >= 3 ? parts[1] : '';
-    const client = getClientById(clientId) || getClients().find(c => c.services.some(s => s.id === serviceId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
         c.services = c.services.filter(s => s.id !== serviceId);
@@ -3838,7 +3859,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (!client) return;
     const link = client.socialLinks.find(l => l.id === linkId);
     if (!link) return;
@@ -3858,7 +3879,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data.startsWith('cl_soc_add') || data === 'cl_soc_add') {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (!client) return;
     await sendTelegramMessage(
       chatId,
@@ -3872,7 +3893,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const platform = parts[1] as SocialLink['platform'];
     const clientId = parts[2];
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
 
     const defaultTitles: Record<string, { title: string; subtitle: string; btn: string }> = {
       facebook: { title: 'Facebook Profile / Page', subtitle: 'অফিসিয়াল ফেসবুক প্রোফাইল', btn: 'যুক্ত হোন' },
@@ -3909,7 +3930,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_social_url', tempData: { clientId: client?.id, linkId, isAdding: false } };
     await sendTelegramMessage(chatId, `🔗 <b>নতুন সোশ্যাল লিঙ্ক (URL) লিখে পাঠান:</b>`);
     return;
@@ -3919,7 +3940,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_social_title', tempData: { clientId: client?.id, linkId } };
     await sendTelegramMessage(chatId, `📌 <b>নতুন সোশ্যাল নাম বা টাইটেল লিখে পাঠান:</b>`);
     return;
@@ -3929,7 +3950,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_social_subtitle', tempData: { clientId: client?.id, linkId } };
     await sendTelegramMessage(chatId, `🏷️ <b>নতুন সাব-টাইটেল বা বিবরণ লিখে পাঠান:</b>`);
     return;
@@ -3939,7 +3960,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const clientId = parts[1];
     const linkId = parts[2];
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_social_button', tempData: { clientId: client?.id, linkId } };
     await sendTelegramMessage(chatId, `🔘 <b>নতুন বাটন টেক্সট লিখে পাঠান:</b>\n<i>(যেমন: "যুক্ত হোন", "সাবস্ক্রাইব", "ফলো করুন")</i>`);
     return;
@@ -3949,7 +3970,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const linkId = parts[parts.length - 1];
     const clientId = parts.length >= 3 ? parts[1] : '';
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
         const l = c.socialLinks.find(item => item.id === linkId);
@@ -3969,7 +3990,7 @@ async function handleCallbackQuery(cb: any) {
     const parts = data.split(':');
     const linkId = parts[parts.length - 1];
     const clientId = parts.length >= 3 ? parts[1] : '';
-    const client = getClientById(clientId) || getClients().find(c => c.socialLinks.some(l => l.id === linkId)) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
         c.socialLinks = c.socialLinks.filter(l => l.id !== linkId);
@@ -3985,7 +4006,7 @@ async function handleCallbackQuery(cb: any) {
   // Contact Field Edit Triggers
   if (data === 'cl_contact_edit_wa' || data.startsWith('cl_contact_edit_wa:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId) || getClients()[0];
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_contact_wa', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📱 <b>নতুন WhatsApp নম্বর দিন:</b>\n<i>(যেমন: +8801700000000)</i>`);
     return;
@@ -3993,7 +4014,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_contact_edit_wa_msg' || data.startsWith('cl_contact_edit_wa_msg:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_contact_wa_msg', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `💬 <b>হোয়াটসঅ্যাপে স্বয়ংক্রিয় টাইপ বার্তাটি লিখুন:</b>`);
     return;
@@ -4001,7 +4022,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_contact_edit_email' || data.startsWith('cl_contact_edit_email:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_contact_email', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `✉️ <b>নতুন ইমেইল ঠিকানা লিখে পাঠান:</b>`);
     return;
@@ -4009,7 +4030,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'cl_contact_edit_note' || data.startsWith('cl_contact_edit_note:')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
-    const client = getClientById(clientId) || getClientByChatId(chatId);
+    const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_contact_note', tempData: { clientId: client?.id } };
     await sendTelegramMessage(chatId, `📝 <b>যোগাযোগ বক্সের নিচে দেখানো বার্তাটি লিখুন:</b>`);
     return;
@@ -4538,18 +4559,35 @@ app.post('/api/telegram-webhook', async (req, res) => {
   }
 });
 
+let currentPollAbortController: AbortController | null = null;
+
 async function startTelegramPolling() {
-  if (globalThis.__telegram_polling_active || botState.isPolling) {
+  if (globalThis.__telegram_polling_active && botState.isPolling) {
     console.log('🤖 Telegram polling already active. Skipping duplicate instance.');
     return;
   }
+  
+  if (currentPollAbortController) {
+    try {
+      currentPollAbortController.abort();
+    } catch {}
+    currentPollAbortController = null;
+  }
+
   globalThis.__telegram_polling_active = true;
   botState.isPolling = true;
 
   try {
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, { method: 'POST' });
+    const delCtrl = new AbortController();
+    const delTimer = setTimeout(() => delCtrl.abort(), 10000);
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, {
+      method: 'POST',
+      signal: delCtrl.signal
+    }).catch(() => {});
+    clearTimeout(delTimer);
+
     const meRes = await telegramRequest('getMe', {});
-    if (meRes.ok) {
+    if (meRes.ok && meRes.result) {
       botState.botUsername = meRes.result.username;
       botState.botFirstName = meRes.result.first_name;
       console.log(`🤖 Telegram Bot connected as @${botState.botUsername} (${botState.botFirstName}) via Long Polling`);
@@ -4562,10 +4600,21 @@ async function startTelegramPolling() {
     while (botState.isPolling) {
       try {
         botStateInternal.lastActiveTimestamp = Date.now();
+        currentPollAbortController = new AbortController();
+        const fetchTimeoutId = setTimeout(() => {
+          try {
+            currentPollAbortController?.abort();
+          } catch {}
+        }, 18000);
+
         const response = await fetch(
           `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${botState.offset}&timeout=10`,
-          { method: 'GET' }
+          {
+            method: 'GET',
+            signal: currentPollAbortController.signal
+          }
         );
+        clearTimeout(fetchTimeoutId);
 
         if (!response.ok) {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -4577,7 +4626,7 @@ async function startTelegramPolling() {
         if (!data.ok && data.error_code === 409) {
           console.warn('⚠️ Telegram 409 Conflict: Another bot instance is polling. Resetting offset & waiting...');
           botState.offset = 0;
-          await new Promise(r => setTimeout(r, 4000));
+          await new Promise(r => setTimeout(r, 3000));
           continue;
         }
 
@@ -4629,27 +4678,36 @@ async function startTelegramPolling() {
           }
         }
         botState.errorsCount = 0;
-      } catch (err) {
-        botState.errorsCount++;
-        await new Promise(r => setTimeout(r, Math.min(botState.errorsCount * 1500, 10000)));
+      } catch (err: any) {
+        if (err?.name !== 'AbortError') {
+          botState.errorsCount++;
+          console.warn(`⚠️ Telegram polling loop warning (${botState.errorsCount}):`, err?.message || err);
+        }
+        await new Promise(r => setTimeout(r, Math.min(botState.errorsCount * 1000, 5000)));
       }
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise(r => setTimeout(r, 500));
     }
   })();
 }
 
 startTelegramPolling();
 
-// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >35s
+// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >25s
 setInterval(() => {
-  const isStale = Date.now() - botStateInternal.lastActiveTimestamp > 35000;
+  const isStale = Date.now() - botStateInternal.lastActiveTimestamp > 25000;
   if (!botState.isPolling || isStale) {
-    console.log('🤖 Bot Watchdog: Polling inactive/stale. Auto-restarting Telegram bot...');
+    console.log('🤖 Bot Watchdog: Polling inactive or stale (>25s). Force restarting Telegram bot...');
+    if (currentPollAbortController) {
+      try {
+        currentPollAbortController.abort();
+      } catch {}
+      currentPollAbortController = null;
+    }
     globalThis.__telegram_polling_active = false;
     botState.isPolling = false;
     startTelegramPolling().catch(e => console.error('Watchdog restart error:', e));
   }
-}, 10000);
+}, 8000);
 
 // Keep-alive internal self pinger to prevent Node process idle suspension
 setInterval(() => {
