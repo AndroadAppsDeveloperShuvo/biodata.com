@@ -959,12 +959,12 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     ⚠️ আপনি বর্তমানে অফলাইনে আছেন। সংরক্ষিত তথ্য দেখানো হচ্ছে।
   </div>
 
-  <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-transparent border-0 shadow-none relative pb-24 z-10">
+  <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24">
     
-    <!-- Profile Banner & Header with Smooth Linear Gradient Mask -->
-    <div class="profile-banner-container relative w-full h-44 sm:h-52 overflow-hidden rounded-3xl bg-zinc-900 shadow-2xl">
-      <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || 'https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg')}" alt="Banner" class="w-full h-full object-cover opacity-60 filter brightness-110 contrast-105" onerror="this.src='https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'" />
-      <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-b from-slate-950/20 via-[#020617]/60 to-[#020617]"></div>
+    <!-- Profile Banner & Header -->
+    <div class="profile-banner-container relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900">
+      <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || 'https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg')}" alt="Banner" class="w-full h-full object-cover opacity-80" onerror="this.src='https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'" />
+      <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
     </div>
 
     <!-- Profile Info Box -->
