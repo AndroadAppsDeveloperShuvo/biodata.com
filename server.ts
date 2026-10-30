@@ -3574,7 +3574,7 @@ async function handleCallbackQuery(cb: any) {
     }
     const statusText = isWebhookActive
       ? `🟢 <b>চালু আছে (Webhook Active)</b>\n<code>${escapeHtml(info.url)}</code>`
-      : `⚪ <b>বন্ধ (Long Polling চালু আছে)</b>`;
+      : `🟢 <b>সক্রিয় ও অনলাইন (Long Polling 24/7 চালু আছে)</b>`;
     const pending = info.pending_update_count || 0;
     const lastErr = info.last_error_message ? `\n⚠️ <b>সর্বশেষ এরর:</b> <i>${escapeHtml(info.last_error_message)}</i>` : '';
 
