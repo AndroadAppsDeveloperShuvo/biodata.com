@@ -17,6 +17,15 @@ const PORT = Number(process.env.PORT) || 3000;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8649772073:AAHvhPRNE5pZmWPN1qU68z0ug3isdP7fNPg';
 const TELEGRAM_ADMIN_CHAT_ID = String(process.env.TELEGRAM_CHAT_ID || '5440151107');
 
+// Global Crash Protection - Prevent process termination on transient errors
+process.on('uncaughtException', (err) => {
+  console.error('🛡️ Process Uncaught Exception Guard:', err);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('🛡️ Process Unhandled Rejection Guard:', reason);
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -4471,10 +4480,63 @@ async function handleCallbackQuery(cb: any) {
 }
 }
 
-// Telegram Long Polling Loop
+// Telegram Long Polling Loop & Resilience Infrastructure
 declare global {
   var __telegram_polling_active: boolean | undefined;
 }
+
+const botStateInternal = {
+  isPolling: false,
+  offset: 0,
+  errorsCount: 0,
+  botUsername: '',
+  botFirstName: '',
+  lastActiveTimestamp: Date.now()
+};
+
+// Webhook endpoint for Telegram Updates
+app.post('/api/telegram-webhook', async (req, res) => {
+  try {
+    const update = req.body;
+    if (update && typeof update === 'object') {
+      botStateInternal.lastActiveTimestamp = Date.now();
+      if (update.callback_query) {
+        await handleCallbackQuery(update.callback_query);
+      } else if (update.message) {
+        const msg = update.message;
+        const chatId = String(msg.chat.id);
+        const sender = msg.from?.first_name || 'User';
+
+        if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
+          const state = userStates[chatId];
+          if (state && (
+            state.step === 'add_image' ||
+            state.step === 'edit_service_val' ||
+            state.step === 'prof_edit_avatar' ||
+            state.step === 'prof_edit_banner' ||
+            state.step === 'admin_wizard_logo' ||
+            state.step === 'client_srv_image' ||
+            state.step === 'client_prof_avatar' ||
+            state.step === 'client_prof_banner'
+          )) {
+            const bestPhoto = msg.photo[msg.photo.length - 1];
+            const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
+            if (fileInfo.ok && fileInfo.result?.file_path) {
+              const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
+              await handleUserMessage(chatId, directPhotoUrl, sender);
+            }
+          }
+        } else if (msg.text) {
+          await handleUserMessage(chatId, msg.text, sender);
+        }
+      }
+    }
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error('Webhook processing error:', err);
+    return res.status(200).json({ ok: true });
+  }
+});
 
 async function startTelegramPolling() {
   if (globalThis.__telegram_polling_active || botState.isPolling) {
@@ -4499,6 +4561,7 @@ async function startTelegramPolling() {
   (async () => {
     while (botState.isPolling) {
       try {
+        botStateInternal.lastActiveTimestamp = Date.now();
         const response = await fetch(
           `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?offset=${botState.offset}&timeout=10`,
           { method: 'GET' }
@@ -4521,6 +4584,7 @@ async function startTelegramPolling() {
         if (data.ok && Array.isArray(data.result)) {
           for (const update of data.result) {
             botState.offset = update.update_id + 1;
+            botStateInternal.lastActiveTimestamp = Date.now();
             try {
               if (update.callback_query) {
                 await handleCallbackQuery(update.callback_query);
@@ -4576,14 +4640,21 @@ async function startTelegramPolling() {
 
 startTelegramPolling();
 
-// Watchdog timer: Automatically restarts Telegram polling if it ever stops
+// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >35s
 setInterval(() => {
-  if (!botState.isPolling) {
-    console.log('🤖 Bot Watchdog: Polling stopped. Auto-restarting Telegram bot...');
+  const isStale = Date.now() - botStateInternal.lastActiveTimestamp > 35000;
+  if (!botState.isPolling || isStale) {
+    console.log('🤖 Bot Watchdog: Polling inactive/stale. Auto-restarting Telegram bot...');
     globalThis.__telegram_polling_active = false;
-    startTelegramPolling();
+    botState.isPolling = false;
+    startTelegramPolling().catch(e => console.error('Watchdog restart error:', e));
   }
-}, 30000);
+}, 10000);
+
+// Keep-alive internal self pinger to prevent Node process idle suspension
+setInterval(() => {
+  fetch(`http://localhost:${PORT}/api/health`).catch(() => {});
+}, 15000);
 
 // Setup Express + Vite Server
 async function setupServer() {
