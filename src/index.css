@@ -971,5 +971,105 @@ main[data-theme="dark_glassmorphism"] #btnShareProfile > div {
   font-weight: 600 !important;
 }
 
+/* ==========================================
+   SHUVOX LIGHTNING CYBER 3D THEME RULES
+   ========================================== */
+
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+@keyframes spinReverse {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+@keyframes lightningFlash {
+  0%, 85%, 90%, 93%, 100% { background-color: transparent; }
+  87% { background-color: rgba(200, 230, 255, 0.1); }
+  91% { background-color: rgba(150, 210, 255, 0.25); }
+  92% { background-color: rgba(255, 255, 255, 0.1); }
+}
+
+@keyframes lightningStrike {
+  0%, 85%, 90%, 93%, 100% { opacity: 0; transform: scaleY(0.8) translateY(-20px); }
+  87% { opacity: 0.8; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 20px #0ff); }
+  91% { opacity: 1; transform: scaleY(1.1) translateY(10px); filter: drop-shadow(0 0 40px #fff) brightness(2); }
+  92% { opacity: 0.5; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 10px #0ff); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-spin-reverse {
+  animation: spinReverse 4s linear infinite !important;
+}
+
+.lightning-bg-flash {
+  animation: lightningFlash 10s infinite;
+}
+
+.lightning-bolt-svg {
+  animation: lightningStrike 10s infinite;
+  transform-origin: top center;
+}
+
+/* Animated Gradient Border Wrapper for Profile */
+.gradient-border-wrapper {
+  position: relative;
+  border-radius: 1.5rem; 
+  padding: 2px; 
+  overflow: hidden;
+}
+
+.gradient-border-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+      from 0deg, 
+      transparent 0%, 
+      transparent 30%, 
+      #a855f7 50%,
+      #06b6d4 70%,
+      transparent 100%
+  );
+  animation: spin 4s linear infinite;
+  z-index: 0;
+}
+
+.gradient-border-inner {
+  position: relative;
+  background: rgba(15, 23, 42, 0.7); 
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 1.4rem; 
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Theme Rules for shuvox_lightning_cyber */
+[data-theme="shuvox_lightning_cyber"],
+body[data-theme="shuvox_lightning_cyber"] {
+  background-color: #020617 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="shuvox_lightning_cyber"] main,
+main[data-theme="shuvox_lightning_cyber"] {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
 
 

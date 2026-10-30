@@ -186,6 +186,7 @@ export default function App() {
     }
   }, [themeStyle]);
 
+  const isShuvoxLightning = themeStyle === 'shuvox_lightning_cyber';
   const isGlass = themeStyle === 'dark_glassmorphism';
   const isCyber = themeStyle === 'cyberpunk_neon';
   const isOrganic = themeStyle === 'organic_nature';
@@ -196,7 +197,9 @@ export default function App() {
     <div
       data-theme={themeStyle}
       className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
-      isPopArt
+      isShuvoxLightning
+        ? 'bg-[#020617] text-white'
+        : isPopArt
         ? 'bg-[#facc15] text-black'
         : isOrganic
         ? 'bg-[#dce6d8] text-[#1e3323]'
@@ -209,6 +212,36 @@ export default function App() {
         : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
     }`}>
       
+      {/* SHUVOX Lightning Cyber 3D Background Orbs & Lightning Bolts */}
+      {isShuvoxLightning && (
+        <>
+          {/* 3D Glass Depth Effect Background Orbs */}
+          <div className="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+            {/* Top Left Purple Orb */}
+            <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" />
+            {/* Bottom Right Cyan Orb */}
+            <div className="absolute top-[40%] right-[-10%] w-96 h-96 bg-cyan-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style={{ animationDelay: '2s' }} />
+            {/* Center Blue Orb */}
+            <div className="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[150px] animate-blob" style={{ animationDelay: '4s' }} />
+          </div>
+
+          {/* LIGHTNING EFFECT LAYERS */}
+          <div className="fixed inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen lightning-bg-flash" />
+          <div className="fixed top-0 left-[70%] md:left-[80%] -translate-x-1/2 w-32 h-[60vh] z-0 pointer-events-none flex justify-center">
+            {/* Lightning Bolt SVG */}
+            <svg className="lightning-bolt-svg w-full h-full text-cyan-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+              <path d="M60 0 L20 120 L50 130 L10 230 L45 220 L25 300 L90 150 L55 160 L85 60 Z" fill="currentColor" />
+            </svg>
+          </div>
+          <div className="fixed top-0 left-[20%] md:left-[15%] -translate-x-1/2 w-20 h-[40vh] z-0 pointer-events-none flex justify-center" style={{ animationDelay: '0.5s' }}>
+            {/* Smaller Secondary Lightning Bolt SVG */}
+            <svg className="lightning-bolt-svg w-full h-full text-purple-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style={{ animationDelay: '0.2s' }}>
+              <path d="M50 0 L10 90 L40 100 L0 180 L35 170 L15 250 L80 120 L45 130 L75 40 Z" fill="currentColor" />
+            </svg>
+          </div>
+        </>
+      )}
+
       {/* Ultra Cyber Glass Ambient Grid Background & Glowing Orbs */}
       {isUltraGlass && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -267,8 +300,10 @@ export default function App() {
       {/* Main Responsive Bio Container */}
       <main
         data-theme={themeStyle}
-        className={`w-full max-w-[480px] rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 relative z-10 ${
-          isUltraGlass
+        className={`w-full max-w-[620px] rounded-3xl transition-all duration-500 relative z-10 ${
+          isShuvoxLightning
+            ? 'bg-transparent text-white border-0 shadow-none'
+            : isUltraGlass
             ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]'
             : isPopArt
             ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000]'

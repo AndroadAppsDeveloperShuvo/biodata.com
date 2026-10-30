@@ -821,14 +821,74 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
       transform: translateZ(0);
     }
-    [data-theme="ultra_cyber_glass"] #btnShareProfile > div {
-      background: linear-gradient(145deg, rgba(24, 24, 27, 0.9) 0%, rgba(9, 9, 11, 0.9) 100%) !important;
+    /* SHUVOX Lightning Cyber Theme Rules */
+    [data-theme="shuvox_lightning_cyber"],
+    body[data-theme="shuvox_lightning_cyber"] {
+      background-color: #020617 !important;
+      color: #ffffff !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] main,
+    main[data-theme="shuvox_lightning_cyber"] {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] .glass-card,
+    main[data-theme="shuvox_lightning_cyber"] .glass-card {
+      background: rgba(15, 23, 42, 0.7) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 1.25rem !important;
+      color: #ffffff !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] #socialLinksContainer > a {
+      background: rgba(255, 255, 255, 0.05) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 1rem !important;
+      color: #ffffff !important;
+      transition: all 0.3s ease !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] #socialLinksContainer > a:hover {
+      transform: scale(1.02) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
+      border-color: rgba(96, 165, 250, 0.5) !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] #servicesGrid > div {
+      background: rgba(255, 255, 255, 0.05) !important;
+      backdrop-filter: blur(16px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 1rem !important;
+      transition: all 0.3s ease !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] #servicesGrid > div:hover {
+      transform: scale(1.04) !important;
+      background: rgba(255, 255, 255, 0.1) !important;
+      box-shadow: 0 0 25px rgba(168, 85, 247, 0.4) !important;
+      border-color: rgba(192, 132, 252, 0.5) !important;
+    }
+    [data-theme="shuvox_lightning_cyber"] #btnShareProfile > div {
+      background: rgba(15, 23, 42, 0.8) !important;
       border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
     }
   </style>
 </head>
-<body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950">
+<body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950" data-theme="${escapeHtml(client.themeStyle || 'shuvox_lightning_cyber')}">
+
+  <!-- Ambient 3D Orbs & Lightning Layers -->
+  <div class="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>
+    <div class="absolute top-[40%] right-[-10%] w-96 h-96 bg-cyan-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style="animation-delay: 2s;"></div>
+    <div class="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[150px] animate-blob" style="animation-delay: 4s;"></div>
+  </div>
+  <div class="fixed inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen lightning-bg-flash"></div>
+  <div class="fixed top-0 left-[70%] md:left-[80%] -translate-x-1/2 w-32 h-[60vh] z-0 pointer-events-none flex justify-center">
+    <svg class="lightning-bolt-svg w-full h-full text-cyan-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M60 0 L20 120 L50 130 L10 230 L45 220 L25 300 L90 150 L55 160 L85 60 Z" fill="currentColor" />
+    </svg>
+  </div>
 
   <!-- Offline Status Bar Indicator -->
   <div id="offlineIndicator" class="hidden fixed top-0 inset-x-0 bg-amber-500 text-zinc-950 text-xs font-bold py-1 text-center z-50 shadow-md">

@@ -9,6 +9,7 @@ interface Props {
 }
 
 export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
+  const isShuvoxLightning = themeStyle === 'shuvox_lightning_cyber';
   const isUltraGlass = themeStyle === 'ultra_cyber_glass';
   const isGlass = themeStyle === 'dark_glassmorphism';
 
@@ -23,6 +24,95 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           <div className="h-6 w-44 bg-slate-800 rounded-md mt-3 animate-pulse" />
           <div className="h-3.5 w-28 bg-slate-800/80 rounded-md mt-2 animate-pulse" />
           <div className="h-3.5 w-56 bg-slate-800/60 rounded-md mt-2 animate-pulse" />
+        </div>
+      </div>
+    );
+  }
+
+  // Special SHUVOX Lightning Cyber 3D Profile Header
+  if (isShuvoxLightning) {
+    return (
+      <div className="relative z-10 w-full mb-6">
+        {/* Status Badge */}
+        <div className="flex justify-end w-full mb-3">
+          <span className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            Active
+          </span>
+        </div>
+
+        {/* Main Profile Card with Animated Border */}
+        <div className="gradient-border-wrapper shadow-[0_0_40px_rgba(168,85,247,0.15)]">
+          <div className="gradient-border-inner p-6 sm:p-8 flex flex-col items-center text-center">
+            {/* Avatar */}
+            <div className="relative mb-6 flex justify-center items-center w-32 h-32 sm:w-36 sm:h-36 group cursor-pointer">
+              {/* Glow behind */}
+              <div className="absolute inset-4 rounded-full bg-gradient-to-tr from-cyan-500 to-purple-500 blur-xl opacity-40 group-hover:opacity-80 transition-opacity duration-500" />
+
+              {/* Outer Ring (Clockwise) */}
+              <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-cyan-400 border-b-purple-500 animate-[spin_3s_linear_infinite] shadow-[0_0_15px_rgba(6,182,212,0.3)]" />
+
+              {/* Inner Ring (Counter-Clockwise) */}
+              <div className="absolute inset-2 rounded-full border-[3px] border-transparent border-l-purple-500 border-r-cyan-400 animate-spin-reverse shadow-[0_0_15px_rgba(168,85,247,0.3)]" />
+
+              {/* Image */}
+              <img
+                className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-[#0f172a] z-10"
+                src={profile.avatarUrl || 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
+                alt={profile.name || 'Profile'}
+                referrerPolicy="no-referrer"
+              />
+
+              {/* Verification Badge */}
+              <div className="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-1 border-2 border-[#0f172a] z-20">
+                <ShieldCheck className="w-4 h-4 fill-white text-blue-500" />
+              </div>
+            </div>
+
+            {/* Name & Title */}
+            {profile.name && (
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-wider mb-1 flex items-center gap-2 font-mono drop-shadow-[0_0_10px_rgba(6,182,212,0.8)] text-white">
+                <span className="text-cyan-400 animate-pulse">⚡</span>
+                {profile.name}
+                <span className="text-cyan-400 animate-pulse">⚡</span>
+              </h1>
+            )}
+
+            {profile.handle && (
+              <p className="text-cyan-300 font-mono text-sm mb-3">{profile.handle}</p>
+            )}
+
+            {profile.title && (
+              <p className="text-gray-300 font-medium text-sm mb-2">{profile.title}</p>
+            )}
+
+            {profile.location && (
+              <p className="text-gray-400 text-xs flex items-center gap-1 mb-4">
+                <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                {profile.location}
+              </p>
+            )}
+
+            {profile.bio && (
+              <p className="text-gray-300 text-xs sm:text-sm bg-white/5 border border-white/10 p-3 rounded-xl backdrop-blur-sm max-w-md my-2">
+                "{profile.bio}"
+              </p>
+            )}
+
+            {/* Bio Badges */}
+            {badges && badges.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2 w-full max-w-md mt-4">
+                {badges.map((b) => (
+                  <span
+                    key={b.id}
+                    className="bg-white/5 border border-white/10 px-3 py-1 rounded-md text-xs font-medium text-cyan-300 backdrop-blur-sm shadow-sm"
+                  >
+                    {b.text}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
