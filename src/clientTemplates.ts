@@ -897,20 +897,6 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       border: none !important;
       box-shadow: none !important;
     }
-    [data-theme="shuvox_lightning_cyber"] .profile-banner-container {
-      background-color: #020617 !important;
-      position: relative !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] .profile-banner-container img {
-      opacity: 0.82 !important;
-      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0) 100%), linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, rgba(0,0,0,0) 100%) !important;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0) 100%), linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, rgba(0,0,0,0) 100%) !important;
-      -webkit-mask-composite: source-in !important;
-      mask-composite: intersect !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] .profile-banner-overlay {
-      background: linear-gradient(to top, #020617 0%, rgba(2, 6, 23, 0.4) 60%, transparent 100%) !important;
-    }
     [data-theme="shuvox_lightning_cyber"] .glass-card,
     main[data-theme="shuvox_lightning_cyber"] .glass-card {
       background: rgba(15, 23, 42, 0.7) !important;
@@ -976,14 +962,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24">
     
     <!-- Profile Banner & Header -->
-    <div class="profile-banner-container relative w-full h-48 sm:h-56 overflow-hidden bg-[#020617]">
+    <div class="profile-banner-container relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900">
       <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || 'https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg')}" alt="Banner" class="w-full h-full object-cover opacity-80" onerror="this.src='https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'" />
-      <!-- Bottom Vertical Fade -->
-      <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent pointer-events-none"></div>
-      <!-- Top Vertical Fade -->
-      <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#020617]/80 via-[#020617]/30 to-transparent pointer-events-none"></div>
-      <!-- Horizontal Side Vignette (Left & Right Edge Blend) -->
-      <div class="profile-banner-side-overlay absolute inset-0 bg-gradient-to-r from-[#020617] via-transparent to-[#020617] pointer-events-none opacity-95"></div>
+      <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
     </div>
 
     <!-- Profile Info Box -->
