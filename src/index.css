@@ -988,17 +988,21 @@ main[data-theme="dark_glassmorphism"] #btnShareProfile > div {
 }
 
 @keyframes lightningFlash {
-  0%, 85%, 90%, 93%, 100% { background-color: transparent; }
-  87% { background-color: rgba(200, 230, 255, 0.1); }
-  91% { background-color: rgba(150, 210, 255, 0.25); }
-  92% { background-color: rgba(255, 255, 255, 0.1); }
+  0%, 100% { background-color: transparent; }
+  18%, 22% { background-color: rgba(200, 230, 255, 0.12); }
+  20% { background-color: rgba(180, 230, 255, 0.28); }
+  68%, 72% { background-color: rgba(200, 230, 255, 0.15); }
+  70% { background-color: rgba(255, 255, 255, 0.22); }
 }
 
 @keyframes lightningStrike {
-  0%, 85%, 90%, 93%, 100% { opacity: 0; transform: scaleY(0.8) translateY(-20px); }
-  87% { opacity: 0.8; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 20px #0ff); }
-  91% { opacity: 1; transform: scaleY(1.1) translateY(10px); filter: drop-shadow(0 0 40px #fff) brightness(2); }
-  92% { opacity: 0.5; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 10px #0ff); }
+  0%, 15%, 25%, 65%, 75%, 100% { opacity: 0; transform: scaleY(0.7) translateY(-20px); }
+  18% { opacity: 0.85; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 40px #06b6d4); }
+  20% { opacity: 1; transform: scaleY(1.1) translateY(10px); filter: drop-shadow(0 0 50px #fff) brightness(2.2); }
+  22% { opacity: 0.4; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 15px #0ff); }
+  68% { opacity: 0.8; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 25px #a855f7); }
+  70% { opacity: 1; transform: scaleY(1.12) translateY(5px); filter: drop-shadow(0 0 45px #fff) brightness(2); }
+  72% { opacity: 0.3; transform: scaleY(1) translateY(0); }
 }
 
 .animate-blob {
@@ -1010,11 +1014,11 @@ main[data-theme="dark_glassmorphism"] #btnShareProfile > div {
 }
 
 .lightning-bg-flash {
-  animation: lightningFlash 10s infinite;
+  animation: lightningFlash 3.5s linear infinite;
 }
 
 .lightning-bolt-svg {
-  animation: lightningStrike 10s infinite;
+  animation: lightningStrike 3.5s linear infinite;
   transform-origin: top center;
 }
 
