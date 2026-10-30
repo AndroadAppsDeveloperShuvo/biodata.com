@@ -1085,8 +1085,10 @@ async function deleteTelegramWebhook() {
     botState.isPolling = false;
     globalThis.__telegram_polling_active = false;
     const res = await telegramRequest('deleteWebhook', { drop_pending_updates: true });
+    startTelegramPolling().catch(() => {});
     return { ok: !!res.ok, result: res };
   } catch (err) {
+    startTelegramPolling().catch(() => {});
     return { ok: false, error: String(err) };
   }
 }
@@ -4916,9 +4918,14 @@ async function setupServer() {
     try {
       const webhookStatus = await getTelegramWebhookStatus();
       if (webhookStatus.ok && webhookStatus.result?.url) {
-        botState.isWebhookMode = true;
-        botState.isPolling = false;
-        console.log(`🌐 Telegram Webhook active on startup: ${webhookStatus.result.url}`);
+        if (webhookStatus.result.url.includes('ais-dev-') || webhookStatus.result.url.includes('ais-pre-') || webhookStatus.result?.last_error_message) {
+          console.log('🔄 Dev preview Webhook or blocked URL detected. Resetting to active Long Polling mode...');
+          await deleteTelegramWebhook();
+        } else {
+          botState.isWebhookMode = true;
+          botState.isPolling = false;
+          console.log(`🌐 Telegram Webhook active on startup: ${webhookStatus.result.url}`);
+        }
       } else {
         startTelegramPolling();
       }
