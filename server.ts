@@ -1413,7 +1413,8 @@ async function sendClientFilesToTelegram(chatId: string | number, client: Client
     `১. ক্লায়েন্টের GitHub অ্যাকাউন্টে যান এবং একটি রিপোজিটরি তৈরি করুন (যেমন: <code>username.github.io</code> অথবা যেকোনো নাম)।\n` +
     `২. এই ৩টি ফাইল (<code>index.html</code>, <code>manifest.json</code>, <code>sw.js</code>) রিপোজিটরির রুটে আপলোড / Commit করুন।\n` +
     `৩. GitHub Pages চালু করে দিন।\n\n` +
-    `✅ <b>ব্যাস কাজ শেষ!</b> ক্লায়েন্ট তার টেলিগ্রাম চ্যাট আইডি (<code>${client.chatId}</code>) থেকে আমাদের বটকে <code>/start</code> পাঠালেই নিজের ওয়েবসাইট সাথে সাথে লাইভ কন্ট্রোল করতে পারবে। আপনার কোনো কিছু করার প্রয়োজন হবে না!`;
+    `✅ <b>ব্যাস কাজ শেষ!</b> ক্লায়েন্ট তার টেলিগ্রাম চ্যাট আইডি (<code>${client.chatId}</code>) থেকে আমাদের বটকে <code>/start</code> পাঠালেই নিজের ওয়েবসাইট সাথে সাথে লাইভ কন্ট্রোল করতে পারবে।\n\n` +
+    `💡 <i>নোট: GitHub-এ ফাইল আপলোড করার পর GitHub Pages তৈরি হতে ১-২ মিনিট সময় লাগে এবং ব্রাউজারে পুরাতন ফাইল ক্যাশ (Cache) থেকে যেতে পারে। নতুন পরিবর্তন দেখতে ব্রাউজারের ক্যাশ ক্লিয়ার করুন বা Incognito মোডে ওপেন করুন।</i>`;
 
   await sendTelegramMessage(chatId, instructions, {
     reply_markup: getAdminSingleClientKeyboard(client.id)

@@ -169,6 +169,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   });
 
   return `<!DOCTYPE html>
+<!-- Generated Build Signature: ${Date.now()} -->
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
@@ -821,6 +822,69 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
       transform: translateZ(0);
     }
+    /* Keyframes & Classes for SHUVOX Lightning Cyber Theme */
+    @keyframes blob {
+      0% { transform: translate(0px, 0px) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0px, 0px) scale(1); }
+    }
+    @keyframes lightningFlash {
+      0%, 100% { background-color: transparent; }
+      18%, 22% { background-color: rgba(200, 230, 255, 0.12); }
+      20% { background-color: rgba(180, 230, 255, 0.28); }
+      68%, 72% { background-color: rgba(200, 230, 255, 0.15); }
+      70% { background-color: rgba(255, 255, 255, 0.22); }
+    }
+    @keyframes lightningStrike {
+      0%, 15%, 25%, 65%, 75%, 100% { opacity: 0; transform: scaleY(0.7) translateY(-20px); }
+      18% { opacity: 0.85; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 40px #06b6d4); }
+      20% { opacity: 1; transform: scaleY(1.1) translateY(10px); filter: drop-shadow(0 0 50px #fff) brightness(2.2); }
+      22% { opacity: 0.4; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 15px #0ff); }
+      68% { opacity: 0.8; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 25px #a855f7); }
+      70% { opacity: 1; transform: scaleY(1.12) translateY(5px); filter: drop-shadow(0 0 45px #fff) brightness(2); }
+      72% { opacity: 0.3; transform: scaleY(1) translateY(0); }
+    }
+    .animate-blob { animation: blob 7s infinite; }
+    .lightning-bg-flash { animation: lightningFlash 3.5s linear infinite; }
+    .lightning-bolt-svg { animation: lightningStrike 3.5s linear infinite; transform-origin: top center; }
+
+    /* Animated Gradient Border Wrapper for Profile */
+    .gradient-border-wrapper {
+      position: relative;
+      border-radius: 1.5rem; 
+      padding: 2px; 
+      overflow: hidden;
+    }
+    .gradient-border-wrapper::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+          from 0deg, 
+          transparent 0%, 
+          transparent 30%, 
+          #a855f7 50%,
+          #06b6d4 70%,
+          transparent 100%
+      );
+      animation: spinSlow 4s linear infinite;
+      z-index: 0;
+    }
+    .gradient-border-inner {
+      position: relative;
+      background: rgba(15, 23, 42, 0.7); 
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 1.4rem; 
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+    }
+
     /* SHUVOX Lightning Cyber Theme Rules */
     [data-theme="shuvox_lightning_cyber"],
     body[data-theme="shuvox_lightning_cyber"] {
@@ -1270,12 +1334,13 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     }
 
     function applyThemeStyle(theme) {
-      var themeClass = theme || 'classic_dark';
+      var themeClass = theme || 'shuvox_lightning_cyber';
       document.body.setAttribute('data-theme', themeClass);
       var mainEl = document.querySelector('main');
       var glassBg = document.getElementById('glassmorphismMeshBg');
       var organicBg = document.getElementById('organicLeafBg');
       var ultraBg = document.getElementById('ultraCyberGridBg');
+      var shuvoxBg = document.getElementById('shuvoxLightningBg');
 
       var ring1 = document.getElementById('avatarSpinRing1');
       var ring2 = document.getElementById('avatarSpinRing2');
@@ -1283,7 +1348,45 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var avatarBox = document.getElementById('avatarImgBox');
       var avatarImg = document.getElementById('profileAvatar');
 
-      if (themeClass === 'ultra_cyber_glass') {
+      if (themeClass === 'shuvox_lightning_cyber') {
+        if (glassBg) glassBg.style.display = 'none';
+        if (organicBg) organicBg.style.display = 'none';
+        if (ultraBg) ultraBg.style.display = 'none';
+        if (!shuvoxBg) {
+          shuvoxBg = document.createElement('div');
+          shuvoxBg.id = 'shuvoxLightningBg';
+          shuvoxBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
+          shuvoxBg.innerHTML = 
+            '<div class="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">'
+            + '<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>'
+            + '<div class="absolute top-[40%] right-[-10%] w-96 h-96 bg-cyan-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style="animation-delay: 2s;"></div>'
+            + '<div class="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[150px] animate-blob" style="animation-delay: 4s;"></div>'
+            + '</div>'
+            + '<div class="fixed inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen lightning-bg-flash"></div>'
+            + '<div class="fixed top-0 left-[70%] md:left-[80%] -translate-x-1/2 w-32 h-[60vh] z-0 pointer-events-none flex justify-center">'
+            + '<svg class="lightning-bolt-svg w-full h-full text-cyan-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M60 0 L20 120 L50 130 L10 230 L45 220 L25 300 L90 150 L55 160 L85 60 Z" fill="currentColor" /></svg>'
+            + '</div>'
+            + '<div class="fixed top-0 left-[20%] md:left-[15%] -translate-x-1/2 w-20 h-[40vh] z-0 pointer-events-none flex justify-center" style="animation-delay: 0.5s;">'
+            + '<svg class="lightning-bolt-svg w-full h-full text-purple-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="animation-delay: 0.2s;"><path d="M50 0 L10 90 L40 100 L0 180 L35 170 L15 250 L80 120 L45 130 L75 40 Z" fill="currentColor" /></svg>'
+            + '</div>';
+          document.body.insertBefore(shuvoxBg, document.body.firstChild);
+        }
+        shuvoxBg.style.display = 'block';
+
+        if (ring1) ring1.classList.remove('hidden');
+        if (ring2) ring2.classList.remove('hidden');
+        if (glowOrb) glowOrb.classList.remove('hidden');
+        if (avatarBox) {
+          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)] relative z-10';
+        }
+        if (avatarImg) {
+          avatarImg.className = 'w-full h-full object-cover rounded-full';
+        }
+        if (mainEl) {
+          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-transparent border-0 shadow-none relative pb-24 z-10';
+        }
+      } else if (themeClass === 'ultra_cyber_glass') {
+        if (shuvoxBg) shuvoxBg.style.display = 'none';
         if (glassBg) glassBg.style.display = 'none';
         if (organicBg) organicBg.style.display = 'none';
         if (!ultraBg) {
@@ -1311,6 +1414,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
           mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col glass-premium rounded-[2.5rem] border border-white/18 shadow-[0_0_50px_rgba(34,211,238,0.25)] relative pb-24 z-10';
         }
       } else {
+        if (shuvoxBg) shuvoxBg.style.display = 'none';
         if (ultraBg) ultraBg.style.display = 'none';
         if (ring1) ring1.classList.add('hidden');
         if (ring2) ring2.classList.add('hidden');
