@@ -1074,6 +1074,28 @@ main[data-theme="shuvox_lightning_cyber"] {
   box-shadow: none !important;
 }
 
+[data-theme="shuvox_lightning_cyber"] .profile-banner-container {
+  background-color: #020617 !important;
+  position: relative !important;
+}
+
+[data-theme="shuvox_lightning_cyber"] .profile-banner-container img {
+  opacity: 0.82 !important;
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0) 100%), linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, rgba(0,0,0,0) 100%) !important;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0.8) 60%, rgba(0,0,0,0) 100%), linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 12%, rgba(0,0,0,1) 88%, rgba(0,0,0,0) 100%) !important;
+  -webkit-mask-composite: source-in !important;
+  mask-composite: intersect !important;
+}
+
+[data-theme="shuvox_lightning_cyber"] .profile-banner-overlay {
+  background: linear-gradient(to top, #020617 0%, rgba(2, 6, 23, 0.4) 60%, transparent 100%) !important;
+}
+
+[data-theme="shuvox_lightning_cyber"] .profile-banner-side-overlay {
+  background: linear-gradient(to right, #020617 0%, transparent 20%, transparent 80%, #020617 100%) !important;
+}
+
+
 
 
 

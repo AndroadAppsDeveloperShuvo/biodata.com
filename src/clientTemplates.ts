@@ -1179,6 +1179,15 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       return [];
     }
 
+    function getInitials(name) {
+      if (!name) return 'SX';
+      var parts = String(name).trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+      }
+      return String(name).substring(0, 2).toUpperCase();
+    }
+
     function renderProfile(p) {
       if (!p) return;
       if (p.name) document.getElementById('profileName').textContent = p.name;
@@ -1189,13 +1198,21 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       if (p.title) document.getElementById('profileTitle').textContent = p.title;
       if (p.location) document.getElementById('profileLocation').textContent = p.location;
       if (p.bio) document.getElementById('profileBio').textContent = p.bio;
-      if (p.avatarUrl) {
-        var av = document.getElementById('profileAvatar');
-        if (av) av.src = p.avatarUrl;
+
+      var avBox = document.getElementById('avatarImgBox');
+      if (avBox) {
+        var avUrl = (p.avatarUrl && p.avatarUrl.trim() !== '') ? p.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg';
+        avBox.innerHTML = '<img id="profileAvatar" src="' + avUrl + '" alt="Avatar" class="w-full h-full object-cover" />';
       }
-      if (p.bannerUrl) {
-        var bn = document.getElementById('profileBanner');
-        if (bn) bn.src = p.bannerUrl;
+
+      var bn = document.getElementById('profileBanner');
+      if (bn) {
+        if (p.bannerUrl && p.bannerUrl.trim() !== '') {
+          bn.style.display = 'block';
+          bn.src = p.bannerUrl;
+        } else {
+          bn.style.display = 'none';
+        }
       }
     }
 

@@ -1029,6 +1029,28 @@ function escapeHtml(text: string): string {
     .replace(/>/g, '&gt;');
 }
 
+function isRemoveCommand(text: string): boolean {
+  if (!text) return false;
+  const lower = text.trim().toLowerCase();
+  return (
+    lower === '/remove' ||
+    lower === 'remove' ||
+    lower === 'none' ||
+    lower === '/none' ||
+    lower === 'clear' ||
+    lower === '/clear' ||
+    lower === 'no' ||
+    lower === '/no' ||
+    lower === 'delete' ||
+    lower === '/delete' ||
+    lower === 'off' ||
+    lower === '/off' ||
+    lower === 'খালি' ||
+    lower === 'মুছে ফেলুন' ||
+    lower === 'সরিয়ে দিন'
+  );
+}
+
 // Telegram API Helper Functions
 async function telegramRequest(method: string, body: any) {
   try {
@@ -2118,11 +2140,19 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
   }
 
   if (state.step === 'client_prof_banner') {
-    updateClientData(activeClient.id, c => { c.profile.bannerUrl = trimmed; });
-    userStates[chatId] = { step: 'idle' };
-    const reply = `✅ <b>ব্যানার কভার ছবি সফলভাবে আপডেট হয়েছে!</b>`;
-    await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
-    return reply;
+    if (isRemoveCommand(trimmed)) {
+      updateClientData(activeClient.id, c => { c.profile.bannerUrl = ''; });
+      userStates[chatId] = { step: 'idle' };
+      const reply = `✅ <b>ব্যানার কভার ছবি সফলভাবে সরিয়ে ফেলা হয়েছে!</b>\n\n<i>ওয়েবসাইটে এখন ব্যানার ছবি ছাড়া ক্লিন ফাঁকা ডার্ক ব্যাকগ্রাউন্ড থাকবে।</i>`;
+      await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
+      return reply;
+    } else {
+      updateClientData(activeClient.id, c => { c.profile.bannerUrl = trimmed; });
+      userStates[chatId] = { step: 'idle' };
+      const reply = `✅ <b>ব্যানার কভার ছবি সফলভাবে আপডেট হয়েছে!</b>`;
+      await sendTelegramMessage(chatId, reply, { reply_markup: getClientProfileMenuKeyboard(activeClient) });
+      return reply;
+    }
   }
 
   if (state.step === 'client_badge_add_text') {
@@ -3431,14 +3461,25 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
   // Profile Edit: Banner URL
   if (state.step === 'prof_edit_banner') {
     const prof = getProfileInfo();
-    prof.bannerUrl = trimmed;
-    saveProfileInfo(prof);
-    addLog('edit', senderName, `ব্যানার ছবি আপডেট`);
-    userStates[chatId] = { step: 'idle' };
+    if (isRemoveCommand(trimmed)) {
+      prof.bannerUrl = '';
+      saveProfileInfo(prof);
+      addLog('edit', senderName, `ব্যানার ছবি অপসারণ`);
+      userStates[chatId] = { step: 'idle' };
 
-    const msg = `✅ <b>ব্যানার ছবি সফলভাবে আপডেট হয়েছে!</b>\n\n🏞️ <a href="${escapeHtml(prof.bannerUrl)}">নতুন ব্যানার দেখুন</a>`;
-    await sendTelegramMessage(chatId, msg, { reply_markup: getProfileMenuKeyboard() });
-    return msg;
+      const msg = `✅ <b>ব্যানার কভার ছবি সফলভাবে সরিয়ে ফেলা হয়েছে!</b>\n\n<i>ওয়েবসাইটে এখন ব্যানার ছাড়া ফাঁকা ডার্ক ব্যাকগ্রাউন্ড দেখাবে।</i>`;
+      await sendTelegramMessage(chatId, msg, { reply_markup: getProfileMenuKeyboard() });
+      return msg;
+    } else {
+      prof.bannerUrl = trimmed;
+      saveProfileInfo(prof);
+      addLog('edit', senderName, `ব্যানার ছবি আপডেট`);
+      userStates[chatId] = { step: 'idle' };
+
+      const msg = `✅ <b>ব্যানার ছবি সফলভাবে আপডেট হয়েছে!</b>\n\n🏞️ <a href="${escapeHtml(prof.bannerUrl)}">নতুন ব্যানার দেখুন</a>`;
+      await sendTelegramMessage(chatId, msg, { reply_markup: getProfileMenuKeyboard() });
+      return msg;
+    }
   }
 
   // Badge Add
@@ -3951,7 +3992,7 @@ async function handleCallbackQuery(cb: any) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
     const client = resolveClientForChat(chatId, clientId);
     userStates[chatId] = { step: 'client_prof_banner', tempData: { clientId: client?.id } };
-    await sendTelegramMessage(chatId, `🏞️ <b>ব্যানার ছবি পরিবর্তন</b>\n\n📷 আপনার ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`);
+    await sendTelegramMessage(chatId, `🏞️ <b>ব্যানার ছবি পরিবর্তন</b>\n\n📷 আপনার ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:\n\n💡 <i>(ব্যানার কভার তুলে দিতে বা খালি রাখতে <code>/remove</code> অথবা <code>none</code> লিখে পাঠান)</i>`);
     return;
   }
 
@@ -4350,7 +4391,7 @@ async function handleCallbackQuery(cb: any) {
     const prof = getProfileInfo();
     await sendTelegramMessage(
       chatId,
-      `🖼️ <b>প্রোফাইল ছবি পরিবর্তন</b>\n\nবর্তমান ছবি: <a href="${escapeHtml(prof.avatarUrl)}">দেখুন</a>\n\n📷 আপনার পছন্দের প্রোফাইল ছবিটি সরাসরি এই চ্যাটে <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`
+      `🖼️ <b>প্রোফাইল ছবি পরিবর্তন</b>\n\nবর্তমান ছবি: ${prof.avatarUrl ? `<a href="${escapeHtml(prof.avatarUrl)}">দেখুন</a>` : '<i>(খালি)</i>'}\n\n📷 আপনার পছন্দের প্রোফাইল ছবিটি সরাসরি এই চ্যাটে <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`
     );
     return;
   }
@@ -4360,7 +4401,7 @@ async function handleCallbackQuery(cb: any) {
     const prof = getProfileInfo();
     await sendTelegramMessage(
       chatId,
-      `🏞️ <b>ব্যানার কভার ছবি পরিবর্তন</b>\n\nবর্তমান ব্যানার: <a href="${escapeHtml(prof.bannerUrl)}">দেখুন</a>\n\n📷 আপনার পছন্দের ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:`
+      `🏞️ <b>ব্যানার কভার ছবি পরিবর্তন</b>\n\nবর্তমান ব্যানার: ${prof.bannerUrl ? `<a href="${escapeHtml(prof.bannerUrl)}">দেখুন</a>` : '<i>(খালি)</i>'}\n\n📷 আপনার পছন্দের ব্যানার ছবিটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ব্যানারের <b>সরাসরি ওয়েব লিংক (URL)</b> লিখে পাঠান:\n\n💡 <i>(ব্যানার কভার তুলে দিতে/খালি করতে <code>/remove</code> অথবা <code>none</code> লিখে পাঠান)</i>`
     );
     return;
   }

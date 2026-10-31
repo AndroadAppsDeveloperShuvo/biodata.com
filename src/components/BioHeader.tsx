@@ -8,6 +8,15 @@ interface Props {
   themeStyle?: string;
 }
 
+const getInitials = (name?: string) => {
+  if (!name) return 'SX';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return name.substring(0, 2).toUpperCase();
+};
+
 export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
   const isShuvoxLightning = themeStyle === 'shuvox_lightning_cyber';
   const isUltraGlass = themeStyle === 'ultra_cyber_glass';
@@ -46,7 +55,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           <div className="gradient-border-inner p-6 sm:p-8 flex flex-col items-center text-center relative overflow-hidden">
             
             {/* 50% Opacity Banner Cover Overlay */}
-            {profile.bannerUrl && (
+            {profile.bannerUrl && profile.bannerUrl.trim() !== '' && (
               <div className="absolute top-0 inset-x-0 h-36 sm:h-44 z-0 overflow-hidden pointer-events-none">
                 <img
                   src={profile.bannerUrl}
@@ -68,10 +77,10 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
               {/* Inner Ring (Counter-Clockwise) */}
               <div className="absolute inset-2 rounded-full border-[3px] border-transparent border-l-purple-500 border-r-cyan-400 animate-spin-reverse shadow-[0_0_20px_rgba(168,85,247,0.5)]" />
 
-              {/* Image */}
+              {/* Image / Fallback Image */}
               <img
                 className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-[#0f172a] z-10 shadow-2xl"
-                src={profile.avatarUrl || 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
+                src={profile.avatarUrl && profile.avatarUrl.trim() !== '' ? profile.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
                 alt={profile.name || 'Profile'}
                 referrerPolicy="no-referrer"
               />
@@ -137,7 +146,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
     <div>
       {/* Banner Cover */}
       <div className="profile-banner-container relative h-36 sm:h-44 w-full bg-slate-900 overflow-hidden">
-        {profile.bannerUrl && (
+        {profile.bannerUrl && profile.bannerUrl.trim() !== '' && (
           <img
             src={profile.bannerUrl}
             alt="Banner"
@@ -200,7 +209,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
             style={isUltraGlass ? { animation: 'gradientX 3.5s ease infinite', backgroundSize: '200% 200%' } : undefined}
           >
             <img
-              src={profile.avatarUrl || 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
+              src={profile.avatarUrl && profile.avatarUrl.trim() !== '' ? profile.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
               alt={profile.name || 'User'}
               referrerPolicy="no-referrer"
               className={`w-full h-full object-cover ${isUltraGlass ? 'rounded-full' : 'rounded-xl'}`}
