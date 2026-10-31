@@ -1979,8 +1979,6 @@ async function sendClientFullSummary(chatId: string, client: ClientRecord) {
   text += `• Email: <code>${escapeHtml(client.contact.email)}</code>\n`;
 
   text += `\n🛠️ <b>মোট সাভিস:</b> ${client.services.length} টি লাইভ\n`;
-  text += `🎨 <b>লেআউট:</b> ${client.layoutStyle === 'services_first' ? 'সার্ভিস আগে' : 'সোশ্যাল আগে (Admin UI)'}\n`;
-
   await sendTelegramMessage(chatId, text, { reply_markup: getClientMainMenuKeyboard(client) });
 }
 

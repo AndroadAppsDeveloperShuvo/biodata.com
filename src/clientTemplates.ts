@@ -962,13 +962,13 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24">
     
     <!-- Profile Banner & Header -->
-    <div class="profile-banner-container relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900">
-      <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || 'https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg')}" alt="Banner" class="w-full h-full object-cover opacity-80" onerror="this.src='https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg'" />
+    <div id="profileBannerContainer" class="profile-banner-container relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900 ${client.profile.bannerUrl && client.profile.bannerUrl.trim() !== '' ? '' : 'hidden'}" style="${client.profile.bannerUrl && client.profile.bannerUrl.trim() !== '' ? '' : 'display:none;'}">
+      <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || '')}" alt="Banner" class="w-full h-full object-cover opacity-80" />
       <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
     </div>
 
     <!-- Profile Info Box -->
-    <div class="relative px-5 -mt-16 flex flex-col items-center text-center">
+    <div id="profileInfoBox" class="relative px-5 flex flex-col items-center text-center ${client.profile.bannerUrl && client.profile.bannerUrl.trim() !== '' ? '-mt-16' : 'mt-4 pt-4'}">
       <!-- Avatar with Live Indicator & Spinning Rings -->
       <div id="avatarContainerWrapper" class="relative my-3 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
         <!-- Outer Spinning Rings for Ultra Cyber Glass -->
@@ -1205,13 +1205,26 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         avBox.innerHTML = '<img id="profileAvatar" src="' + avUrl + '" alt="Avatar" class="w-full h-full object-cover" />';
       }
 
+      var bnContainer = document.getElementById('profileBannerContainer') || document.querySelector('.profile-banner-container');
       var bn = document.getElementById('profileBanner');
-      if (bn) {
+      var infoBox = document.getElementById('profileInfoBox');
+      if (bnContainer) {
         if (p.bannerUrl && p.bannerUrl.trim() !== '') {
-          bn.style.display = 'block';
-          bn.src = p.bannerUrl;
+          bnContainer.style.display = 'block';
+          if (bn) {
+            bn.style.display = 'block';
+            bn.src = p.bannerUrl;
+          }
+          if (infoBox) {
+            infoBox.classList.remove('mt-4', 'pt-4');
+            infoBox.classList.add('-mt-16');
+          }
         } else {
-          bn.style.display = 'none';
+          bnContainer.style.display = 'none';
+          if (infoBox) {
+            infoBox.classList.remove('-mt-16');
+            infoBox.classList.add('mt-4', 'pt-4');
+          }
         }
       }
     }

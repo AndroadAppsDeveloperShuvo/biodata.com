@@ -142,29 +142,48 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
     );
   }
 
+  const hasBanner = Boolean(profile.bannerUrl && profile.bannerUrl.trim() !== '');
+
   return (
-    <div>
-      {/* Banner Cover */}
-      <div className="profile-banner-container relative h-36 sm:h-44 w-full bg-slate-900 overflow-hidden">
-        {profile.bannerUrl && profile.bannerUrl.trim() !== '' && (
+    <div className="w-full">
+      {/* Banner Cover - ONLY rendered when bannerUrl exists */}
+      {hasBanner ? (
+        <div className="profile-banner-container relative h-36 sm:h-44 w-full bg-slate-900 overflow-hidden rounded-t-2xl">
           <img
             src={profile.bannerUrl}
             alt="Banner"
             referrerPolicy="no-referrer"
             className="w-full h-full object-cover opacity-80"
           />
-        )}
-        <div className="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40" />
+          <div className="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40" />
 
-        {/* Top Active Status */}
-        <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+          {/* Top Active Status inside Banner */}
+          <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
+            <span className={`${
+              isUltraGlass
+                ? 'bg-zinc-900/80 text-cyan-300 border border-cyan-400/30'
+                : isGlass
+                ? 'bg-emerald-500/90 text-white shadow-md'
+                : 'bg-emerald-500/90 text-white'
+            } text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xl backdrop-blur-md tracking-wider`}>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              {isUltraGlass ? 'OPEN TO WORK' : 'Active'}
+            </span>
+          </div>
+        </div>
+      ) : (
+        /* Top Active Status when Banner is removed */
+        <div className="flex justify-end w-full pt-3 px-4">
           <span className={`${
             isUltraGlass
               ? 'bg-zinc-900/80 text-cyan-300 border border-cyan-400/30'
               : isGlass
               ? 'bg-emerald-500/90 text-white shadow-md'
               : 'bg-emerald-500/90 text-white'
-          } text-[11px] font-bold px-3 py-1 rounded-full flex items-center gap-1.5 shadow-xl backdrop-blur-md tracking-wider`}>
+          } text-[11px] font-bold px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-xl backdrop-blur-md tracking-wider`}>
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -172,10 +191,10 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
             {isUltraGlass ? 'OPEN TO WORK' : 'Active'}
           </span>
         </div>
-      </div>
+      )}
 
       {/* Profile Header & Avatar */}
-      <div className="px-5 pt-0 pb-4 relative -mt-14 flex flex-col items-center text-center">
+      <div className={`px-5 pb-4 relative flex flex-col items-center text-center ${hasBanner ? '-mt-14' : 'pt-2'}`}>
         {/* Avatar Container */}
         <div className="relative my-3 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
           {/* Outer Decorative Spinning Rings for Ultra Cyber Glass */}
