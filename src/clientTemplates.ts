@@ -217,6 +217,14 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     }
     .avatar-glow {
       box-shadow: 0 0 0 3px #09090b, 0 0 0 5px rgba(6, 182, 212, 0.6), 0 10px 25px -5px rgba(6, 182, 212, 0.4);
+      border-radius: 9999px !important;
+      overflow: hidden !important;
+    }
+    .avatar-glow img,
+    #avatarImgBox img,
+    #profileAvatar {
+      border-radius: 9999px !important;
+      object-fit: cover !important;
     }
     @keyframes pulseSlow {
       0%, 100% { transform: scale(1); opacity: 1; }
@@ -976,8 +984,8 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         <div id="avatarSpinRing2" class="hidden absolute -inset-3 sm:-inset-3.5 rounded-full border-2 border-dashed border-purple-500 pointer-events-none z-0 shadow-[0_0_25px_rgba(168,85,247,0.6)]" style="animation: spinReverse 8s linear infinite;"></div>
         <div id="avatarGlowOrb" class="hidden absolute inset-2 rounded-full bg-cyan-400/20 blur-xl pointer-events-none z-0 animate-pulse"></div>
 
-        <div id="avatarImgBox" class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300">
-          <img id="profileAvatar" src="${escapeHtml(client.profile.avatarUrl || client.logoUrl)}" alt="Avatar" class="w-full h-full object-cover" onerror="this.src='${escapeHtml(client.logoUrl)}'" />
+        <div id="avatarImgBox" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300">
+          <img id="profileAvatar" src="${escapeHtml(client.profile.avatarUrl || client.logoUrl)}" alt="Avatar" class="w-full h-full object-cover rounded-full" onerror="this.src='${escapeHtml(client.logoUrl)}'" />
         </div>
         <div class="absolute bottom-0 right-0 bg-emerald-500 text-zinc-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border-2 border-zinc-950 flex items-center gap-1 shadow-lg z-20">
           <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
@@ -1202,7 +1210,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       var avBox = document.getElementById('avatarImgBox');
       if (avBox) {
         var avUrl = (p.avatarUrl && p.avatarUrl.trim() !== '') ? p.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg';
-        avBox.innerHTML = '<img id="profileAvatar" src="' + avUrl + '" alt="Avatar" class="w-full h-full object-cover" />';
+        avBox.innerHTML = '<img id="profileAvatar" src="' + avUrl + '" alt="Avatar" class="w-full h-full object-cover rounded-full" />';
       }
 
       var bnContainer = document.getElementById('profileBannerContainer') || document.querySelector('.profile-banner-container');
@@ -1450,10 +1458,10 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         if (ring2) ring2.classList.add('hidden');
         if (glowOrb) glowOrb.classList.add('hidden');
         if (avatarBox) {
-          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300';
+          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300';
         }
         if (avatarImg) {
-          avatarImg.className = 'w-full h-full object-cover rounded-2xl';
+          avatarImg.className = 'w-full h-full object-cover rounded-full';
         }
 
         if (themeClass === 'bold_flat_popart') {

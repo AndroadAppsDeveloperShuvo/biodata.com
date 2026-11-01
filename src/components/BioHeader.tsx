@@ -77,13 +77,15 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
               {/* Inner Ring (Counter-Clockwise) */}
               <div className="absolute inset-2 rounded-full border-[3px] border-transparent border-l-purple-500 border-r-cyan-400 animate-spin-reverse shadow-[0_0_20px_rgba(168,85,247,0.5)]" />
 
-              {/* Image / Fallback Image */}
-              <img
-                className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-[#0f172a] z-10 shadow-2xl"
-                src={profile.avatarUrl && profile.avatarUrl.trim() !== '' ? profile.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
-                alt={profile.name || 'Profile'}
-                referrerPolicy="no-referrer"
-              />
+              {/* Image Container with strict circular masking */}
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 z-10 shadow-2xl">
+                <img
+                  className="w-full h-full rounded-full object-cover"
+                  src={profile.avatarUrl && profile.avatarUrl.trim() !== '' ? profile.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
+                  alt={profile.name || 'Profile'}
+                  referrerPolicy="no-referrer"
+                />
+              </div>
 
               {/* Verification Badge */}
               <div className="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-1 border-2 border-[#0f172a] z-20 shadow-lg">
@@ -218,12 +220,12 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           )}
 
           <div
-            className={`avatar-glow relative z-10 ${
+            className={`avatar-glow relative z-10 overflow-hidden ${
               isUltraGlass
                 ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)]'
                 : isGlass
-                ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-amber-300 to-pink-400 shadow-xl overflow-hidden'
-                : 'w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl overflow-hidden'
+                ? 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-cyan-400 via-amber-300 to-pink-400 shadow-xl'
+                : 'w-24 h-24 sm:w-28 sm:h-28 rounded-full p-1 bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 shadow-xl'
             }`}
             style={isUltraGlass ? { animation: 'gradientX 3.5s ease infinite', backgroundSize: '200% 200%' } : undefined}
           >
@@ -231,7 +233,7 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
               src={profile.avatarUrl && profile.avatarUrl.trim() !== '' ? profile.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg'}
               alt={profile.name || 'User'}
               referrerPolicy="no-referrer"
-              className={`w-full h-full object-cover ${isUltraGlass ? 'rounded-full' : 'rounded-xl'}`}
+              className="w-full h-full object-cover rounded-full"
             />
           </div>
 
