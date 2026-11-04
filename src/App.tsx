@@ -10,6 +10,7 @@ import { HighlightsServices } from './components/HighlightsServices';
 import { DirectContact } from './components/DirectContact';
 import { ShareAndFooter } from './components/ShareAndFooter';
 import { CyberSpaceCanvas } from './components/CyberSpaceCanvas';
+import { BoidsWireframeCanvas } from './components/BoidsWireframeCanvas';
 import { HighlightService, SocialLink, ContactInfo, PersonalInfo, Badge } from './types/bio';
 
 const CACHE_KEY = 'shuvo_bio_live_cache_v2';
@@ -187,6 +188,7 @@ export default function App() {
     }
   }, [themeStyle]);
 
+  const isWireframe = themeStyle === 'ignitron_wireframe';
   const isIgnitronSpace = themeStyle === 'ignitron_cyber_space';
   const isShuvoxLightning = themeStyle === 'shuvox_lightning_cyber';
   const isGlass = themeStyle === 'dark_glassmorphism';
@@ -199,7 +201,9 @@ export default function App() {
     <div
       data-theme={themeStyle}
       className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
-      isIgnitronSpace
+      isWireframe
+        ? 'bg-[#050505] text-white font-mono'
+        : isIgnitronSpace
         ? 'bg-[#010309] text-cyan-50'
         : isShuvoxLightning
         ? 'bg-[#020617] text-white'
@@ -215,6 +219,9 @@ export default function App() {
         ? 'bg-[#09090b] text-slate-100'
         : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
     }`}>
+
+      {/* Systems That Hold Up - Wireframe Boids Particles Canvas */}
+      {isWireframe && <BoidsWireframeCanvas />}
 
       {/* Cyber Space Arrowhead Swarm Canvas Theme */}
       {isIgnitronSpace && <CyberSpaceCanvas />}

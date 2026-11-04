@@ -1675,31 +1675,37 @@ function getClientThemeOnlyKeyboard(client: ClientRecord) {
       ],
       [
         {
-          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)',
+          text: (theme === 'ignitron_wireframe' ? '🟢 ' : '⚪ ') + '🚀 ১. ইগনিট্রন ওয়্যারফ্রেম ৩ডি (Systems That Hold Up - Wireframe Boids)',
+          callback_data: `cl_set_theme:ignitron_wireframe:${client.id}`
+        }
+      ],
+      [
+        {
+          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ২. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)',
           callback_data: `cl_set_theme:shuvox_lightning_cyber:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৩. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
           callback_data: `cl_set_theme:ultra_cyber_glass:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৩. অর্গানিক নেচার (Organic Nature)',
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
           callback_data: `cl_set_theme:organic_nature:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
           callback_data: `cl_set_theme:bold_flat_popart:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)',
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৬. ক্লাসিক ডার্ক (Classic Dark)',
           callback_data: `cl_set_theme:classic_dark:${client.id}`
         }
       ],
@@ -1721,31 +1727,37 @@ function getAdminThemeMenuKeyboard() {
       ],
       [
         {
-          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)',
+          text: (theme === 'ignitron_wireframe' ? '🟢 ' : '⚪ ') + '🚀 ১. ইগনিট্রন ওয়্যারফ্রেম ৩ডি (Systems That Hold Up - Wireframe Boids)',
+          callback_data: `admin_set_theme:ignitron_wireframe`
+        }
+      ],
+      [
+        {
+          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ২. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)',
           callback_data: `admin_set_theme:shuvox_lightning_cyber`
         }
       ],
       [
         {
-          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৩. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
           callback_data: `admin_set_theme:ultra_cyber_glass`
         }
       ],
       [
         {
-          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৩. অর্গানিক নেচার (Organic Nature)',
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
           callback_data: `admin_set_theme:organic_nature`
         }
       ],
       [
         {
-          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
           callback_data: `admin_set_theme:bold_flat_popart`
         }
       ],
       [
         {
-          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)',
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৬. ক্লাসিক ডার্ক (Classic Dark)',
           callback_data: `admin_set_theme:classic_dark`
         }
       ],
@@ -2031,15 +2043,17 @@ async function sendClientLayoutOnlyMenu(chatId: string, client: ClientRecord) {
 async function sendClientThemeOnlyMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
   const theme = client.themeStyle || 'shuvox_lightning_cyber';
-  const themeName = theme === 'shuvox_lightning_cyber'
-    ? '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)'
+  const themeName = theme === 'ignitron_wireframe'
+    ? '🚀 ১. ইগনিট্রন ওয়্যারফ্রেম ৩ডি (Systems That Hold Up - Wireframe Boids)'
+    : theme === 'shuvox_lightning_cyber'
+    ? '⚡ ২. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)'
     : theme === 'ultra_cyber_glass'
-    ? '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
+    ? '✨ ৩. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
     : theme === 'organic_nature'
-    ? '🍃 ৩. অর্গানিক নেচার (Organic Nature)'
+    ? '🍃 ৪. অর্গানিক নেচার (Organic Nature)'
     : theme === 'bold_flat_popart'
-    ? '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
-    : '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)';
+    ? '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+    : '🕶️ ৬. ক্লাসিক ডার্ক (Classic Dark)';
 
   const text = `🎨 <b>ওয়েবসাইট কালার থিম নির্বাচন:</b>\n\n`
     + `বর্তমান থিম: <b>${themeName}</b>\n\n`
@@ -2617,10 +2631,9 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
   // Admin Add Client Command: /newclient or /addclient
   if (trimmed === '/newclient' || trimmed === '/addclient') {
     userStates[chatId] = { step: 'admin_wizard_chatid', tempData: {} };
-    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি: ক্লায়েন্টের Telegram Chat ID দিন</b>\n\n`
+    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ১/২): ক্লায়েন্টের Telegram Chat ID</b>\n\n`
       + `ক্লাইন্টের টেলিগ্রাম চ্যাট আইডিটি লিখে পাঠান:\n`
       + `<i>(ক্লাইন্ট টেলিগ্রামে @userinfobot এ স্টার্ট দিলে তার Chat ID পেয়ে যাবে, যেমন: <code>1234567890</code>)</i>\n\n`
-      + `💡 <i>নোট: ক্লায়েন্ট একাউন্ট তৈরি হওয়া মাত্রই ৩টি PWA ফাইল ক্লায়েন্টের ইনবক্সে পৌঁছে যাবে এবং ক্লায়েন্ট নিজের বট থেকে নাম, লোগো, থিম ও সার্ভিস কন্ট্রোল করতে পারবে।</i>\n\n`
       + `🔙 বাতিল করতে /cancel লিখুন`;
     await sendTelegramMessage(chatId, msg);
     return msg;
@@ -2635,7 +2648,7 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     return msg;
   }
 
-  // Admin Wizard Step 1: Client Chat ID -> Instant Creation!
+  // Admin Wizard Step 1: Client Chat ID
   if (state.step === 'admin_wizard_chatid') {
     const rawId = trimmed.replace(/[^0-9-]/g, '');
     if (!rawId || rawId.length < 5) {
@@ -2650,10 +2663,34 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
       return err;
     }
 
+    userStates[chatId] = {
+      step: 'admin_wizard_appname',
+      tempData: { clientChatId: rawId }
+    };
+
+    const msg = `🏷️ <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ২/২): ক্লায়েন্টের নাম (Client Name)</b>\n\n`
+      + `ক্লায়েন্টের নাম বা সাইটের পূর্ণ নাম লিখে পাঠান:\n`
+      + `<i>(যেমন: <code>Md Tamim</code> বা <code>Tamim - Bio Data</code>)</i>\n\n`
+      + `🔙 বাতিল করতে /cancel লিখুন`;
+    await sendTelegramMessage(chatId, msg);
+    return msg;
+  }
+
+  // Admin Wizard Step 2: Client Name -> Finish Creation!
+  if (state.step === 'admin_wizard_appname') {
+    const appName = trimmed;
+    if (!appName || appName.length < 2) {
+      const err = `❌ অনুগ্রহ করে ক্লায়েন্টের একটি নাম লিখুন (যেমন: <code>Md Tamim</code>)\nবাতিল করতে /cancel লিখুন।`;
+      await sendTelegramMessage(chatId, err);
+      return err;
+    }
+
+    const shortName = appName.replace(/[^a-zA-Z0-9 ]/g, '').trim().substring(0, 15).toUpperCase() || 'BIO DATA';
+
     const tempData = {
-      clientChatId: rawId,
-      appName: 'Bio Data Website',
-      shortName: 'BIO DATA',
+      clientChatId: state.tempData?.clientChatId,
+      appName,
+      shortName,
       logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10'
     };
 
@@ -3771,7 +3808,7 @@ async function handleCallbackQuery(cb: any) {
 
   if (data === 'admin_btn_add_client') {
     userStates[chatId] = { step: 'admin_wizard_chatid', tempData: {} };
-    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ১/৪): ক্লায়েন্টের Telegram Chat ID</b>\n\n`
+    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ১/২): ক্লায়েন্টের Telegram Chat ID</b>\n\n`
       + `ক্লাইন্টের টেলিগ্রাম চ্যাট আইডিটি লিখে পাঠান:\n`
       + `<i>(ক্লাইন্ট টেলিগ্রামে @userinfobot এ স্টার্ট দিলে তার Chat ID পেয়ে যাবে, যেমন: <code>1234567890</code>)</i>\n\n`
       + `🔙 বাতিল করতে /cancel লিখুন`;

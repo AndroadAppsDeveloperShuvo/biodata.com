@@ -196,8 +196,25 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <!-- Google Fonts & Tailwind CDN -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            wireBlue: '#00f0ff',
+            wireRed: '#ff003c',
+            darkBg: '#050505',
+          }
+        }
+      }
+    }
+  </script>
   
   <style>
     body {
@@ -205,9 +222,72 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       background-color: #09090b;
       color: #f4f4f5;
       -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
     }
     .font-tech {
       font-family: 'Orbitron', monospace, sans-serif;
+    }
+
+    /* --- Scroll Reveal Animations --- */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* --- Wireframe Box Styles (Debug Look) --- */
+    .wire-box {
+      position: relative;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(4px);
+      transition: background 0.3s ease;
+    }
+    .wire-box:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    /* Blue Wireframe */
+    .wire-blue {
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+    .wire-blue::before, .wire-blue::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border: 1px solid #00f0ff;
+    }
+    .wire-blue::before { top: -4px; left: -4px; }
+    .wire-blue::after { bottom: -4px; right: -4px; }
+
+    /* Red Wireframe */
+    .wire-red {
+      border: 1px solid rgba(255, 0, 60, 0.4);
+    }
+    .wire-red::before, .wire-red::after {
+      content: '';
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border: 1px solid #ff003c;
+    }
+    .wire-red::before { top: -4px; right: -4px; }
+    .wire-red::after { bottom: -4px; left: -4px; }
+
+    /* Background Canvas */
+    #boidsCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.6;
     }
     .glass-card {
       background: rgba(18, 18, 24, 0.75);
@@ -951,6 +1031,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   </style>
 </head>
 <body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950" data-theme="${escapeHtml(client.themeStyle || 'shuvox_lightning_cyber')}">
+
+  <!-- Background Boids Particles Canvas (Systems That Hold Up) -->
+  <canvas id="boidsCanvas"></canvas>
 
   <!-- Ambient 3D Orbs & Lightning Layers -->
   <div class="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -1759,6 +1842,128 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     window.addEventListener('online', updateOnlineStatus);
     window.addEventListener('offline', updateOnlineStatus);
     updateOnlineStatus();
+
+    // --- Boids / Constellation Canvas Animation ---
+    (function initBoidsCanvas() {
+      var canvas = document.getElementById('boidsCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      var width, height;
+      var boids = [];
+      var colors = ['#00f0ff', '#ff003c', '#4338ca', '#fbbf24'];
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function Boid() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+        this.size = Math.random() * 4 + 2;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.angle = Math.atan2(this.vy, this.vx);
+      }
+
+      Boid.prototype.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx += (Math.random() - 0.5) * 0.1;
+        this.vy += (Math.random() - 0.5) * 0.1;
+
+        var speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 2) {
+          this.vx = (this.vx / speed) * 2;
+          this.vy = (this.vy / speed) * 2;
+        }
+
+        this.angle = Math.atan2(this.vy, this.vx);
+
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      };
+
+      Boid.prototype.draw = function() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.angle);
+
+        ctx.beginPath();
+        ctx.moveTo(this.size * 2, 0);
+        ctx.lineTo(-this.size, this.size);
+        ctx.lineTo(-this.size / 2, 0);
+        ctx.lineTo(-this.size, -this.size);
+        ctx.closePath();
+
+        ctx.fillStyle = this.color;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+        ctx.fill();
+
+        ctx.restore();
+      };
+
+      var numBoids = Math.min(window.innerWidth / 30, 60);
+      for (var i = 0; i < numBoids; i++) {
+        boids.push(new Boid());
+      }
+
+      function animate() {
+        ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+        ctx.fillRect(0, 0, width, height);
+
+        boids.forEach(function(b) {
+          b.update();
+          b.draw();
+        });
+
+        ctx.lineWidth = 0.5;
+        for (var i = 0; i < boids.length; i++) {
+          for (var j = i + 1; j < boids.length; j++) {
+            var dx = boids[i].x - boids[j].x;
+            var dy = boids[i].y - boids[j].y;
+            var dist = dx * dx + dy * dy;
+            if (dist < 10000) {
+              ctx.beginPath();
+              ctx.strokeStyle = 'rgba(255, 255, 255, ' + (0.1 - dist / 100000) + ')';
+              ctx.moveTo(boids[i].x, boids[i].y);
+              ctx.lineTo(boids[j].x, boids[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+
+    // --- Scroll Reveal Animations ---
+    document.addEventListener('DOMContentLoaded', function() {
+      var revealElements = document.querySelectorAll('.reveal');
+      var revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      }, {
+        root: null,
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
+      });
+
+      revealElements.forEach(function(el) { revealObserver.observe(el); });
+    });
   </script>
 </body>
 </html>

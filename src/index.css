@@ -1095,6 +1095,86 @@ main[data-theme="shuvox_lightning_cyber"] {
   background: linear-gradient(to right, #020617 0%, transparent 20%, transparent 80%, #020617 100%) !important;
 }
 
+/* --- Wireframe Box Styles (Debug Look - Systems that hold up) --- */
+.wire-box {
+  position: relative;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(4px);
+  transition: background 0.3s ease;
+}
+.wire-box:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Blue Wireframe */
+.wire-blue {
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+.wire-blue::before, .wire-blue::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #00f0ff;
+}
+.wire-blue::before { top: -4px; left: -4px; }
+.wire-blue::after { bottom: -4px; right: -4px; }
+
+/* Red Wireframe */
+.wire-red {
+  border: 1px solid rgba(255, 0, 60, 0.4);
+}
+.wire-red::before, .wire-red::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #ff003c;
+}
+.wire-red::before { top: -4px; right: -4px; }
+.wire-red::after { bottom: -4px; left: -4px; }
+
+/* Scroll Reveal Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Theme Rules for ignitron_wireframe */
+[data-theme="ignitron_wireframe"],
+body[data-theme="ignitron_wireframe"] {
+  background-color: #050505 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="ignitron_wireframe"] main {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="ignitron_wireframe"] .glass-card,
+[data-theme="ignitron_wireframe"] #socialLinksContainer > a,
+[data-theme="ignitron_wireframe"] #servicesGrid > div,
+[data-theme="ignitron_wireframe"] #contactContainer,
+[data-theme="ignitron_wireframe"] #btnShareProfile > div {
+  background: rgba(255, 255, 255, 0.02) !important;
+  backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(0, 240, 255, 0.3) !important;
+  position: relative !important;
+}
+
+[data-theme="ignitron_wireframe"] #socialLinksContainer > a:hover,
+[data-theme="ignitron_wireframe"] #servicesGrid > div:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(0, 240, 255, 0.7) !important;
+}
+
 
 
 
