@@ -206,7 +206,7 @@ export default function App() {
         : isIgnitronSpace
         ? 'bg-[#010309] text-cyan-50'
         : isShuvoxLightning
-        ? 'bg-[#020617] text-white'
+        ? 'bg-[#020617] bg-crosshairs text-white'
         : isPopArt
         ? 'bg-[#facc15] text-black'
         : isOrganic
@@ -221,7 +221,7 @@ export default function App() {
     }`}>
 
       {/* Systems That Hold Up - Wireframe Boids Particles Canvas */}
-      {isWireframe && <BoidsWireframeCanvas />}
+      {(isWireframe || isShuvoxLightning) && <BoidsWireframeCanvas />}
 
       {/* Cyber Space Arrowhead Swarm Canvas Theme */}
       {isIgnitronSpace && <CyberSpaceCanvas />}

@@ -278,6 +278,13 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     .wire-red::before { top: -4px; right: -4px; }
     .wire-red::after { bottom: -4px; left: -4px; }
 
+    /* Crosshairs Background Pattern */
+    .bg-crosshairs {
+      background-image: radial-gradient(#333 1px, transparent 0);
+      background-size: 40px 40px;
+      background-position: -19px -19px;
+    }
+    
     /* Background Canvas */
     #boidsCanvas {
       position: fixed;
@@ -285,9 +292,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
+      z-index: 0;
       pointer-events: none;
-      opacity: 0.6;
+      opacity: 0.8;
     }
     .glass-card {
       background: rgba(18, 18, 24, 0.75);
@@ -1030,7 +1037,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     }
   </style>
 </head>
-<body class="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950" data-theme="${escapeHtml(client.themeStyle || 'shuvox_lightning_cyber')}">
+<body class="min-h-screen bg-zinc-950 bg-crosshairs text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950" data-theme="${escapeHtml(client.themeStyle || 'shuvox_lightning_cyber')}">
 
   <!-- Background Boids Particles Canvas (Systems That Hold Up) -->
   <canvas id="boidsCanvas"></canvas>
@@ -1852,7 +1859,8 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
 
       var width, height;
       var boids = [];
-      var colors = ['#00f0ff', '#ff003c', '#4338ca', '#fbbf24'];
+      var numBoids = 60;
+      var colors = ['#3b82f6', '#ef4444', '#facc15', '#a855f7', '#2dd4bf'];
 
       function resize() {
         width = canvas.width = window.innerWidth;
@@ -1864,43 +1872,43 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       function Boid() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 2;
-        this.vy = (Math.random() - 0.5) * 2;
-        this.size = Math.random() * 4 + 2;
+        this.vx = (Math.random() - 0.5) * 4;
+        this.vy = (Math.random() - 0.5) * 4;
         this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.angle = Math.atan2(this.vy, this.vx);
+        this.size = Math.random() * 4 + 4;
       }
 
       Boid.prototype.update = function() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx += (Math.random() - 0.5) * 0.1;
-        this.vy += (Math.random() - 0.5) * 0.1;
-
-        var speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        if (speed > 2) {
-          this.vx = (this.vx / speed) * 2;
-          this.vy = (this.vy / speed) * 2;
-        }
-
-        this.angle = Math.atan2(this.vy, this.vx);
-
         if (this.x < 0) this.x = width;
         if (this.x > width) this.x = 0;
         if (this.y < 0) this.y = height;
         if (this.y > height) this.y = 0;
+
+        this.vx += (Math.random() - 0.5) * 0.2;
+        this.vy += (Math.random() - 0.5) * 0.2;
+
+        var speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (speed > 3) {
+          this.vx = (this.vx / speed) * 3;
+          this.vy = (this.vy / speed) * 3;
+        }
+
+        this.x += this.vx;
+        this.y += this.vy;
       };
 
       Boid.prototype.draw = function() {
+        var angle = Math.atan2(this.vy, this.vx);
+
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle);
+        ctx.rotate(angle);
 
         ctx.beginPath();
-        ctx.moveTo(this.size * 2, 0);
-        ctx.lineTo(-this.size, this.size);
+        ctx.moveTo(this.size, 0);
+        ctx.lineTo(-this.size, this.size / 1.5);
         ctx.lineTo(-this.size / 2, 0);
-        ctx.lineTo(-this.size, -this.size);
+        ctx.lineTo(-this.size, -this.size / 1.5);
         ctx.closePath();
 
         ctx.fillStyle = this.color;
@@ -1911,7 +1919,6 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         ctx.restore();
       };
 
-      var numBoids = Math.min(window.innerWidth / 30, 60);
       for (var i = 0; i < numBoids; i++) {
         boids.push(new Boid());
       }
@@ -1920,25 +1927,26 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
         ctx.fillRect(0, 0, width, height);
 
-        boids.forEach(function(b) {
-          b.update();
-          b.draw();
-        });
-
-        ctx.lineWidth = 0.5;
         for (var i = 0; i < boids.length; i++) {
           for (var j = i + 1; j < boids.length; j++) {
             var dx = boids[i].x - boids[j].x;
             var dy = boids[i].y - boids[j].y;
-            var dist = dx * dx + dy * dy;
-            if (dist < 10000) {
+            var dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 100) {
               ctx.beginPath();
-              ctx.strokeStyle = 'rgba(255, 255, 255, ' + (0.1 - dist / 100000) + ')';
               ctx.moveTo(boids[i].x, boids[i].y);
               ctx.lineTo(boids[j].x, boids[j].y);
+              ctx.strokeStyle = 'rgba(59, 130, 246, ' + (1 - dist / 100) + ')';
+              ctx.lineWidth = 0.5;
               ctx.stroke();
             }
           }
+        }
+
+        for (var k = 0; k < boids.length; k++) {
+          boids[k].update();
+          boids[k].draw();
         }
 
         requestAnimationFrame(animate);

@@ -1060,6 +1060,13 @@ main[data-theme="dark_glassmorphism"] #btnShareProfile > div {
   height: 100%;
 }
 
+/* Crosshairs Background Pattern */
+.bg-crosshairs {
+  background-image: radial-gradient(#333 1px, transparent 0);
+  background-size: 40px 40px;
+  background-position: -19px -19px;
+}
+
 /* Theme Rules for shuvox_lightning_cyber */
 [data-theme="shuvox_lightning_cyber"],
 body[data-theme="shuvox_lightning_cyber"] {
