@@ -4113,19 +4113,42 @@ async function handleCallbackQuery(cb: any) {
       });
       const updated = getClientById(client.id) || client;
       saveThemeConfig(themeStyle, updated.layoutStyle);
-      const themeName = themeStyle === 'ultra_cyber_glass'
-        ? '✨ ১. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
+      const themeName = themeStyle === 'shuvox_lightning_cyber'
+        ? '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber 3D)'
+        : themeStyle === 'ultra_cyber_glass'
+        ? '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
         : themeStyle === 'organic_nature'
-        ? '🍃 ২. অর্গানিক নেচার (Organic Nature)'
+        ? '🍃 ৩. অর্গানিক নেচার (Organic Nature)'
         : themeStyle === 'bold_flat_popart'
-        ? '💥 ৩. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
-        : '🕶️ ৪. ক্লাসিক ডার্ক (Classic Dark)';
+        ? '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+        : '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)';
       await sendTelegramMessage(
         chatId,
         `🎨 <b>ওয়েবসাইট থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`,
         { reply_markup: getClientThemeOnlyKeyboard(updated) }
       );
     }
+    return;
+  }
+
+  // Admin Set Theme Choice
+  if (data.startsWith('admin_set_theme:')) {
+    const themeStyle = data.replace('admin_set_theme:', '');
+    saveThemeConfig(themeStyle);
+    const themeName = themeStyle === 'shuvox_lightning_cyber'
+      ? '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber 3D)'
+      : themeStyle === 'ultra_cyber_glass'
+      ? '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
+      : themeStyle === 'organic_nature'
+      ? '🍃 ৩. অর্গানিক নেচার (Organic Nature)'
+      : themeStyle === 'bold_flat_popart'
+      ? '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+      : '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)';
+    await sendTelegramMessage(
+      chatId,
+      `🎨 <b>মাস্টার অ্যাডমিন থিম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n✨ বর্তমান থিম: <b>${themeName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই থিম কার্যকর হয়ে গেছে! 🚀</i>`,
+      { reply_markup: getAdminThemeMenuKeyboard() }
+    );
     return;
   }
 
