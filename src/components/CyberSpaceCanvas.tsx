@@ -12,12 +12,29 @@ interface Boid {
   trail: { x: number; y: number }[];
 }
 
+interface CADBox {
+  id: string;
+  label: string;
+  rect: DOMRect;
+  color: string;
+  isHovered: boolean;
+}
+
 export const CyberSpaceCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const [boidCount, setBoidCount] = useState<number>(90);
+  const [showIntro, setShowIntro] = useState<boolean>(true);
+  const [autoScan, setAutoScan] = useState<boolean>(true);
   const [showRulers, setShowRulers] = useState<boolean>(true);
-  const [showLaserGrid, setShowLaserGrid] = useState<boolean>(true);
+  const [boidCount, setBoidCount] = useState<number>(110);
   const [fps, setFps] = useState<number>(60);
+
+  // Intro explosion sequence timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowIntro(false);
+    }, 2400);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -38,7 +55,7 @@ export const CyberSpaceCanvas: React.FC = () => {
 
     window.addEventListener('resize', handleResize);
 
-    // Mouse & Touch tracking for laser crosshair and gravity pull
+    // Mouse tracking for interactive laser target & boid attraction
     const mouse = {
       x: width / 2,
       y: height / 2,
@@ -46,10 +63,28 @@ export const CyberSpaceCanvas: React.FC = () => {
       down: false,
     };
 
+    let hoveredCadId: string | null = null;
+
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
       mouse.active = true;
+
+      // Check if mouse is hovering any CAD registered element
+      const elements = document.querySelectorAll('[data-cad-id]');
+      let found: string | null = null;
+      elements.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        if (
+          e.clientX >= r.left &&
+          e.clientX <= r.right &&
+          e.clientY >= r.top &&
+          e.clientY <= r.bottom
+        ) {
+          found = el.getAttribute('data-cad-id');
+        }
+      });
+      hoveredCadId = found;
     };
 
     const handleTouchMove = (e: TouchEvent) => {
@@ -73,48 +108,53 @@ export const CyberSpaceCanvas: React.FC = () => {
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
 
-    // Color Palette matching ignitron.dev/space exactly
-    const colors = [
-      '#ff2a85', // Neon Pink
-      '#ffea00', // Bright Yellow
-      '#00ff66', // Electric Green
-      '#00f0ff', // High-tech Cyan
-      '#a855f7', // Purple
-      '#ff6b00', // Vibrant Orange
+    // Color Palette matching ignitron.dev/space video exactly
+    const palette = [
+      '#ff2a85', // Hot Pink
+      '#ffea00', // Neon Yellow
+      '#00ff66', // Vibrant Lime Green
+      '#00f0ff', // High-Tech Cyan
+      '#a855f7', // Electric Purple
+      '#ff6b00', // Deep Orange
       '#ffffff', // Pure White
-      '#3b82f6', // Deep Blue
+      '#3b82f6', // Vivid Blue
     ];
 
-    const types: Boid['type'][] = ['arrow', 'arrow', 'cross', 'dash', 'square', 'triangle', 'dot'];
+    const types: Boid['type'][] = ['arrow', 'arrow', 'cross', 'dash', 'triangle', 'square', 'dot'];
 
-    // Initialize Boids
-    const numBoids = 90;
+    // Initialize 110 Flocking Boids dispersing from explosion center
     const boids: Boid[] = [];
+    const centerX = width / 2;
+    const centerY = height / 2;
 
-    for (let i = 0; i < numBoids; i++) {
+    for (let i = 0; i < 110; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 3.5;
+      const speed = 3 + Math.random() * 5;
       boids.push({
-        x: Math.random() * width,
-        y: Math.random() * height,
+        x: centerX + (Math.random() - 0.5) * 60,
+        y: centerY + (Math.random() - 0.5) * 60,
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed,
         type: types[Math.floor(Math.random() * types.length)],
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color: palette[Math.floor(Math.random() * palette.length)],
         size: 5 + Math.random() * 6,
         angle: angle,
         trail: [],
       });
     }
 
-    // FPS calculation state
+    // Auto Scanner state variables
+    let autoScanIndex = 0;
+    let autoScanTimer = 0;
+    let scanLineY = 0;
+    let laserBarX = 0;
+
+    // FPS counter state
     let frameCount = 0;
     let lastFpsCheck = performance.now();
-    let laserY = 0;
-    let laserSpeed = 1.2;
 
     // Render loop
-    const render = () => {
+    const draw = () => {
       const now = performance.now();
       frameCount++;
       if (now - lastFpsCheck >= 1000) {
@@ -125,13 +165,13 @@ export const CyberSpaceCanvas: React.FC = () => {
 
       ctx.clearRect(0, 0, width, height);
 
-      // Deep Space Obsidian Background
-      ctx.fillStyle = '#05070e';
+      // 1. Deep Space Pitch Black Canvas Background
+      ctx.fillStyle = '#03050a';
       ctx.fillRect(0, 0, width, height);
 
-      // Tech CAD Grid Lines
-      const gridSize = 48;
-      ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+      // 2. Blueprint Tech Grid Lines
+      const gridSize = 40;
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.06)';
       ctx.lineWidth = 1;
 
       for (let x = 0; x < width; x += gridSize) {
@@ -148,106 +188,214 @@ export const CyberSpaceCanvas: React.FC = () => {
         ctx.stroke();
       }
 
-      // Horizontal Laser Scanning Line
-      laserY += laserSpeed;
-      if (laserY > height) laserY = 0;
+      // 3. Global Sweeping Laser Scan Line
+      scanLineY += 1.8;
+      if (scanLineY > height) scanLineY = 0;
 
-      if (showLaserGrid) {
-        const laserGrad = ctx.createLinearGradient(0, laserY - 15, 0, laserY + 15);
-        laserGrad.addColorStop(0, 'rgba(255, 42, 133, 0)');
-        laserGrad.addColorStop(0.5, 'rgba(255, 42, 133, 0.35)');
-        laserGrad.addColorStop(1, 'rgba(255, 42, 133, 0)');
-        ctx.fillStyle = laserGrad;
-        ctx.fillRect(0, laserY - 15, width, 30);
+      const scanGrad = ctx.createLinearGradient(0, scanLineY - 20, 0, scanLineY + 20);
+      scanGrad.addColorStop(0, 'rgba(255, 42, 133, 0)');
+      scanGrad.addColorStop(0.5, 'rgba(255, 42, 133, 0.4)');
+      scanGrad.addColorStop(1, 'rgba(255, 42, 133, 0)');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanLineY - 20, width, 40);
 
-        ctx.strokeStyle = '#ff2a85';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, laserY);
-        ctx.lineTo(width, laserY);
-        ctx.stroke();
+      ctx.strokeStyle = '#ff2a85';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath();
+      ctx.moveTo(0, scanLineY);
+      ctx.lineTo(width, scanLineY);
+      ctx.stroke();
+
+      // 4. CAD RULERS along top and left
+      if (showRulers) {
+        ctx.fillStyle = 'rgba(0, 240, 255, 0.5)';
+        ctx.font = '9px monospace';
+
+        for (let x = 0; x < width; x += 80) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, 6);
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+          ctx.stroke();
+          ctx.fillText(`${x}`, x + 2, 12);
+        }
+
+        for (let y = 0; y < height; y += 80) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(6, y);
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+          ctx.stroke();
+          ctx.fillText(`${y}`, 8, y + 8);
+        }
       }
 
-      // Interactive Mouse Laser Crosshair
-      if (mouse.active && showLaserGrid) {
-        ctx.save();
-        ctx.strokeStyle = 'rgba(0, 240, 255, 0.25)';
-        ctx.setLineDash([4, 4]);
-        ctx.lineWidth = 1;
+      // 5. INTERACTIVE CAD BOUNDING BOX & PROJECTION LASERS SYSTEM
+      // Find all DOM elements registered with data-cad-id
+      const cadElements = document.querySelectorAll('[data-cad-id]');
+      const cadBoxes: CADBox[] = [];
 
-        // X Axis Line
+      cadElements.forEach((el, index) => {
+        const id = el.getAttribute('data-cad-id') || `box_${index}`;
+        const label = el.getAttribute('data-cad-label') || `[NODE_0${index + 1}]`;
+        const color = el.getAttribute('data-cad-color') || palette[index % palette.length];
+        const rect = el.getBoundingClientRect();
+
+        // Only draw if within viewport
+        if (rect.bottom > 0 && rect.top < height && rect.right > 0 && rect.left < width) {
+          cadBoxes.push({
+            id,
+            label,
+            rect,
+            color,
+            isHovered: hoveredCadId === id,
+          });
+        }
+      });
+
+      // Auto Scanner rotation timer
+      autoScanTimer++;
+      if (autoScanTimer > 180 && cadBoxes.length > 0) {
+        autoScanTimer = 0;
+        autoScanIndex = (autoScanIndex + 1) % cadBoxes.length;
+      }
+
+      // Draw CAD Bounding Boxes and Projection Lines
+      cadBoxes.forEach((box, i) => {
+        const { rect, label, color } = box;
+        const isActive = box.isHovered || (autoScan && i === autoScanIndex);
+
+        const pad = 4;
+        const left = rect.left - pad;
+        const top = rect.top - pad;
+        const w = rect.width + pad * 2;
+        const h = rect.height + pad * 2;
+        const right = left + w;
+        const bottom = top + h;
+
+        ctx.save();
+
+        // If Active: Draw Full Projection Laser Guidelines to Screen Edges (like in video!)
+        if (isActive) {
+          ctx.strokeStyle = 'rgba(255, 42, 133, 0.7)';
+          ctx.lineWidth = 1;
+          ctx.setLineDash([3, 3]);
+
+          // Top & Bottom horizontal extension laser lines
+          ctx.beginPath();
+          ctx.moveTo(0, top);
+          ctx.lineTo(width, top);
+          ctx.moveTo(0, bottom);
+          ctx.lineTo(width, bottom);
+          ctx.stroke();
+
+          // Left & Right vertical extension laser lines
+          ctx.strokeStyle = 'rgba(0, 240, 255, 0.7)';
+          ctx.beginPath();
+          ctx.moveTo(left, 0);
+          ctx.lineTo(left, height);
+          ctx.moveTo(right, 0);
+          ctx.lineTo(right, height);
+          ctx.stroke();
+
+          ctx.setLineDash([]);
+        }
+
+        // Bounding Box Outline
+        ctx.strokeStyle = isActive ? '#00f0ff' : 'rgba(0, 240, 255, 0.3)';
+        ctx.lineWidth = isActive ? 2 : 1;
+        ctx.strokeRect(left, top, w, h);
+
+        // Corner Target Crosshairs '+'
+        const crossSize = isActive ? 8 : 5;
+        ctx.strokeStyle = isActive ? '#ff2a85' : 'rgba(255, 42, 133, 0.6)';
+        ctx.lineWidth = 1.5;
+
+        // Top-Left Crosshair
+        ctx.beginPath();
+        ctx.moveTo(left - crossSize, top);
+        ctx.lineTo(left + crossSize, top);
+        ctx.moveTo(left, top - crossSize);
+        ctx.lineTo(left, top + crossSize);
+        ctx.stroke();
+
+        // Top-Right Crosshair
+        ctx.beginPath();
+        ctx.moveTo(right - crossSize, top);
+        ctx.lineTo(right + crossSize, top);
+        ctx.moveTo(right, top - crossSize);
+        ctx.lineTo(right, top + crossSize);
+        ctx.stroke();
+
+        // Bottom-Left Crosshair
+        ctx.beginPath();
+        ctx.moveTo(left - crossSize, bottom);
+        ctx.lineTo(left + crossSize, bottom);
+        ctx.moveTo(left, bottom - crossSize);
+        ctx.lineTo(left, bottom + crossSize);
+        ctx.stroke();
+
+        // Bottom-Right Crosshair
+        ctx.beginPath();
+        ctx.moveTo(right - crossSize, bottom);
+        ctx.lineTo(right + crossSize, bottom);
+        ctx.moveTo(right, bottom - crossSize);
+        ctx.lineTo(right, bottom + crossSize);
+        ctx.stroke();
+
+        // Dimension Tag Badge sitting on Top Border
+        ctx.font = '10px monospace';
+        const tagText = `${label} [${Math.round(rect.width)}x${Math.round(rect.height)}]`;
+        const tagWidth = ctx.measureText(tagText).width + 12;
+
+        ctx.fillStyle = isActive ? '#ff2a85' : 'rgba(5, 7, 14, 0.9)';
+        ctx.fillRect(left + 6, top - 14, tagWidth, 14);
+        ctx.strokeStyle = isActive ? '#00f0ff' : 'rgba(0, 240, 255, 0.5)';
+        ctx.strokeRect(left + 6, top - 14, tagWidth, 14);
+
+        ctx.fillStyle = isActive ? '#ffffff' : '#00f0ff';
+        ctx.fillText(tagText, left + 12, top - 3);
+
+        ctx.restore();
+      });
+
+      // 6. INTERACTIVE MOUSE LASER POINTER
+      if (mouse.active) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 4]);
+
         ctx.beginPath();
         ctx.moveTo(0, mouse.y);
         ctx.lineTo(width, mouse.y);
-        ctx.stroke();
-
-        // Y Axis Line
-        ctx.beginPath();
         ctx.moveTo(mouse.x, 0);
         ctx.lineTo(mouse.x, height);
         ctx.stroke();
 
         ctx.setLineDash([]);
-
-        // Target Cross Circle at Mouse Position
-        ctx.strokeStyle = '#00f0ff';
+        ctx.strokeStyle = mouse.down ? '#ff2a85' : '#00f0ff';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
-        ctx.arc(mouse.x, mouse.y, 18, 0, Math.PI * 2);
+        ctx.arc(mouse.x, mouse.y, 16, 0, Math.PI * 2);
         ctx.stroke();
 
-        // Target Center Dot
-        ctx.fillStyle = mouse.down ? '#ff2a85' : '#00f0ff';
+        ctx.fillStyle = '#ffea00';
         ctx.beginPath();
         ctx.arc(mouse.x, mouse.y, 3, 0, Math.PI * 2);
         ctx.fill();
 
-        // Cursor Coordinate Label Box
-        ctx.font = '10px monospace';
-        ctx.fillStyle = 'rgba(5, 7, 14, 0.85)';
-        ctx.fillRect(mouse.x + 12, mouse.y - 22, 110, 18);
-        ctx.strokeStyle = '#00f0ff';
-        ctx.strokeRect(mouse.x + 12, mouse.y - 22, 110, 18);
-        ctx.fillStyle = '#00f0ff';
-        ctx.fillText(`X:${Math.round(mouse.x)} Y:${Math.round(mouse.y)}`, mouse.x + 18, mouse.y - 10);
-
         ctx.restore();
       }
 
-      // CAD Ruler Margins along top & left
-      if (showRulers) {
-        ctx.fillStyle = 'rgba(0, 240, 255, 0.4)';
-        ctx.font = '9px monospace';
-
-        // Top Horizontal Ruler
-        for (let x = 0; x < width; x += 100) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, 8);
-          ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
-          ctx.stroke();
-          ctx.fillText(`${x}`, x + 3, 14);
-        }
-
-        // Left Vertical Ruler
-        for (let y = 0; y < height; y += 100) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(8, y);
-          ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
-          ctx.stroke();
-          ctx.fillText(`${y}`, 10, y + 8);
-        }
-      }
-
-      // BOIDS FLOCKING ALGORITHM (Reynolds' Rules: Separation, Alignment, Cohesion)
-      const visualRange = 90;
-      const protectedRange = 25;
-      const centeringFactor = 0.0006;
+      // 7. REYNOLDS' BOIDS FLOCKING ALGORITHM (110 Particle Swarms)
+      const visualRange = 100;
+      const protectedRange = 28;
+      const centeringFactor = 0.0007;
       const avoidFactor = 0.05;
-      const matchingFactor = 0.04;
-      const maxSpeed = 4.8;
-      const minSpeed = 1.8;
+      const matchingFactor = 0.045;
+      const maxSpeed = 5.2;
+      const minSpeed = 2.0;
 
       boids.forEach((boid, idx) => {
         let xposAvg = 0;
@@ -296,14 +444,14 @@ export const CyberSpaceCanvas: React.FC = () => {
         boid.vx += closeDx * avoidFactor;
         boid.vy += closeDy * avoidFactor;
 
-        // Mouse gravity steering
+        // Mouse gravity pull / scatter
         if (mouse.active) {
           const mdx = mouse.x - boid.x;
           const mdy = mouse.y - boid.y;
           const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
 
-          if (mdist < 220 && mdist > 10) {
-            const pull = mouse.down ? 0.35 : 0.08;
+          if (mdist < 240 && mdist > 10) {
+            const pull = mouse.down ? 0.45 : 0.12;
             boid.vx += (mdx / mdist) * pull;
             boid.vy += (mdy / mdist) * pull;
           }
@@ -319,23 +467,22 @@ export const CyberSpaceCanvas: React.FC = () => {
           boid.vy = (boid.vy / speed) * minSpeed;
         }
 
-        // Update position
         boid.x += boid.vx;
         boid.y += boid.vy;
         boid.angle = Math.atan2(boid.vy, boid.vx);
 
-        // Wrap boundaries smoothly
-        const margin = 40;
+        // Screen wrap
+        const margin = 50;
         if (boid.x < -margin) boid.x = width + margin;
         if (boid.x > width + margin) boid.x = -margin;
         if (boid.y < -margin) boid.y = height + margin;
         if (boid.y > height + margin) boid.y = -margin;
 
-        // Save position for motion trail
+        // Save trail
         boid.trail.push({ x: boid.x, y: boid.y });
-        if (boid.trail.length > 5) boid.trail.shift();
+        if (boid.trail.length > 6) boid.trail.shift();
 
-        // Render Boid Trail
+        // Draw Boid Trail
         ctx.save();
         if (boid.trail.length > 1) {
           ctx.beginPath();
@@ -344,15 +491,15 @@ export const CyberSpaceCanvas: React.FC = () => {
             ctx.lineTo(boid.trail[t].x, boid.trail[t].y);
           }
           ctx.strokeStyle = boid.color;
-          ctx.globalAlpha = 0.25;
-          ctx.lineWidth = 1;
+          ctx.globalAlpha = 0.35;
+          ctx.lineWidth = 1.5;
           ctx.stroke();
         }
 
-        // Render Boid Shape
+        // Draw Boid Particle
         ctx.translate(boid.x, boid.y);
         ctx.rotate(boid.angle);
-        ctx.globalAlpha = 0.95;
+        ctx.globalAlpha = 1.0;
         ctx.fillStyle = boid.color;
         ctx.strokeStyle = boid.color;
 
@@ -361,15 +508,14 @@ export const CyberSpaceCanvas: React.FC = () => {
         if (boid.type === 'arrow') {
           // Sharp Chevron Triangular Arrowhead
           ctx.beginPath();
-          ctx.moveTo(s * 1.4, 0);
-          ctx.lineTo(-s, -s * 0.85);
+          ctx.moveTo(s * 1.5, 0);
+          ctx.lineTo(-s, -s * 0.9);
           ctx.lineTo(-s * 0.3, 0);
-          ctx.lineTo(-s, s * 0.85);
+          ctx.lineTo(-s, s * 0.9);
           ctx.closePath();
           ctx.fill();
         } else if (boid.type === 'cross') {
-          // Plus / Target Cross
-          ctx.lineWidth = 1.8;
+          ctx.lineWidth = 2;
           ctx.beginPath();
           ctx.moveTo(-s, 0);
           ctx.lineTo(s, 0);
@@ -377,14 +523,12 @@ export const CyberSpaceCanvas: React.FC = () => {
           ctx.lineTo(0, s);
           ctx.stroke();
         } else if (boid.type === 'dash') {
-          // Alignment Dash
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 2.5;
           ctx.beginPath();
           ctx.moveTo(-s, 0);
           ctx.lineTo(s, 0);
           ctx.stroke();
         } else if (boid.type === 'triangle') {
-          // Wireframe Delta
           ctx.lineWidth = 1.5;
           ctx.beginPath();
           ctx.moveTo(s, 0);
@@ -393,11 +537,9 @@ export const CyberSpaceCanvas: React.FC = () => {
           ctx.closePath();
           ctx.stroke();
         } else if (boid.type === 'square') {
-          // Blueprint Micro Square
           ctx.lineWidth = 1.5;
           ctx.strokeRect(-s / 2, -s / 2, s, s);
         } else {
-          // Glowing Solid Particle Dot
           ctx.beginPath();
           ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
           ctx.fill();
@@ -406,10 +548,10 @@ export const CyberSpaceCanvas: React.FC = () => {
         ctx.restore();
       });
 
-      animationFrameId = requestAnimationFrame(render);
+      animationFrameId = requestAnimationFrame(draw);
     };
 
-    render();
+    draw();
 
     return () => {
       window.removeEventListener('resize', handleResize);
@@ -419,55 +561,66 @@ export const CyberSpaceCanvas: React.FC = () => {
       window.removeEventListener('mouseup', handleMouseUp);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [showLaserGrid, showRulers]);
+  }, [autoScan, showRulers]);
 
   return (
     <>
-      {/* Fullscreen Interactive Canvas */}
+      {/* Interactive Fullscreen Canvas Overlay (pointer-events-none so users can click links underneath) */}
       <canvas
         ref={canvasRef}
-        className="fixed inset-0 w-full h-full pointer-events-none z-0"
+        className="fixed inset-0 w-full h-full pointer-events-none z-20"
       />
 
-      {/* Top Banner Tag */}
-      <div className="fixed top-3 left-3 z-50 pointer-events-none hidden sm:block">
-        <div className="bg-slate-950/90 border border-cyan-500/50 text-cyan-300 font-mono text-[10px] sm:text-xs px-3 py-1.5 rounded-lg shadow-[0_0_20px_rgba(0,240,255,0.3)] backdrop-blur-md flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-          <span className="font-extrabold text-white">IGNITRON CYBER SPACE</span>
-          <span className="text-pink-400 font-semibold">// MATRIX v3.0</span>
+      {/* Opening Matrix Swarm Explosion Intro Banner */}
+      {showIntro && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-2xl animate-out fade-out duration-700 pointer-events-none font-mono">
+          <div className="text-center p-8 border-2 border-cyan-400 rounded-3xl bg-slate-950 shadow-[0_0_80px_rgba(0,240,255,0.6)] max-w-md mx-4">
+            <div className="w-12 h-12 rounded-full border-2 border-dashed border-pink-500 animate-spin mx-auto mb-4 flex items-center justify-center text-cyan-400 font-bold text-lg">
+              +
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-widest mb-2 drop-shadow-[0_0_20px_rgba(0,240,255,1)]">
+              IGNITRON CYBER SPACE
+            </h2>
+            <p className="text-cyan-400 text-xs font-bold tracking-widest uppercase mb-4">
+              // INITIALIZING MATRIX BOID SWARM & CAD SCANNER
+            </p>
+            <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-cyan-500/50">
+              <div className="bg-gradient-to-r from-cyan-400 via-pink-500 to-yellow-400 h-full w-full animate-[pulse_1s_infinite]" />
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Floating Bottom Telemetry Control HUD Bar (matching ignitron.dev/space) */}
+      {/* Floating Bottom Telemetry Control HUD Bar (matching ignitron.dev/space video) */}
       <div className="fixed bottom-3 inset-x-3 sm:inset-x-auto sm:right-4 z-50 pointer-events-auto flex items-center justify-between sm:justify-end gap-2 font-mono text-[10px] text-cyan-300">
-        <div className="bg-slate-950/90 border border-cyan-500/40 px-3 py-1.5 rounded-xl backdrop-blur-xl shadow-[0_0_25px_rgba(0,240,255,0.2)] flex items-center gap-3">
+        <div className="bg-slate-950/95 border-2 border-cyan-400/60 px-3.5 py-1.5 rounded-2xl backdrop-blur-2xl shadow-[0_0_30px_rgba(0,240,255,0.3)] flex items-center gap-3">
           <span className="flex items-center gap-1.5 font-bold text-white">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
             32 AGENTS
           </span>
           <span className="text-cyan-400/60">•</span>
           <span className="font-bold text-cyan-300">{fps} FPS</span>
           <span className="text-cyan-400/60">•</span>
-          <span className="font-bold text-pink-400">{boidCount} BOIDS</span>
+          <span className="font-bold text-pink-400">110 BOIDS</span>
 
           <button
             type="button"
-            onClick={() => setShowLaserGrid(!showLaserGrid)}
-            className={`px-2 py-0.5 rounded border text-[9px] font-bold transition-all cursor-pointer ${
-              showLaserGrid
-                ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200'
+            onClick={() => setAutoScan(!autoScan)}
+            className={`px-2.5 py-1 rounded-lg border text-[9px] font-bold transition-all cursor-pointer ${
+              autoScan
+                ? 'bg-cyan-400 text-slate-950 border-cyan-300 shadow-[0_0_10px_rgba(0,240,255,0.5)]'
                 : 'bg-slate-900 border-slate-700 text-slate-500'
             }`}
           >
-            [SCAN: {showLaserGrid ? 'ON' : 'OFF'}]
+            [AUTO-SCANNER: {autoScan ? 'ON' : 'OFF'}]
           </button>
 
           <button
             type="button"
             onClick={() => setShowRulers(!showRulers)}
-            className={`px-2 py-0.5 rounded border text-[9px] font-bold transition-all cursor-pointer hidden sm:block ${
+            className={`px-2.5 py-1 rounded-lg border text-[9px] font-bold transition-all cursor-pointer hidden sm:block ${
               showRulers
-                ? 'bg-pink-500/20 border-pink-400 text-pink-200'
+                ? 'bg-pink-500 text-white border-pink-400 shadow-[0_0_10px_rgba(255,42,133,0.5)]'
                 : 'bg-slate-900 border-slate-700 text-slate-500'
             }`}
           >

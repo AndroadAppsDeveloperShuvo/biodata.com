@@ -45,22 +45,37 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
       <div className="relative z-10 w-full mb-6 font-mono">
         {/* Top CAD Blueprint Navigation Header */}
         <div className="flex justify-between items-center w-full mb-3 text-xs text-cyan-400">
-          <span className="bg-slate-950/90 border border-cyan-500/40 px-3 py-1 rounded-lg backdrop-blur-md shadow-[0_0_15px_rgba(0,240,255,0.2)]">
+          <span
+            data-cad-id="cad_sys_header"
+            data-cad-label="[01] SYS.NODE"
+            data-cad-color="#00f0ff"
+            className="bg-slate-950/90 border border-cyan-400/60 px-3 py-1 rounded-lg backdrop-blur-md shadow-[0_0_15px_rgba(0,240,255,0.2)]"
+          >
             <span className="text-pink-400 font-bold">[01]</span> SYS.NODE // VER_3.0
           </span>
-          <span className="inline-flex items-center gap-1.5 py-1 px-3 rounded-lg text-xs font-bold bg-cyan-500/10 border border-cyan-400/50 text-cyan-300 backdrop-blur-md shadow-[0_0_20px_rgba(0,240,255,0.35)]">
+          <span
+            data-cad-id="cad_status_header"
+            data-cad-label="[ONLINE]"
+            data-cad-color="#00ff66"
+            className="inline-flex items-center gap-1.5 py-1 px-3 rounded-lg text-xs font-bold bg-cyan-500/10 border border-cyan-400/60 text-cyan-300 backdrop-blur-md shadow-[0_0_20px_rgba(0,240,255,0.35)]"
+          >
             <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
             [ SYSTEM ONLINE ]
           </span>
         </div>
 
         {/* Blueprint Wireframe Box Container */}
-        <div className="relative bg-slate-950/95 border-2 border-cyan-400/80 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-[0_0_50px_rgba(0,240,255,0.3)] overflow-hidden group">
+        <div
+          data-cad-id="cad_profile_card"
+          data-cad-label="[PROFILE_CARD]"
+          data-cad-color="#ff2a85"
+          className="relative bg-slate-950/80 border-2 border-cyan-400/80 rounded-3xl p-6 sm:p-8 flex flex-col items-center text-center shadow-[0_0_60px_rgba(0,240,255,0.35)] overflow-hidden group backdrop-blur-xl"
+        >
           {/* Corner CAD Target Crosshairs '+' */}
-          <div className="absolute top-2 left-3 text-cyan-400/80 text-sm font-black">+</div>
-          <div className="absolute top-2 right-3 text-cyan-400/80 text-sm font-black">+</div>
-          <div className="absolute bottom-2 left-3 text-cyan-400/80 text-sm font-black">+</div>
-          <div className="absolute bottom-2 right-3 text-cyan-400/80 text-sm font-black">+</div>
+          <div className="absolute top-2 left-3 text-cyan-400 text-sm font-black">+</div>
+          <div className="absolute top-2 right-3 text-cyan-400 text-sm font-black">+</div>
+          <div className="absolute bottom-2 left-3 text-cyan-400 text-sm font-black">+</div>
+          <div className="absolute bottom-2 right-3 text-cyan-400 text-sm font-black">+</div>
 
           {/* Top Label Tag */}
           <div className="absolute top-0 right-8 bg-cyan-400 text-slate-950 text-[9px] font-extrabold px-2 py-0.5 rounded-b font-mono tracking-widest">
@@ -80,7 +95,12 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           )}
 
           {/* Avatar Container with Rotating Bracket Reticle Target Box */}
-          <div className="relative my-4 flex justify-center items-center w-32 h-32 sm:w-36 sm:h-36 group cursor-pointer z-10">
+          <div
+            data-cad-id="cad_avatar_target"
+            data-cad-label="[AVATAR_TARGET]"
+            data-cad-color="#ffea00"
+            className="relative my-4 flex justify-center items-center w-32 h-32 sm:w-36 sm:h-36 group cursor-pointer z-10"
+          >
             {/* Outer Rotating Target Frame */}
             <div className="absolute inset-0 border-2 border-dashed border-cyan-400/80 rounded-2xl animate-[spin_12s_linear_infinite] shadow-[0_0_25px_rgba(0,240,255,0.4)]" />
             <div className="absolute -inset-2 border border-pink-500/50 rounded-2xl animate-pulse" />
@@ -103,7 +123,12 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
 
           {/* Name & Title */}
           {profile.name && (
-            <h1 className="relative z-10 text-2xl sm:text-3xl font-black tracking-wider mb-1 flex items-center gap-2 drop-shadow-[0_0_15px_rgba(0,240,255,0.9)] text-white">
+            <h1
+              data-cad-id="cad_name_node"
+              data-cad-label="[NAME_NODE]"
+              data-cad-color="#00f0ff"
+              className="relative z-10 text-2xl sm:text-3xl font-black tracking-wider mb-1 flex items-center gap-2 drop-shadow-[0_0_15px_rgba(0,240,255,0.9)] text-white"
+            >
               <span className="text-pink-500 animate-pulse">&gt;</span>
               {profile.name}
               <span className="text-pink-500 animate-pulse">&lt;</span>
@@ -111,7 +136,12 @@ export const BioHeader: React.FC<Props> = ({ profile, badges, themeStyle }) => {
           )}
 
           {profile.handle && (
-            <p className="relative z-10 text-cyan-300 font-mono text-xs sm:text-sm mb-3 bg-slate-900/90 px-3.5 py-1 rounded-lg border border-cyan-500/50 shadow-inner tracking-widest flex items-center gap-2">
+            <p
+              data-cad-id="cad_handle_node"
+              data-cad-label="[HANDLE_ID]"
+              data-cad-color="#a855f7"
+              className="relative z-10 text-cyan-300 font-mono text-xs sm:text-sm mb-3 bg-slate-900/90 px-3.5 py-1 rounded-lg border border-cyan-500/50 shadow-inner tracking-widest flex items-center gap-2"
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
               {profile.handle}
             </p>

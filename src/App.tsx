@@ -308,7 +308,9 @@ export default function App() {
       <main
         data-theme={themeStyle}
         className={`w-full max-w-[620px] rounded-3xl transition-all duration-500 relative z-10 ${
-          isShuvoxLightning
+          isIgnitronSpace
+            ? 'bg-transparent text-cyan-50 border-0 shadow-none'
+            : isShuvoxLightning
             ? 'bg-transparent text-white border-0 shadow-none'
             : isUltraGlass
             ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]'

@@ -36,6 +36,9 @@ export const HighlightsServices: React.FC<Props> = ({ services, themeStyle }) =>
           return (
             <div
               key={service.id}
+              data-cad-id={`cad_service_${service.id}`}
+              data-cad-label={`[MEDIA_0${index + 1}]`}
+              data-cad-color={index % 2 === 0 ? '#ffea00' : '#00ff66'}
               className={`service-card group relative rounded-2xl overflow-hidden aspect-square border transition-all duration-300 ease-out hover:scale-[1.03] active:scale-[0.98] ${
                 isIgnitronSpace
                   ? 'bg-slate-950 border-2 border-cyan-400/70 hover:border-pink-500 shadow-[0_0_20px_rgba(0,240,255,0.25)] hover:shadow-[0_0_30px_rgba(255,42,133,0.4)]'

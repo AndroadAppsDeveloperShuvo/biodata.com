@@ -84,9 +84,12 @@ export const SocialLinks: React.FC<Props> = ({ links, themeStyle }) => {
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
+            data-cad-id={`cad_social_${link.id}`}
+            data-cad-label={`[LINK_0${idx + 1}]`}
+            data-cad-color={idx % 2 === 0 ? '#00f0ff' : '#ff2a85'}
             className={`social-link-card group relative w-full flex items-center justify-between p-3.5 rounded-2xl transition-all duration-300 ease-out hover:scale-[1.025] hover:-translate-y-0.5 active:scale-[0.98] ${
               isIgnitronSpace
-                ? 'bg-slate-950/90 border-2 border-cyan-400/60 hover:border-pink-500 shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_35px_rgba(255,42,133,0.4)] font-mono overflow-hidden'
+                ? 'bg-slate-950/90 border-2 border-cyan-400/70 hover:border-pink-500 shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_35px_rgba(255,42,133,0.4)] font-mono overflow-hidden'
                 : 'bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 shadow-xl neon-border'
             }`}
           >

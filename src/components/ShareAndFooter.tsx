@@ -46,6 +46,9 @@ export const ShareAndFooter: React.FC<Props> = ({ onShowToast, themeStyle }) => 
       {/* Share Box */}
       <div
         id="btnShareProfile"
+        data-cad-id="cad_share_card"
+        data-cad-label="[SHARE_NODE]"
+        data-cad-color="#ff2a85"
         className={`share-profile-card p-4 rounded-2xl flex items-center justify-between gap-3 shadow-md ${
           isIgnitronSpace
             ? 'bg-slate-950 border-2 border-cyan-400/70 shadow-[0_0_25px_rgba(0,240,255,0.2)] relative overflow-hidden'

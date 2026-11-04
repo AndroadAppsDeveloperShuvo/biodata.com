@@ -15,6 +15,9 @@ export const DirectContact: React.FC<Props> = ({ contact, themeStyle }) => {
   return (
     <div
       id="contactContainer"
+      data-cad-id="cad_direct_contact"
+      data-cad-label="[MSG_DISPATCH]"
+      data-cad-color="#00f0ff"
       className={`contact-card p-4 rounded-2xl space-y-3 shadow-lg ${
         isIgnitronSpace
           ? 'bg-slate-950 border-2 border-cyan-400/70 shadow-[0_0_25px_rgba(0,240,255,0.2)] font-mono relative overflow-hidden'
