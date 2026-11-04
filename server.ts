@@ -2617,9 +2617,10 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
   // Admin Add Client Command: /newclient or /addclient
   if (trimmed === '/newclient' || trimmed === '/addclient') {
     userStates[chatId] = { step: 'admin_wizard_chatid', tempData: {} };
-    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি (ধাপ ১/৫): ক্লায়েন্টের Telegram Chat ID</b>\n\n`
+    const msg = `👤 <b>নতুন ক্লায়েন্ট তৈরি: ক্লায়েন্টের Telegram Chat ID দিন</b>\n\n`
       + `ক্লাইন্টের টেলিগ্রাম চ্যাট আইডিটি লিখে পাঠান:\n`
       + `<i>(ক্লাইন্ট টেলিগ্রামে @userinfobot এ স্টার্ট দিলে তার Chat ID পেয়ে যাবে, যেমন: <code>1234567890</code>)</i>\n\n`
+      + `💡 <i>নোট: ক্লায়েন্ট একাউন্ট তৈরি হওয়া মাত্রই ৩টি PWA ফাইল ক্লায়েন্টের ইনবক্সে পৌঁছে যাবে এবং ক্লায়েন্ট নিজের বট থেকে নাম, লোগো, থিম ও সার্ভিস কন্ট্রোল করতে পারবে।</i>\n\n`
       + `🔙 বাতিল করতে /cancel লিখুন`;
     await sendTelegramMessage(chatId, msg);
     return msg;
@@ -2634,7 +2635,7 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     return msg;
   }
 
-  // Admin Wizard Step 1: Client Chat ID
+  // Admin Wizard Step 1: Client Chat ID -> Instant Creation!
   if (state.step === 'admin_wizard_chatid') {
     const rawId = trimmed.replace(/[^0-9-]/g, '');
     if (!rawId || rawId.length < 5) {
@@ -2648,88 +2649,15 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
       await sendTelegramMessage(chatId, err);
       return err;
     }
-    state.tempData = { clientChatId: rawId };
-    state.step = 'admin_wizard_appname';
-    userStates[chatId] = state;
-    const msg = `🏷️ <b>ধাপ ২/৫: সাইট / অ্যাপের পূর্ণ নাম (App Full Name)</b>\n\n`
-      + `ক্লাইন্টের বায়ো সাইটের নাম কী হবে? লিখে পাঠান:\n`
-      + `<i>(যেমন: <code>Md Tamim - Bio Data</code> বা <code>শাকিব - অফিসিয়াল বায়ো</code>)</i>\n\n`
-      + `🔙 বাতিল করতে /cancel লিখুন`;
-    await sendTelegramMessage(chatId, msg);
-    return msg;
-  }
 
-  // Admin Wizard Step 2: App Name
-  if (state.step === 'admin_wizard_appname') {
-    const appName = trimmed;
-    if (!appName || appName.length < 2) {
-      const err = `❌ অনুগ্রহ করে একটি নাম লিখুন (যেমন: <code>Md Tamim - Bio Data</code>)`;
-      await sendTelegramMessage(chatId, err);
-      return err;
-    }
-    state.tempData = { ...state.tempData, appName };
-    state.step = 'admin_wizard_shortname';
-    userStates[chatId] = state;
-    const msg = `📱 <b>ধাপ ৩/৫: PWA শর্ট নেম (Short Name for Home Screen)</b>\n\n`
-      + `মোবাইলের হোমস্ক্রিনে শর্টকাট আইকনের নিচে যে সংক্ষিপ্ত নাম দেখাবে তা লিখুন (১২ অক্ষরের মধ্যে):\n`
-      + `<i>(যেমন: <code>TAMIM BIO</code> বা <code>SHAKIB APP</code>)</i>\n\n`
-      + `🔙 বাতিল করতে /cancel লিখুন`;
-    await sendTelegramMessage(chatId, msg);
-    return msg;
-  }
+    const tempData = {
+      clientChatId: rawId,
+      appName: 'Bio Data Website',
+      shortName: 'BIO DATA',
+      logoUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10'
+    };
 
-  // Admin Wizard Step 3: Short Name
-  if (state.step === 'admin_wizard_shortname') {
-    const shortName = (trimmed || 'BIO DATA').substring(0, 15).toUpperCase();
-    state.tempData = { ...state.tempData, shortName };
-    state.step = 'admin_wizard_logo';
-    userStates[chatId] = state;
-    const msg = `🖼️ <b>ধাপ ৪/৫: PWA অ্যাপ লোগো (App Icon / Logo)</b>\n\n`
-      + `📷 ক্লাইন্টের পছন্দের লোগো বা ছবি সরাসরি এই চ্যাটে <b>ফটো হিসেবে সেন্ড করুন</b> অথবা ছবির <b>সরাসরি ওয়েব লিংক (Image URL)</b> লিখে পাঠান:\n\n`
-      + `🔙 বাতিল করতে /cancel লিখুন`;
-    await sendTelegramMessage(chatId, msg);
-    return msg;
-  }
-
-  // Admin Wizard Step 4: Logo -> Advance to Step 5: Layout
-  if (state.step === 'admin_wizard_logo') {
-    const logoUrl = trimmed.startsWith('http')
-      ? trimmed
-      : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10';
-    
-    state.tempData = { ...state.tempData, logoUrl };
-    state.step = 'admin_wizard_layout';
-    userStates[chatId] = state;
-
-    const msg = `🎨 <b>ধাপ ৫/৫: ক্লায়েন্ট ওয়েবসাইটের লেআউট স্টাইল নির্বাচন করুন</b>\n\n`
-      + `ক্লায়েন্টের সাইটে কোন বিভাগটি আগে দেখাবে নির্বাচন করুন:\n\n`
-      + `১️⃣ <b>সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল - রিকমেন্ডেড ⭐)</b>\n`
-      + `• সাজানোর ক্রম: প্রোফাইল ➔ <b>সোশ্যাল মিডিয়া</b> ➔ সার্ভিস ও টুলস ➔ যোগাযোগ\n`
-      + `<i>(আপনার নিজস্ব মূল বায়ো সাইটে যেমন আছে)</i>\n\n`
-      + `২️⃣ <b>সার্ভিস ও টুলস আগে (সার্ভিস স্টাইল)</b>\n`
-      + `• সাজানোর ক্রম: প্রোফাইল ➔ <b>সার্ভিস ও টুলস</b> ➔ সোশ্যাল লিঙ্ক ➔ যোগাযোগ\n\n`
-      + `👇 নিচের বাটনে চাপুন অথবা <b>1</b> বা <b>2</b> লিখে পাঠান:\n`
-      + `<i>(নোট: পরবর্তীতে বট থেকে যেকোনো সময় এক ক্লিকে লেআউট পরিবর্তন করা যাবে)</i>`;
-
-    await sendTelegramMessage(chatId, msg, {
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: '⭐ ১. সোশ্যাল আগে (Admin UI Style)', callback_data: 'admin_layout:social_first' }],
-          [{ text: '🛠️ ২. সার্ভিস আগে (Services First)', callback_data: 'admin_layout:services_first' }],
-          [{ text: '❌ বাতিল (/cancel)', callback_data: 'cmd_menu' }]
-        ]
-      }
-    });
-    return msg;
-  }
-
-  // Admin Wizard Step 5: Layout Style & Finish
-  if (state.step === 'admin_wizard_layout') {
-    let layoutStyle: 'social_first' | 'services_first' = 'social_first';
-    if (trimmed === '2' || trimmed.includes('সার্ভিস') || trimmed.toLowerCase().includes('service')) {
-      layoutStyle = 'services_first';
-    }
-    return await completeClientCreation(chatId, state.tempData, layoutStyle, senderName);
+    return await completeClientCreation(chatId, tempData, 'social_first', senderName);
   }
 
   // Admin Broadcast Message Step
