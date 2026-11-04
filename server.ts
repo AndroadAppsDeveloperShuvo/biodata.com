@@ -1675,37 +1675,31 @@ function getClientThemeOnlyKeyboard(client: ClientRecord) {
       ],
       [
         {
-          text: (theme === 'ignitron_wireframe' ? '🟢 ' : '⚪ ') + '🚀 ১. ইগনিট্রন ওয়্যারফ্রেম ৩ডি (Systems That Hold Up - Wireframe Boids)',
-          callback_data: `cl_set_theme:ignitron_wireframe:${client.id}`
-        }
-      ],
-      [
-        {
-          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ২. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)',
+          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber 3D)',
           callback_data: `cl_set_theme:shuvox_lightning_cyber:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৩. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
           callback_data: `cl_set_theme:ultra_cyber_glass:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৩. অর্গানিক নেচার (Organic Nature)',
           callback_data: `cl_set_theme:organic_nature:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
           callback_data: `cl_set_theme:bold_flat_popart:${client.id}`
         }
       ],
       [
         {
-          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৬. ক্লাসিক ডার্ক (Classic Dark)',
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)',
           callback_data: `cl_set_theme:classic_dark:${client.id}`
         }
       ],
@@ -1727,37 +1721,31 @@ function getAdminThemeMenuKeyboard() {
       ],
       [
         {
-          text: (theme === 'ignitron_wireframe' ? '🟢 ' : '⚪ ') + '🚀 ১. ইগনিট্রন ওয়্যারফ্রেম ৩ডি (Systems That Hold Up - Wireframe Boids)',
-          callback_data: `admin_set_theme:ignitron_wireframe`
-        }
-      ],
-      [
-        {
-          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ২. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)',
+          text: (theme === 'shuvox_lightning_cyber' ? '🟢 ' : '⚪ ') + '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber 3D)',
           callback_data: `admin_set_theme:shuvox_lightning_cyber`
         }
       ],
       [
         {
-          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ৩. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
+          text: (theme === 'ultra_cyber_glass' ? '🟢 ' : '⚪ ') + '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)',
           callback_data: `admin_set_theme:ultra_cyber_glass`
         }
       ],
       [
         {
-          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৪. অর্গানিক নেচার (Organic Nature)',
+          text: (theme === 'organic_nature' ? '🟢 ' : '⚪ ') + '🍃 ৩. অর্গানিক নেচার (Organic Nature)',
           callback_data: `admin_set_theme:organic_nature`
         }
       ],
       [
         {
-          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
+          text: (theme === 'bold_flat_popart' ? '🟢 ' : '⚪ ') + '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)',
           callback_data: `admin_set_theme:bold_flat_popart`
         }
       ],
       [
         {
-          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৬. ক্লাসিক ডার্ক (Classic Dark)',
+          text: (theme === 'classic_dark' ? '🟢 ' : '⚪ ') + '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)',
           callback_data: `admin_set_theme:classic_dark`
         }
       ],
@@ -2043,17 +2031,15 @@ async function sendClientLayoutOnlyMenu(chatId: string, client: ClientRecord) {
 async function sendClientThemeOnlyMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
   const theme = client.themeStyle || 'shuvox_lightning_cyber';
-  const themeName = theme === 'ignitron_wireframe'
-    ? '🚀 ১. ইগনিট্রন ওয়্যারফ্রেম ৩ডি (Systems That Hold Up - Wireframe Boids)'
-    : theme === 'shuvox_lightning_cyber'
-    ? '⚡ ২. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber)'
+  const themeName = theme === 'shuvox_lightning_cyber'
+    ? '⚡ ১. শোভক্স লাইটনিং সাইবার ৩ডি (SHUVOX Lightning Cyber 3D)'
     : theme === 'ultra_cyber_glass'
-    ? '✨ ৩. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
+    ? '✨ ২. আল্ট্রা প্রিমিয়াম সাইবার গ্লাস (Ultra Cyber Glass 3D)'
     : theme === 'organic_nature'
-    ? '🍃 ৪. অর্গানিক নেচার (Organic Nature)'
+    ? '🍃 ৩. অর্গানিক নেচার (Organic Nature)'
     : theme === 'bold_flat_popart'
-    ? '💥 ৫. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
-    : '🕶️ ৬. ক্লাসিক ডার্ক (Classic Dark)';
+    ? '💥 ৪. বোল্ড ফ্ল্যাট পপ আর্ট (Bold Flat Pop Art)'
+    : '🕶️ ৫. ক্লাসিক ডার্ক (Classic Dark)';
 
   const text = `🎨 <b>ওয়েবসাইট কালার থিম নির্বাচন:</b>\n\n`
     + `বর্তমান থিম: <b>${themeName}</b>\n\n`
