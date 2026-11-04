@@ -158,6 +158,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   const cleanFbBase = firebaseDbUrl.replace(/\/+$/, '');
   const clientEndpoint = `${cleanFbBase}/clients/${client.id}.json`;
   const initialDataJson = JSON.stringify({
+    appName: client.appName,
+    shortName: client.shortName,
+    logoUrl: client.logoUrl,
     profile: client.profile,
     badges: client.badges,
     services: client.services,
@@ -182,13 +185,13 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <link rel="icon" type="image/png" href="${escapeHtml(client.logoUrl)}">
   
   <!-- PWA & Mobile Web App Meta -->
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#09090b">
+  <link rel="manifest" href="manifest.json" id="manifestLink">
+  <meta name="theme-color" content="#09090b" id="themeColorMeta">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="${escapeHtml(client.shortName)}">
-  <link rel="apple-touch-icon" href="${escapeHtml(client.logoUrl)}">
+  <meta name="apple-mobile-web-app-title" content="${escapeHtml(client.shortName)}" id="appleTitleMeta">
+  <link rel="apple-touch-icon" href="${escapeHtml(client.logoUrl)}" id="appleTouchIcon">
   
   <!-- Google Fonts & Tailwind CDN -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1123,9 +1126,9 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <!-- PWA Floating Install Prompt Bar -->
   <div id="pwaFloatingBanner" class="fixed bottom-4 inset-x-4 max-w-md mx-auto bg-zinc-900/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-3 transform translate-y-28 opacity-0 transition-all duration-300 z-40">
     <div class="flex items-center gap-3 min-w-0">
-      <img src="${escapeHtml(client.logoUrl)}" alt="Logo" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-800" />
+      <img id="pwaInstallIcon" src="${escapeHtml(client.logoUrl)}" alt="Logo" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-800" />
       <div class="min-w-0">
-        <h4 class="text-xs font-bold text-white truncate">${escapeHtml(client.shortName)} অ্যাপ</h4>
+        <h4 id="pwaInstallTitle" class="text-xs font-bold text-white truncate">${escapeHtml(client.shortName)} অ্যাপ</h4>
         <p class="text-[10px] text-zinc-400 truncate">হোমস্ক্রিনে ইনস্টল করে সহজে ওপেন করুন</p>
       </div>
     </div>
@@ -1516,15 +1519,72 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       }
     }
 
+    function updateDynamicPwaMetadata(data) {
+      if (!data) return;
+      var appName = data.appName || (data.profile ? data.profile.name : '') || 'Bio Data';
+      var shortName = data.shortName || appName;
+      var logoUrl = data.logoUrl || (data.profile ? data.profile.avatarUrl : '') || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10';
+
+      document.title = appName;
+
+      var ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', appName);
+
+      var ogImage = document.querySelector('meta[property="og:image"]');
+      if (ogImage) ogImage.setAttribute('content', logoUrl);
+
+      var favIcon = document.querySelector('link[rel="icon"]');
+      if (favIcon) favIcon.setAttribute('href', logoUrl);
+
+      var appleIcon = document.querySelector('link[rel="apple-touch-icon"]') || document.getElementById('appleTouchIcon');
+      if (appleIcon) appleIcon.setAttribute('href', logoUrl);
+
+      var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]') || document.getElementById('appleTitleMeta');
+      if (appleTitle) appleTitle.setAttribute('content', shortName);
+
+      try {
+        var dynamicManifest = {
+          id: "./",
+          name: appName,
+          short_name: shortName,
+          description: "Official Social Bio & Developer Portfolio of " + (data.profile ? data.profile.name : appName),
+          start_url: "./",
+          scope: "./",
+          display: "standalone",
+          orientation: "portrait",
+          background_color: "#09090b",
+          theme_color: "#09090b",
+          icons: [
+            { src: logoUrl, sizes: "192x192", type: "image/png", purpose: "any" },
+            { src: logoUrl, sizes: "512x512", type: "image/png", purpose: "any" },
+            { src: logoUrl, sizes: "512x512", type: "image/png", purpose: "maskable" }
+          ]
+        };
+        var manifestBlob = new Blob([JSON.stringify(dynamicManifest, null, 2)], { type: 'application/json' });
+        var manifestUrl = URL.createObjectURL(manifestBlob);
+        var manifestLink = document.getElementById('manifestLink') || document.querySelector('link[rel="manifest"]');
+        if (manifestLink) {
+          manifestLink.setAttribute('href', manifestUrl);
+        }
+      } catch (e) {}
+
+      var pwaBannerTitle = document.getElementById('pwaInstallTitle');
+      if (pwaBannerTitle) pwaBannerTitle.textContent = shortName + ' অ্যাপ';
+
+      var pwaBannerIcon = document.getElementById('pwaInstallIcon');
+      if (pwaBannerIcon && logoUrl) pwaBannerIcon.src = logoUrl;
+    }
+
     var lastUpdatedSig = '';
     function applyAllData(data, shouldToast) {
       if (!data || typeof data !== 'object') return;
       var currentLayout = data.layoutStyle || 'social_first';
       var currentTheme = data.themeStyle || 'classic_dark';
-      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + currentTheme + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
+      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + currentTheme + '_' + (data.appName || '') + '_' + (data.shortName || '') + '_' + (data.logoUrl || '') + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
       if (sig === lastUpdatedSig) return;
       lastUpdatedSig = sig;
 
+      updateDynamicPwaMetadata(data);
       applyLayoutStyle(currentLayout);
       applyThemeStyle(currentTheme);
       if (data.profile) renderProfile(data.profile);
@@ -1538,7 +1598,7 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       } catch (e) {}
 
       if (shouldToast) {
-        showToast('🔄 তথ্য লাইভ আপডেট হয়েছে!');
+        showToast('🔄 PWA & বায়ো তথ্য লাইভ সিঙ্ক হয়েছে!');
       }
     }
 

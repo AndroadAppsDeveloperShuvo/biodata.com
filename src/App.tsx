@@ -9,6 +9,7 @@ import { SocialLinks } from './components/SocialLinks';
 import { HighlightsServices } from './components/HighlightsServices';
 import { DirectContact } from './components/DirectContact';
 import { ShareAndFooter } from './components/ShareAndFooter';
+import { CyberSpaceCanvas } from './components/CyberSpaceCanvas';
 import { HighlightService, SocialLink, ContactInfo, PersonalInfo, Badge } from './types/bio';
 
 const CACHE_KEY = 'shuvo_bio_live_cache_v2';
@@ -186,6 +187,7 @@ export default function App() {
     }
   }, [themeStyle]);
 
+  const isIgnitronSpace = themeStyle === 'ignitron_cyber_space';
   const isShuvoxLightning = themeStyle === 'shuvox_lightning_cyber';
   const isGlass = themeStyle === 'dark_glassmorphism';
   const isCyber = themeStyle === 'cyberpunk_neon';
@@ -197,7 +199,9 @@ export default function App() {
     <div
       data-theme={themeStyle}
       className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
-      isShuvoxLightning
+      isIgnitronSpace
+        ? 'bg-[#010309] text-cyan-50'
+        : isShuvoxLightning
         ? 'bg-[#020617] text-white'
         : isPopArt
         ? 'bg-[#facc15] text-black'
@@ -211,6 +215,9 @@ export default function App() {
         ? 'bg-[#09090b] text-slate-100'
         : 'bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-slate-100'
     }`}>
+
+      {/* Cyber Space Arrowhead Swarm Canvas Theme */}
+      {isIgnitronSpace && <CyberSpaceCanvas />}
       
       {/* SHUVOX Lightning Cyber 3D Background Orbs & Lightning Bolts */}
       {isShuvoxLightning && (
@@ -301,7 +308,9 @@ export default function App() {
       <main
         data-theme={themeStyle}
         className={`w-full max-w-[620px] rounded-3xl transition-all duration-500 relative z-10 ${
-          isShuvoxLightning
+          isIgnitronSpace
+            ? 'bg-transparent text-cyan-50 border-0 shadow-none'
+            : isShuvoxLightning
             ? 'bg-transparent text-white border-0 shadow-none'
             : isUltraGlass
             ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]'
@@ -322,13 +331,13 @@ export default function App() {
         {/* Content Sections */}
         <div className="px-4 sm:px-5 pb-6 space-y-5">
           {/* Social Links List (Live Controlled via Telegram Bot) */}
-          <SocialLinks links={socialLinks} />
+          <SocialLinks links={socialLinks} themeStyle={themeStyle} />
 
           {/* Highlights & Services Grid (Live Controlled via Telegram Bot) */}
-          <HighlightsServices services={services} />
+          <HighlightsServices services={services} themeStyle={themeStyle} />
 
           {/* Direct Contact Buttons (Live Controlled via Telegram Bot) */}
-          <DirectContact contact={contact} />
+          <DirectContact contact={contact} themeStyle={themeStyle} />
 
           {/* Skeleton placeholder during first visit if waiting for initial network load */}
           {isLoading && !profile && (
@@ -339,7 +348,7 @@ export default function App() {
           )}
 
           {/* QR Code & Share Box */}
-          <ShareAndFooter onShowToast={showToast} />
+          <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
         </div>
       </main>
     </div>

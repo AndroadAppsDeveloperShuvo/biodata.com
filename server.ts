@@ -597,8 +597,12 @@ async function syncToFirebase() {
   const baseUrl = cfg.url.replace(/\/+$/, '');
   try {
     const themeCfg = getThemeConfig();
+    const profile = getProfileInfo();
     const payload = {
-      profile: getProfileInfo(),
+      appName: profile.name || "Shuvo Official - Bio Data",
+      shortName: "BIO DATA",
+      logoUrl: profile.avatarUrl || "pwa-512x512.png",
+      profile: profile,
       badges: getBadges(),
       services: getServices(),
       socialLinks: getSocialLinks(),
