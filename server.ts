@@ -1479,8 +1479,11 @@ async function sendClientFilesToTelegram(chatId: string | number, client: Client
     `✅ <b>ব্যাস কাজ শেষ!</b> ক্লায়েন্ট তার টেলিগ্রাম চ্যাট আইডি (<code>${client.chatId}</code>) থেকে আমাদের বটকে <code>/start</code> পাঠালেই নিজের ওয়েবসাইট সাথে সাথে লাইভ কন্ট্রোল করতে পারবে।\n\n` +
     `💡 <i>নোট: GitHub-এ ফাইল আপলোড করার পর GitHub Pages তৈরি হতে ১-২ মিনিট সময় লাগে এবং ব্রাউজারে পুরাতন ফাইল ক্যাশ (Cache) থেকে যেতে পারে। নতুন পরিবর্তন দেখতে ব্রাউজারের ক্যাশ ক্লিয়ার করুন বা Incognito মোডে ওপেন করুন।</i>`;
 
+  const isClientTarget = String(chatId).trim() === String(client.chatId).trim();
+  const keyboard = isClientTarget ? getClientMainMenuKeyboard(client) : getAdminSingleClientKeyboard(client.id);
+
   await sendTelegramMessage(chatId, instructions, {
-    reply_markup: getAdminSingleClientKeyboard(client.id)
+    reply_markup: keyboard
   });
 }
 
@@ -1513,10 +1516,6 @@ function getAdminClientsListKeyboard() {
 function getAdminSingleClientKeyboard(clientId: string) {
   return {
     inline_keyboard: [
-      [
-        { text: '📱 PWA অ্যাপ কনফিগারেশন', callback_data: `admin_pwa_menu:${clientId}` },
-        { text: '🎨 লেআউট & থিম', callback_data: `cl_layout_theme_main:${clientId}` }
-      ],
       [
         { text: '📁 ৩টি ফাইল পুনরায় পাঠান', callback_data: `admin_dl_client:${clientId}` }
       ],
@@ -2542,10 +2541,22 @@ async function completeClientCreation(
     + `• 📱 <b>PWA শর্ট নেম:</b> <code>${escapeHtml(newClient.shortName)}</code>\n`
     + `• 🎨 <b>লেআউট স্টাইল:</b> <b>${layoutName}</b>\n`
     + `• 🆔 <b>ক্লায়েন্ট আইডি:</b> <code>${newClient.id}</code>\n\n`
-    + `📦 <b>এখন ক্লাইন্টের ৩টি কনফিগারেশন ফাইল তৈরি হচ্ছে এবং নিচে পাঠানো হচ্ছে...</b>`
+    + `📦 <b>স্বয়ংক্রিয়ভাবে ৩টি PWA ফাইল এবং স্বাগতম নির্দেশিকা ক্লায়েন্টের টেলিগ্রাম ইনবক্সে (Chat ID: <code>${newClient.chatId}</code>) পাঠায় দেওয়া হয়েছে!</b>`,
+    { reply_markup: getAdminSingleClientKeyboard(newClient.id) }
   );
 
-  await sendClientFilesToTelegram(chatId, newClient);
+  if (newClient.chatId && String(newClient.chatId).trim() !== String(chatId).trim()) {
+    await sendTelegramMessage(
+      newClient.chatId,
+      `👋 <b>আসসালামু আলাইকুম ${escapeHtml(newClient.appName)}!</b>\n\n` +
+      `আপনার প্রফেশনাল বায়ো ডাটা এবং PWA ওয়েবসাইট তৈরি সম্পন্ন হয়েছে! 🚀\n\n` +
+      `নিচে আপনার সাইটের ৩টি প্রয়োজনীয় ফাইল (<code>index.html</code>, <code>manifest.json</code>, <code>sw.js</code>) পাঠানো হচ্ছে:`
+    );
+    await sendClientFilesToTelegram(newClient.chatId, newClient);
+  } else {
+    await sendClientFilesToTelegram(chatId, newClient);
+  }
+
   return 'Client created successfully';
 }
 
