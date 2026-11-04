@@ -1005,7 +1005,10 @@ interface TelegramUserState {
     | 'client_contact_wa'
     | 'client_contact_wa_msg'
     | 'client_contact_email'
-    | 'client_contact_note';
+    | 'client_contact_note'
+    | 'client_pwa_appname'
+    | 'client_pwa_shortname'
+    | 'client_pwa_logo';
   tempData?: any;
 }
 
@@ -1507,6 +1510,7 @@ function getAdminSingleClientKeyboard(clientId: string) {
   return {
     inline_keyboard: [
       [
+        { text: '📱 PWA অ্যাপ কনফিগারেশন', callback_data: `admin_pwa_menu:${clientId}` },
         { text: '🎨 লেআউট & থিম', callback_data: `cl_layout_theme_main:${clientId}` }
       ],
       [
@@ -1517,6 +1521,46 @@ function getAdminSingleClientKeyboard(clientId: string) {
       ],
       [
         { text: '🔙 ক্লায়েন্ট তালিকায় ফিরুন', callback_data: 'admin_menu_clients' }
+      ]
+    ]
+  };
+}
+
+function getAdminPwaMenuKeyboard(clientId: string) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '✏️ অ্যাপের নাম পরিবর্তন', callback_data: `admin_pwa_edit_appname:${clientId}` },
+        { text: '🏷️ শর্ট নেম পরিবর্তন', callback_data: `admin_pwa_edit_shortname:${clientId}` }
+      ],
+      [
+        { text: '🖼️ লোগো/আইকন পরিবর্তন', callback_data: `admin_pwa_edit_logo:${clientId}` }
+      ],
+      [
+        { text: '📦 ৩টি ফাইল সেন্ড করুন', callback_data: `admin_dl_client:${clientId}` }
+      ],
+      [
+        { text: '🔙 ক্লায়েন্ট প্রোফাইল', callback_data: `admin_view_client:${clientId}` }
+      ]
+    ]
+  };
+}
+
+function getClientPwaMenuKeyboard(client: ClientRecord) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '✏️ অ্যাপের নাম পরিবর্তন', callback_data: `cl_pwa_edit_appname:${client.id}` },
+        { text: '🏷️ শর্ট নেম পরিবর্তন', callback_data: `cl_pwa_edit_shortname:${client.id}` }
+      ],
+      [
+        { text: '🖼️ অ্যাপের লোগো/আইকন পরিবর্তন', callback_data: `cl_pwa_edit_logo:${client.id}` }
+      ],
+      [
+        { text: '📦 ৩টি PWA ফাইল ডাউনলোড করুন', callback_data: `cl_pwa_download_files:${client.id}` }
+      ],
+      [
+        { text: '🔙 প্রধান মেন্যু', callback_data: `cl_menu_main:${client.id}` }
       ]
     ]
   };
@@ -1545,6 +1589,7 @@ function getClientMainMenuKeyboard(client: ClientRecord) {
         { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: `cl_preview:${client.id}` }
       ],
       [
+        { text: '📱 PWA অ্যাপ সেটিংস & ৩টি ফাইল', callback_data: `cl_pwa_menu:${client.id}` },
         { text: '🎨 লেআউট & থিম', callback_data: `cl_layout_theme_main:${client.id}` }
       ]
     ]
@@ -1946,6 +1991,17 @@ async function sendClientContactMenu(chatId: string, client: ClientRecord) {
   return msg;
 }
 
+async function sendClientPwaMenu(chatId: string, client: ClientRecord) {
+  userStates[chatId] = { step: 'idle' };
+  const text = `📱 <b>PWA অ্যাপ কনফিগারেশন & ৩টি ফাইল:</b>\n\n`
+    + `• 📛 <b>অ্যাপের নাম (App Name):</b> <b>${escapeHtml(client.appName)}</b>\n`
+    + `• 🏷️ <b>শর্ট নেম (Short Name):</b> <code>${escapeHtml(client.shortName)}</code>\n`
+    + `• 🖼️ <b>লোগো/আইকন URL:</b> <a href="${escapeHtml(client.logoUrl)}">দেখুন</a>\n\n`
+    + `<i>যেকোনো সময় চাইলে এখান থেকে PWA নাম ও লোগো পরিবর্তন করে নতুন ৩টি ফাইল (index.html, manifest.json, sw.js) পুনরায় ডাউনলোড করতে পারবেন!</i>`;
+  await sendTelegramMessage(chatId, text, { reply_markup: getClientPwaMenuKeyboard(client) });
+  return text;
+}
+
 async function sendClientLayoutThemeMainMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
   const text = `🎨 <b>লেআউট & থিম কন্ট্রোল প্যানেল:</b>\n\n`
@@ -2068,9 +2124,36 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
     if (trimmed === '/preview' || trimmed.includes('প্রিভিউ') || trimmed.includes('সামারি') || trimmed.toLowerCase().includes('preview') || trimmed.toLowerCase().includes('summary')) {
       return await sendClientFullSummary(chatId, client);
     }
+    if (trimmed === '/pwa' || trimmed.toLowerCase().includes('pwa') || trimmed.includes('পিডব্লিউএ') || trimmed.includes('ফাইল')) {
+      return await sendClientPwaMenu(chatId, client);
+    }
   }
 
   // Quick Client Shortcuts
+  if (trimmed.startsWith('/appname ')) {
+    const newAppName = trimmed.substring(9).trim();
+    updateClientData(client.id, c => { c.appName = newAppName; });
+    const reply = `✅ <b>PWA অ্যাপের নাম সফলভাবে আপডেট হয়েছে!</b>\n\n📛 <b>${escapeHtml(newAppName)}</b>\n\n<i>নতুন ৩টি ফাইল পেতে নিচের বাটন চাপুন:</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientPwaMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/shortname ')) {
+    const newShortName = trimmed.substring(11).trim();
+    updateClientData(client.id, c => { c.shortName = newShortName; });
+    const reply = `✅ <b>PWA শর্ট নেম সফলভাবে আপডেট হয়েছে!</b>\n\n🏷️ <code>${escapeHtml(newShortName)}</code>\n\n<i>নতুন ৩টি ফাইল পেতে নিচের বাটন চাপুন:</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientPwaMenuKeyboard(client) });
+    return reply;
+  }
+
+  if (trimmed.startsWith('/applogo ')) {
+    const newLogo = trimmed.substring(9).trim();
+    updateClientData(client.id, c => { c.logoUrl = newLogo; });
+    const reply = `✅ <b>PWA অ্যাপ লোগো সফলভাবে আপডেট হয়েছে!</b>\n\n🖼️ <a href="${escapeHtml(newLogo)}">নতুন লোগো দেখুন</a>\n\n<i>নতুন ৩টি ফাইল পেতে নিচের বাটন চাপুন:</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientPwaMenuKeyboard(client) });
+    return reply;
+  }
+
   if (trimmed.startsWith('/name ')) {
     const newName = trimmed.substring(6).trim();
     updateClientData(client.id, c => { c.profile.name = newName; });
@@ -2117,6 +2200,34 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
     updateClientData(client.id, c => { c.contact.email = newEmail; });
     const reply = `✅ <b>ইমেইল সফলভাবে আপডেট হয়েছে!</b>\n\n✉️ <code>${escapeHtml(newEmail)}</code>`;
     await sendTelegramMessage(chatId, reply, { reply_markup: getClientMainMenuKeyboard(client) });
+    return reply;
+  }
+
+  // Client PWA Steps Handlers
+  if (state.step === 'client_pwa_appname') {
+    updateClientData(activeClient.id, c => { c.appName = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(activeClient.id) || activeClient;
+    const reply = `✅ <b>PWA অ্যাপের নাম সফলভাবে পরিবর্তন হয়েছে!</b>\n\n📛 <b>${escapeHtml(trimmed)}</b>\n\n<i>নিচের বাটন চেপে নতুন ৩টি ফাইল ডাউনলোড করতে পারেন:</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientPwaMenuKeyboard(updated) });
+    return reply;
+  }
+
+  if (state.step === 'client_pwa_shortname') {
+    updateClientData(activeClient.id, c => { c.shortName = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(activeClient.id) || activeClient;
+    const reply = `✅ <b>PWA শর্ট নেম সফলভাবে আপডেট হয়েছে!</b>\n\n🏷️ <code>${escapeHtml(trimmed)}</code>\n\n<i>নিচের বাটন চেপে নতুন ৩টি ফাইল ডাউনলোড করতে পারেন:</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientPwaMenuKeyboard(updated) });
+    return reply;
+  }
+
+  if (state.step === 'client_pwa_logo') {
+    updateClientData(activeClient.id, c => { c.logoUrl = trimmed; });
+    userStates[chatId] = { step: 'idle' };
+    const updated = getClientById(activeClient.id) || activeClient;
+    const reply = `✅ <b>PWA অ্যাপের লোগো/আইকন সফলভাবে পরিবর্তন হয়েছে!</b>\n\n🖼️ <a href="${escapeHtml(trimmed)}">নতুন লোগো দেখুন</a>\n\n<i>নিচের বাটন চেপে নতুন ৩টি ফাইল ডাউনলোড করতে পারেন:</i>`;
+    await sendTelegramMessage(chatId, reply, { reply_markup: getClientPwaMenuKeyboard(updated) });
     return reply;
   }
 
@@ -3823,6 +3934,87 @@ async function handleCallbackQuery(cb: any) {
   // CLIENT INTERACTIVE CALLBACKS (cl_*)
   // ==========================================
 
+  // PWA Callbacks
+  if (data === 'cl_pwa_menu' || data === 'cl_pwa' || data.startsWith('cl_pwa_menu:') || data.startsWith('cl_pwa:')) {
+    const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
+    const client = resolveClientForChat(chatId, clientId);
+    if (client) {
+      await sendClientPwaMenu(chatId, client);
+    }
+    return;
+  }
+
+  if (data.startsWith('cl_pwa_edit_appname:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = resolveClientForChat(chatId, clientId);
+    userStates[chatId] = { step: 'client_pwa_appname', tempData: { clientId: client?.id } };
+    await sendTelegramMessage(chatId, `📛 <b>নতুন PWA অ্যাপের নাম (App Name) লিখে পাঠান:</b>\n<i>(যেমন: "SHUVO BIO DATA")</i>`);
+    return;
+  }
+
+  if (data.startsWith('cl_pwa_edit_shortname:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = resolveClientForChat(chatId, clientId);
+    userStates[chatId] = { step: 'client_pwa_shortname', tempData: { clientId: client?.id } };
+    await sendTelegramMessage(chatId, `🏷️ <b>নতুন PWA শর্ট নেম (Short Name) লিখে পাঠান:</b>\n<i>(মোবাইল হোমস্ক্রিনের আইকনের নিচে যে নাম দেখাবে, যেমন: "SHUVO BIO")</i>`);
+    return;
+  }
+
+  if (data.startsWith('cl_pwa_edit_logo:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = resolveClientForChat(chatId, clientId);
+    userStates[chatId] = { step: 'client_pwa_logo', tempData: { clientId: client?.id } };
+    await sendTelegramMessage(chatId, `🖼️ <b>নতুন PWA অ্যাপ লোগো/আইকন:</b>\n\n📷 আপনার পছন্দের লোগোটি সরাসরি <b>ফটো হিসেবে সেন্ড করুন</b> অথবা লোগোর <b>সরাসরি ওয়েব লিঙ্ক (URL)</b> লিখে পাঠান:`);
+    return;
+  }
+
+  if (data.startsWith('cl_pwa_download_files:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = resolveClientForChat(chatId, clientId);
+    if (client) {
+      await sendClientFilesToTelegram(chatId, client);
+    }
+    return;
+  }
+
+  if (data.startsWith('admin_pwa_menu:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = getClientById(clientId) || getClients().find(c => c.id === clientId);
+    if (client) {
+      const text = `📱 <b>'${escapeHtml(client.appName)}' এর PWA অ্যাপ কনফিগারেশন:</b>\n\n`
+        + `• 📛 <b>অ্যাপের নাম:</b> <b>${escapeHtml(client.appName)}</b>\n`
+        + `• 🏷️ <b>শর্ট নেম:</b> <code>${escapeHtml(client.shortName)}</code>\n`
+        + `• 🖼️ <b>লোগো:</b> <a href="${escapeHtml(client.logoUrl)}">দেখুন</a>\n\n`
+        + `<i>তথ্য পরিবর্তন করতে বা নতুন ৩টি ফাইল পাঠাতে নিচে নির্বাচন করুন:</i>`;
+      await sendTelegramMessage(chatId, text, { reply_markup: getAdminPwaMenuKeyboard(client.id) });
+    }
+    return;
+  }
+
+  if (data.startsWith('admin_pwa_edit_appname:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = getClientById(clientId);
+    userStates[chatId] = { step: 'client_pwa_appname', tempData: { clientId: client?.id } };
+    await sendTelegramMessage(chatId, `📛 <b>'${escapeHtml(client?.appName || '')}' এর জন্য নতুন PWA অ্যাপের নাম লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('admin_pwa_edit_shortname:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = getClientById(clientId);
+    userStates[chatId] = { step: 'client_pwa_shortname', tempData: { clientId: client?.id } };
+    await sendTelegramMessage(chatId, `🏷️ <b>'${escapeHtml(client?.appName || '')}' এর জন্য নতুন PWA শর্ট নেম লিখে পাঠান:</b>`);
+    return;
+  }
+
+  if (data.startsWith('admin_pwa_edit_logo:')) {
+    const clientId = data.split(':').slice(-1)[0];
+    const client = getClientById(clientId);
+    userStates[chatId] = { step: 'client_pwa_logo', tempData: { clientId: client?.id } };
+    await sendTelegramMessage(chatId, `🖼️ <b>'${escapeHtml(client?.appName || '')}' এর জন্য নতুন লোগো ছবি সেন্ড করুন বা URL লিখুন:</b>`);
+    return;
+  }
+
   // 1. Client Main Menu
   if (data === 'cl_menu_main' || data === 'cl_menu' || data.startsWith('cl_menu:') || data.startsWith('cl_menu_main')) {
     const clientId = data.includes(':') ? data.split(':').slice(-1)[0] : '';
@@ -4802,7 +4994,8 @@ app.post('/api/telegram-webhook', async (req, res) => {
             state.step === 'client_srv_image' ||
             state.step === 'client_srv_edit_val' ||
             state.step === 'client_prof_avatar' ||
-            state.step === 'client_prof_banner'
+            state.step === 'client_prof_banner' ||
+            state.step === 'client_pwa_logo'
           )) {
             const bestPhoto = msg.photo[msg.photo.length - 1];
             const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
@@ -4926,7 +5119,8 @@ async function startTelegramPolling() {
                     state.step === 'client_srv_image' ||
                     state.step === 'client_srv_edit_val' ||
                     state.step === 'client_prof_avatar' ||
-                    state.step === 'client_prof_banner'
+                    state.step === 'client_prof_banner' ||
+                    state.step === 'client_pwa_logo'
                   )) {
                     const bestPhoto = msg.photo[msg.photo.length - 1];
                     const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
