@@ -4,9 +4,12 @@ import { SocialLink } from '../types/bio';
 
 interface Props {
   links: SocialLink[];
+  themeStyle?: string;
 }
 
-export const SocialLinks: React.FC<Props> = ({ links }) => {
+export const SocialLinks: React.FC<Props> = ({ links, themeStyle }) => {
+  const isIgnitronSpace = themeStyle === 'ignitron_cyber_space';
+
   const getIcon = (platform: string) => {
     switch (platform) {
       case 'facebook':
@@ -65,39 +68,64 @@ export const SocialLinks: React.FC<Props> = ({ links }) => {
 
   return (
     <div className="space-y-2.5">
-      <div className="flex items-center justify-between px-1">
-        <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-          সোশ্যাল লিংক ও প্ল্যাটফর্ম
+      <div className="flex items-center justify-between px-1 font-mono">
+        <h2 className={`text-xs font-bold uppercase tracking-wider ${
+          isIgnitronSpace ? 'text-cyan-300 font-mono' : 'text-slate-400'
+        }`}>
+          {isIgnitronSpace ? '[02] SOCIAL_PROFILES // CONNECT_HUBS' : 'সোশ্যাল লিংক ও প্ল্যাটফর্ম'}
         </h2>
-        <span className="text-[10px] text-cyan-400/80 font-mono">Official Links</span>
+        <span className="text-[10px] text-cyan-400 font-mono">[SYS_LINKS]</span>
       </div>
 
-      <div className="space-y-2">
-        {links.filter(l => l.enabled).map((link) => (
+      <div className="space-y-2.5">
+        {links.filter(l => l.enabled).map((link, idx) => (
           <a
             key={link.id}
             href={link.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="social-link-card group w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 transition-all duration-300 ease-out hover:scale-[1.025] hover:-translate-y-0.5 hover:shadow-xl neon-border active:scale-[0.98]"
+            className={`social-link-card group relative w-full flex items-center justify-between p-3.5 rounded-2xl transition-all duration-300 ease-out hover:scale-[1.025] hover:-translate-y-0.5 active:scale-[0.98] ${
+              isIgnitronSpace
+                ? 'bg-slate-950/90 border-2 border-cyan-400/60 hover:border-pink-500 shadow-[0_0_25px_rgba(0,240,255,0.2)] hover:shadow-[0_0_35px_rgba(255,42,133,0.4)] font-mono overflow-hidden'
+                : 'bg-zinc-900/90 border border-zinc-800/80 hover:border-zinc-700 shadow-xl neon-border'
+            }`}
           >
+            {isIgnitronSpace && (
+              <>
+                <div className="absolute top-1 left-2 text-cyan-400/60 text-[9px] font-bold">+</div>
+                <div className="absolute top-1 right-2 text-pink-400/80 text-[8px] font-bold">[NODE_0{idx + 1}]</div>
+              </>
+            )}
+
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform shadow-inner ${
+                isIgnitronSpace
+                  ? 'bg-slate-900 border border-cyan-400/50'
+                  : 'bg-slate-800/80 border border-slate-700/60'
+              }`}>
                 {getIcon(link.platform)}
               </div>
               <div className="min-w-0">
-                <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-cyan-300 transition-colors truncate">
+                <h3 className={`font-bold text-xs sm:text-sm transition-colors truncate ${
+                  isIgnitronSpace
+                    ? 'text-white group-hover:text-pink-400 font-mono tracking-wider'
+                    : 'text-white group-hover:text-cyan-300'
+                }`}>
                   {link.title}
                 </h3>
-                <p className="text-[11px] text-slate-400 truncate">
+                <p className="text-[11px] text-slate-400 truncate font-sans">
                   {link.subtitle}
                 </p>
               </div>
             </div>
 
             <div className="shrink-0 pl-2">
-              <span className="social-btn-badge inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-xl bg-white/10 group-hover:bg-cyan-500 group-hover:text-slate-950 text-white transition-all shadow-sm">
-                <span>{link.buttonText}</span>
+              <span className={`social-btn-badge inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-xl transition-all shadow-sm ${
+                isIgnitronSpace
+                  ? 'bg-cyan-400 text-slate-950 hover:bg-pink-500 hover:text-white font-mono tracking-wider'
+                  : 'bg-white/10 group-hover:bg-cyan-500 group-hover:text-slate-950 text-white'
+              }`}>
+                <span>{isIgnitronSpace ? `[ ${link.buttonText} ]` : link.buttonText}</span>
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
               </span>
             </div>
