@@ -47,18 +47,18 @@ export const NavigationDrawer: React.FC<Props> = ({
   ];
 
   return (
-    <header className="w-full max-w-[620px] mb-4 z-40 relative font-sans">
+    <header className="sticky top-2 w-full max-w-[620px] mb-4 z-40 font-sans">
       {/* Top Main App Header Bar */}
-      <div className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between transition-all duration-300 backdrop-blur-xl ${
+      <div className={`w-full px-4 py-3 rounded-2xl flex items-center justify-between transition-all duration-300 backdrop-blur-2xl shadow-2xl ${
         isPopArt
           ? 'bg-[#fef08a] border-2 border-black text-black shadow-[4px_4px_0px_0px_#000]'
           : isOrganic
-          ? 'bg-[#e2ece0]/90 border border-[#9cb09a] text-[#1e3323] shadow-md'
+          ? 'bg-[#e2ece0]/95 border border-[#9cb09a] text-[#1e3323] shadow-md'
           : isUltraGlass
-          ? 'bg-zinc-950/80 border border-cyan-500/30 text-white shadow-[0_0_20px_rgba(34,211,238,0.2)]'
+          ? 'bg-zinc-950/90 border border-cyan-500/40 text-white shadow-[0_0_25px_rgba(34,211,238,0.3)]'
           : isGlass
-          ? 'bg-white/80 border border-white/90 text-slate-900 shadow-md'
-          : 'bg-slate-900/85 border border-slate-800 text-white shadow-xl'
+          ? 'bg-white/90 border border-white/90 text-slate-900 shadow-md'
+          : 'bg-slate-900/90 border border-slate-700/80 text-white shadow-xl'
       }`}>
         {/* Left Avatar & Name Brand */}
         <div 
@@ -86,26 +86,41 @@ export const NavigationDrawer: React.FC<Props> = ({
         {/* Right Action Icons & 3-Dot Button */}
         <div className="flex items-center gap-2">
           {/* Layout Model Badge */}
-          <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-400">
-            <Layers className="w-3 h-3" />
-            {layoutStyle === 'app_drawer_3dot' ? '3-Dot App' : layoutStyle === 'bento_box_grid' ? 'Bento Grid' : layoutStyle === 'split_sidebar_grid' ? 'Split Grid' : 'Standard Bio'}
+          <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1 rounded-full ${
+            layoutStyle === 'app_drawer_3dot'
+              ? 'bg-cyan-500/20 border border-cyan-400 text-cyan-300 animate-pulse'
+              : 'bg-cyan-500/10 border border-cyan-400/30 text-cyan-400'
+          }`}>
+            <Layers className="w-3 h-3 text-cyan-400" />
+            {layoutStyle === 'app_drawer_3dot' ? '⋮ 3-Dot App' : layoutStyle === 'bento_box_grid' ? '🍱 Bento' : layoutStyle === 'split_sidebar_grid' ? '⚡ Split' : '📱 Standard'}
           </span>
 
-          {/* 3-Dot Menu Button (⋮) */}
+          {/* 3-Dot Menu Button (⋮) with Pulsing Glow Indicator */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle 3-Dot Menu"
-            className={`p-2 rounded-xl transition-all flex items-center justify-center ${
-              isPopArt
+            className={`relative p-2.5 rounded-xl transition-all flex items-center justify-center font-bold gap-1 ${
+              isOpen
+                ? 'bg-rose-500 text-white shadow-lg ring-2 ring-rose-400'
+                : layoutStyle === 'app_drawer_3dot'
+                ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_20px_rgba(34,211,238,0.5)] ring-2 ring-cyan-400 animate-pulse'
+                : isPopArt
                 ? 'bg-black text-white hover:bg-yellow-400 hover:text-black border border-black'
                 : isUltraGlass
-                ? 'bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/40 border border-cyan-400/40 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
+                ? 'bg-cyan-500/30 text-cyan-200 hover:bg-cyan-500/50 border border-cyan-400/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]'
                 : isGlass
                 ? 'bg-sky-100 text-sky-900 hover:bg-sky-200 border border-sky-300'
                 : 'bg-slate-800 text-cyan-300 hover:bg-slate-700 border border-slate-700'
             }`}
           >
-            {isOpen ? <X className="w-5 h-5" /> : <MoreVertical className="w-5 h-5" />}
+            {isOpen ? (
+              <X className="w-5 h-5" />
+            ) : (
+              <>
+                <MoreVertical className="w-5 h-5" />
+                <span className="text-[10px] hidden sm:inline-block font-mono">MENU</span>
+              </>
+            )}
           </button>
         </div>
       </div>

@@ -446,6 +446,22 @@ export default function App() {
               : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
           }`}
         >
+          {/* Active Tab Breadcrumb Notification Bar */}
+          {activeTab !== 'all' && (
+            <div className="mx-4 mt-4 p-3 rounded-2xl bg-cyan-500/10 border border-cyan-400/40 text-cyan-300 flex items-center justify-between text-xs font-semibold backdrop-blur-md animate-fadeIn shadow-lg">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
+                <span>📍 ফিল্টারড সেকশন: <strong className="text-white uppercase tracking-wider">{activeTab}</strong></span>
+              </div>
+              <button
+                onClick={() => setActiveTab('all')}
+                className="px-3 py-1 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 transition-all text-[11px] shadow"
+              >
+                সবগুলো দেখুন (Show All)
+              </button>
+            </div>
+          )}
+
           {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
           {(activeTab === 'all' || activeTab === 'bio') && (
             <div id="sec-header">
