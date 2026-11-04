@@ -40,7 +40,7 @@ export interface ClientRecord {
     telegramUsername: string;
     customNote: string;
   };
-  layoutStyle?: 'social_first' | 'services_first';
+  layoutStyle?: 'social_first' | 'services_first' | 'app_drawer_3dot' | 'split_sidebar_grid' | 'bento_box_grid' | string;
   themeStyle?: 'classic_dark' | 'dark_glassmorphism' | string;
 }
 

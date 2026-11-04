@@ -11,6 +11,7 @@ import { DirectContact } from './components/DirectContact';
 import { ShareAndFooter } from './components/ShareAndFooter';
 import { CyberSpaceCanvas } from './components/CyberSpaceCanvas';
 import { BoidsWireframeCanvas } from './components/BoidsWireframeCanvas';
+import { NavigationDrawer } from './components/NavigationDrawer';
 import { HighlightService, SocialLink, ContactInfo, PersonalInfo, Badge } from './types/bio';
 
 const CACHE_KEY = 'shuvo_bio_live_cache_v2';
@@ -23,6 +24,7 @@ interface CachedBioData {
   socialLinks?: SocialLink[];
   contact?: ContactInfo | null;
   themeStyle?: string;
+  layoutStyle?: string;
 }
 
 function getLocalCache(): CachedBioData | null {
@@ -57,6 +59,8 @@ export default function App() {
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
   const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
   const [themeStyle, setThemeStyle] = useState<string>(initialCache?.themeStyle || 'dark_glassmorphism');
+  const [layoutStyle, setLayoutStyle] = useState<string>(initialCache?.layoutStyle || 'social_first');
+  const [activeTab, setActiveTab] = useState<string>('all');
   const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
@@ -80,6 +84,9 @@ export default function App() {
     if (data.themeStyle) {
       setThemeStyle(data.themeStyle);
     }
+    if (data.layoutStyle) {
+      setLayoutStyle(data.layoutStyle);
+    }
     if (data.profile) {
       setProfile(data.profile);
     }
@@ -101,7 +108,8 @@ export default function App() {
       services: Array.isArray(data.services) ? data.services : undefined,
       socialLinks: Array.isArray(data.socialLinks) ? data.socialLinks : undefined,
       contact: data.contact,
-      themeStyle: data.themeStyle
+      themeStyle: data.themeStyle,
+      layoutStyle: data.layoutStyle
     });
     setIsLoading(false);
   }, []);
@@ -165,6 +173,9 @@ export default function App() {
           } else if (payload.type === 'theme_updated' && payload.data) {
             setThemeStyle(payload.data);
             setLocalCache({ themeStyle: payload.data });
+          } else if (payload.type === 'layout_updated' && payload.data) {
+            setLayoutStyle(payload.data);
+            setLocalCache({ layoutStyle: payload.data });
           }
         } catch (e) {
           console.error('Error parsing SSE event:', e);
@@ -311,53 +322,195 @@ export default function App() {
         <span>{toastMsg}</span>
       </div>
 
-      {/* Main Responsive Bio Container */}
-      <main
-        data-theme={themeStyle}
-        className={`w-full max-w-[620px] rounded-3xl transition-all duration-500 relative z-10 ${
-          isIgnitronSpace
-            ? 'bg-transparent text-cyan-50 border-0 shadow-none'
-            : isShuvoxLightning
-            ? 'bg-transparent text-white border-0 shadow-none'
-            : isUltraGlass
-            ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]'
-            : isPopArt
-            ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000]'
-            : isOrganic
-            ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
-            : isCyber
-            ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
-            : isGlass
-            ? 'bg-white/75 backdrop-blur-2xl border-2 border-white/90 shadow-[0_25px_60px_rgba(100,116,139,0.2)] text-slate-900'
-            : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
-        }`}
-      >
-        {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
-        <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
+      {/* Top App Bar & Navigation Drawer with 3-Dot Menu */}
+      <NavigationDrawer
+        profile={profile}
+        themeStyle={themeStyle}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        layoutStyle={layoutStyle}
+      />
 
-        {/* Content Sections */}
-        <div className="px-4 sm:px-5 pb-6 space-y-5">
-          {/* Social Links List (Live Controlled via Telegram Bot) */}
-          <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+      {/* Dynamic Layout Models Container */}
+      {layoutStyle === 'split_sidebar_grid' ? (
+        /* Model 3: Split Sidebar & Tabbed Grid */
+        <main
+          data-theme={themeStyle}
+          className="w-full max-w-5xl rounded-3xl transition-all duration-500 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
+        >
+          {/* Left Column: Sticky Profile Card */}
+          <div className={`md:col-span-5 md:sticky md:top-6 rounded-3xl overflow-hidden transition-all shadow-2xl ${
+            isUltraGlass
+              ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_40px_rgba(34,211,238,0.25)]'
+              : isPopArt
+              ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000]'
+              : isOrganic
+              ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323]'
+              : isGlass
+              ? 'bg-white/80 backdrop-blur-2xl border-2 border-white/90 text-slate-900'
+              : 'bg-slate-950/90 border border-slate-800'
+          }`}>
+            <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
+          </div>
 
-          {/* Highlights & Services Grid (Live Controlled via Telegram Bot) */}
-          <HighlightsServices services={services} themeStyle={themeStyle} />
-
-          {/* Direct Contact Buttons (Live Controlled via Telegram Bot) */}
-          <DirectContact contact={contact} themeStyle={themeStyle} />
-
-          {/* Skeleton placeholder during first visit if waiting for initial network load */}
-          {isLoading && !profile && (
-            <div className="space-y-3 py-4 animate-pulse">
-              <div className="h-10 bg-slate-900/80 rounded-xl border border-slate-800" />
-              <div className="h-28 bg-slate-900/80 rounded-xl border border-slate-800" />
+          {/* Right Column: Sections Panel */}
+          <div className="md:col-span-7 space-y-5">
+            {(activeTab === 'all' || activeTab === 'social') && (
+              <div id="sec-social">
+                <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+              </div>
+            )}
+            {(activeTab === 'all' || activeTab === 'services') && (
+              <div id="sec-services">
+                <HighlightsServices services={services} themeStyle={themeStyle} />
+              </div>
+            )}
+            {(activeTab === 'all' || activeTab === 'contact') && (
+              <div id="sec-contact">
+                <DirectContact contact={contact} themeStyle={themeStyle} />
+              </div>
+            )}
+            {(activeTab === 'all' || activeTab === 'share') && (
+              <div id="sec-share">
+                <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
+              </div>
+            )}
+          </div>
+        </main>
+      ) : layoutStyle === 'bento_box_grid' ? (
+        /* Model 4: Bento Box Cyber Matrix Grid */
+        <main
+          data-theme={themeStyle}
+          className="w-full max-w-[680px] rounded-3xl transition-all duration-500 relative z-10 space-y-4"
+        >
+          {/* Bento Box 1: Profile Card */}
+          {(activeTab === 'all' || activeTab === 'bio') && (
+            <div id="sec-header" className={`rounded-3xl transition-all overflow-hidden ${
+              isUltraGlass
+                ? 'glass-premium rounded-[2.5rem] border border-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.25)]'
+                : isPopArt
+                ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000]'
+                : isOrganic
+                ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323]'
+                : isGlass
+                ? 'bg-white/80 backdrop-blur-2xl border-2 border-white/90 text-slate-900'
+                : 'bg-slate-950/85 border border-slate-800'
+            }`}>
+              <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
             </div>
           )}
 
-          {/* QR Code & Share Box */}
-          <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
-        </div>
-      </main>
+          {/* Bento Grid Split Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {(activeTab === 'all' || activeTab === 'social') && (
+              <div id="sec-social" className="sm:col-span-2">
+                <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+              </div>
+            )}
+            {(activeTab === 'all' || activeTab === 'services') && (
+              <div id="sec-services" className="sm:col-span-2">
+                <HighlightsServices services={services} themeStyle={themeStyle} />
+              </div>
+            )}
+            {(activeTab === 'all' || activeTab === 'contact') && (
+              <div id="sec-contact" className="sm:col-span-2">
+                <DirectContact contact={contact} themeStyle={themeStyle} />
+              </div>
+            )}
+            {(activeTab === 'all' || activeTab === 'share') && (
+              <div id="sec-share" className="sm:col-span-2">
+                <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
+              </div>
+            )}
+          </div>
+        </main>
+      ) : (
+        /* Model 1 & 2 & 5: Standard Bio / 3-Dot App / Services First */
+        <main
+          data-theme={themeStyle}
+          className={`w-full max-w-[620px] rounded-3xl transition-all duration-500 relative z-10 ${
+            isIgnitronSpace
+              ? 'bg-transparent text-cyan-50 border-0 shadow-none'
+              : isShuvoxLightning
+              ? 'bg-transparent text-white border-0 shadow-none'
+              : isUltraGlass
+              ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_50px_rgba(34,211,238,0.2)]'
+              : isPopArt
+              ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000]'
+              : isOrganic
+              ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323] shadow-xl shadow-[#587256]/20'
+              : isCyber
+              ? 'bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_40px_rgba(34,211,238,0.4)]'
+              : isGlass
+              ? 'bg-white/75 backdrop-blur-2xl border-2 border-white/90 shadow-[0_25px_60px_rgba(100,116,139,0.2)] text-slate-900'
+              : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
+          }`}
+        >
+          {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
+          {(activeTab === 'all' || activeTab === 'bio') && (
+            <div id="sec-header">
+              <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
+            </div>
+          )}
+
+          {/* Content Sections */}
+          <div className="px-4 sm:px-5 pb-6 space-y-5">
+            {layoutStyle === 'services_first' ? (
+              <>
+                {/* Services Grid First */}
+                {(activeTab === 'all' || activeTab === 'services') && (
+                  <div id="sec-services">
+                    <HighlightsServices services={services} themeStyle={themeStyle} />
+                  </div>
+                )}
+                {/* Social Links Second */}
+                {(activeTab === 'all' || activeTab === 'social') && (
+                  <div id="sec-social">
+                    <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                {/* Social Links First */}
+                {(activeTab === 'all' || activeTab === 'social') && (
+                  <div id="sec-social">
+                    <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+                  </div>
+                )}
+                {/* Services Grid Second */}
+                {(activeTab === 'all' || activeTab === 'services') && (
+                  <div id="sec-services">
+                    <HighlightsServices services={services} themeStyle={themeStyle} />
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Direct Contact Buttons */}
+            {(activeTab === 'all' || activeTab === 'contact') && (
+              <div id="sec-contact">
+                <DirectContact contact={contact} themeStyle={themeStyle} />
+              </div>
+            )}
+
+            {/* Skeleton placeholder during first visit */}
+            {isLoading && !profile && (
+              <div className="space-y-3 py-4 animate-pulse">
+                <div className="h-10 bg-slate-900/80 rounded-xl border border-slate-800" />
+                <div className="h-28 bg-slate-900/80 rounded-xl border border-slate-800" />
+              </div>
+            )}
+
+            {/* QR Code & Share Box */}
+            {(activeTab === 'all' || activeTab === 'share') && (
+              <div id="sec-share">
+                <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
+              </div>
+            )}
+          </div>
+        </main>
+      )}
     </div>
   );
 }

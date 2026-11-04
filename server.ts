@@ -549,7 +549,7 @@ function createNewClient(
   appName: string,
   shortName: string,
   logoUrl: string,
-  layoutStyle: 'social_first' | 'services_first' = 'social_first'
+  layoutStyle: string = 'social_first'
 ): ClientRecord {
   const id = 'c_' + Date.now();
   const name = appName.replace(/[-|•].*$/, '').trim() || 'My Bio';
@@ -1640,21 +1640,39 @@ function getClientLayoutThemeSubMenuKeyboard(client: ClientRecord) {
 }
 
 function getClientLayoutOnlyKeyboard(client: ClientRecord) {
-  const isServicesFirst = client.layoutStyle === 'services_first';
+  const current = client.layoutStyle || 'social_first';
   return {
     inline_keyboard: [
       [
-        { text: '📐 --- লেআউট সাজানো (Section Order) ---', callback_data: `cl_noop` }
+        { text: '📐 --- ওয়েবসাইটের সেকশন লেআউট মডেল ---', callback_data: `cl_noop` }
       ],
       [
         {
-          text: (isServicesFirst ? '⚪ ' : '🟢 ') + '১. সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)',
+          text: (current === 'social_first' ? '🟢 ' : '⚪ ') + '📱 ১. ক্লাসিক সিঙ্গেল পেজ (Social First)',
           callback_data: `cl_set_layout:social_first:${client.id}`
         }
       ],
       [
         {
-          text: (isServicesFirst ? '🟢 ' : '⚪ ') + '২. সার্ভিস ও টুলস আগে (সার্ভিস স্টাইল)',
+          text: (current === 'app_drawer_3dot' ? '🟢 ' : '⚪ ') + '🗂️ ২. থ্রি-ডট নেভিগেশন & ড্রয়ার অ্যাপ (3-Dot App Tabs)',
+          callback_data: `cl_set_layout:app_drawer_3dot:${client.id}`
+        }
+      ],
+      [
+        {
+          text: (current === 'split_sidebar_grid' ? '🟢 ' : '⚪ ') + '⚡ ৩. সাইডবার & স্প্লিট হিরো গ্রিড (Split Sidebar)',
+          callback_data: `cl_set_layout:split_sidebar_grid:${client.id}`
+        }
+      ],
+      [
+        {
+          text: (current === 'bento_box_grid' ? '🟢 ' : '⚪ ') + '🍱 ৪. বেন্টো বক্স সাইবার কার্ডস (Bento Grid Matrix)',
+          callback_data: `cl_set_layout:bento_box_grid:${client.id}`
+        }
+      ],
+      [
+        {
+          text: (current === 'services_first' ? '🟢 ' : '⚪ ') + '🛠️ ৫. সাভিসেস ফার্স্ট লেআউট (Services First)',
           callback_data: `cl_set_layout:services_first:${client.id}`
         }
       ],
@@ -2017,13 +2035,23 @@ async function sendClientLayoutThemeMainMenu(chatId: string, client: ClientRecor
 
 async function sendClientLayoutOnlyMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
-  const isServicesFirst = client.layoutStyle === 'services_first';
-  const text = `📐 <b>ওয়েবসাইটের সেকশন লেআউট সাজানো:</b>\n\n`
-    + `বর্তমান লেআউট: <b>${isServicesFirst ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)'}</b>\n\n`
-    + `<b>লেআউট অপশনসমূহ:</b>\n`
-    + `১️⃣ <b>সোশ্যাল মিডিয়া আগে</b>: প্রোফাইল ➔ সোশ্যাল লিংক ➔ সার্ভিস সমূহ ➔ যোগাযোগ\n\n`
-    + `২️⃣ <b>সার্ভিস ও টুলস আগে</b>: প্রোফাইল ➔ সার্ভিস সমূহ ➔ সোশ্যাল লিংক ➔ যোগাযোগ\n\n`
-    + `<i>নিচের অপশন থেকে নির্বাচন করুন (লাইভ ওয়েবসাইটে সাথে সাথে পরিবর্তন হবে):</i>`;
+  const current = client.layoutStyle || 'social_first';
+  const names: Record<string, string> = {
+    social_first: '📱 ১. ক্লাসিক সিঙ্গেল পেজ',
+    app_drawer_3dot: '🗂️ ২. থ্রি-ডট নেভিগেশন & ড্রয়ার অ্যাপ (3-Dot App Tabs)',
+    split_sidebar_grid: '⚡ ৩. সাইডবার & স্প্লিট হিরো গ্রিড',
+    bento_box_grid: '🍱 ৪. বেন্টো বক্স সাইবার কার্ডস',
+    services_first: '🛠️ ৫. সাভিসেস ফার্স্ট লেআউট'
+  };
+  const text = `📐 <b>ওয়েবসাইটের সেকশন লেআউট মডেল নির্বাচন:</b>\n\n`
+    + `বর্তমান লেআউট মডেল: <b>${names[current] || current}</b>\n\n`
+    + `<b>৫টি নতুন লেআউট মডেল:</b>\n`
+    + `১️⃣ <b>ক্লাসিক সিঙ্গেল পেজ</b>: প্রফেশনাল ফিড ফ্লো (প্রোফাইল ➔ সোশ্যাল ➔ সার্ভিস)\n`
+    + `২️⃣ <b>থ্রি-ডট নেভিগেশন & ড্রয়ার অ্যাপ</b>: থ্রি-ডট (⋮) বাটন, ফিল্টার ট্যাব & ড্রয়ার মেনু!\n`
+    + `৩️⃣ <b>সাইডবার & স্প্লিট হিরো</b>: ফিক্সড প্রোফাইল সাইডবার ও ড্যাশবোর্ড কার্ডসমূহ\n`
+    + `৪️⃣ <b>বেন্টো বক্স সাইবার কার্ডস</b>: মডার্ন ইন্টারেক্টিভ বেন্টো গ্রিড লেআউট\n`
+    + `৫️⃣ <b>সাভিসেস ফার্স্ট</b>: সেরা সাভিস ও পোর্টফোলিও সবার উপরে\n\n`
+    + `<i>নিচের অপশন থেকে নির্বাচন করুন (লাইভ ওয়েবসাইটে সাথে সাথে সম্পূর্ণ রূপ বদলে যাবে):</i>`;
   await sendTelegramMessage(chatId, text, { reply_markup: getClientLayoutOnlyKeyboard(client) });
   return text;
 }
@@ -4082,7 +4110,7 @@ async function handleCallbackQuery(cb: any) {
   // 9. Client Set Layout Choice
   if (data.startsWith('cl_set_layout:')) {
     const parts = data.split(':');
-    const style = parts[1] as 'social_first' | 'services_first';
+    const style = parts[1];
     const clientId = parts[2];
     const client = resolveClientForChat(chatId, clientId);
     if (client) {
@@ -4091,10 +4119,17 @@ async function handleCallbackQuery(cb: any) {
       });
       const updated = getClientById(client.id) || client;
       saveThemeConfig(updated.themeStyle, style);
-      const styleName = style === 'services_first' ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)';
+      const names: Record<string, string> = {
+        social_first: '📱 ১. ক্লাসিক সিঙ্গেল পেজ',
+        app_drawer_3dot: '🗂️ ২. থ্রি-ডট নেভিগেশন & ড্রয়ার অ্যাপ (3-Dot App Tabs)',
+        split_sidebar_grid: '⚡ ৩. সাইডবার & স্প্লিট হিরো গ্রিড',
+        bento_box_grid: '🍱 ৪. বেন্টো বক্স সাইবার কার্ডস',
+        services_first: '🛠️ ৫. সাভিসেস ফার্স্ট লেআউট'
+      };
+      const styleName = names[style] || style;
       await sendTelegramMessage(
         chatId,
-        `✅ <b>লেআউট সফলভাবে পরিবর্তন হয়েছে!</b>\n\n📐 বর্তমান সাজানো: <b>${styleName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই লেআউট কার্যকর হয়ে গেছে! 🚀</i>`,
+        `✅ <b>লেআউট মডেল সফলভাবে পরিবর্তন হয়েছে!</b>\n\n📐 বর্তমান মডেল: <b>${styleName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই লেআউট সক্রিয় হয়ে গেছে! 🚀</i>`,
         { reply_markup: getClientLayoutOnlyKeyboard(updated) }
       );
     }
