@@ -3,12 +3,10 @@ import { Share2, Check, Copy } from 'lucide-react';
 
 interface Props {
   onShowToast: (msg: string) => void;
-  themeStyle?: string;
 }
 
-export const ShareAndFooter: React.FC<Props> = ({ onShowToast, themeStyle }) => {
+export const ShareAndFooter: React.FC<Props> = ({ onShowToast }) => {
   const [copied, setCopied] = useState(false);
-  const isIgnitronSpace = themeStyle === 'ignitron_cyber_space';
   const shareUrl = 'https://androadappsdevelopershuvo.github.io/biodata.com';
 
   const handleCopy = () => {
@@ -42,33 +40,17 @@ export const ShareAndFooter: React.FC<Props> = ({ onShowToast, themeStyle }) => 
   };
 
   return (
-    <div className="space-y-4 font-mono">
+    <div className="space-y-4">
       {/* Share Box */}
-      <div
-        id="btnShareProfile"
-        data-cad-id="cad_share_card"
-        data-cad-label="[SHARE_NODE]"
-        data-cad-color="#ff2a85"
-        className={`share-profile-card p-4 rounded-2xl flex items-center justify-between gap-3 shadow-md ${
-          isIgnitronSpace
-            ? 'bg-slate-950 border-2 border-cyan-400/70 shadow-[0_0_25px_rgba(0,240,255,0.2)] relative overflow-hidden'
-            : 'bg-slate-900/70 border border-slate-800/80'
-        }`}
-      >
-        {isIgnitronSpace && (
-          <div className="absolute top-1 left-2 text-cyan-400/70 text-[9px] font-bold">+</div>
-        )}
-
+      <div id="btnShareProfile" className="share-profile-card p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 flex items-center justify-between gap-3 shadow-md">
         <div className="space-y-0.5 min-w-0 flex-1">
-          <h4 className={`share-title text-xs font-bold truncate ${
-            isIgnitronSpace ? 'text-cyan-300' : 'text-white'
-          }`}>
-            {isIgnitronSpace ? '[05] SHARE_SYSTEM_LINK' : 'বন্ধুদের সাথে শেয়ার করুন'}
+          <h4 className="share-title text-xs font-bold text-white truncate">
+            বন্ধুদের সাথে শেয়ার করুন
           </h4>
-          <p className="share-sub text-[11px] text-slate-400 truncate font-sans">
+          <p className="share-sub text-[11px] text-slate-400 truncate">
             এই বায়ো পেজের লিংক এক ক্লিকে কপি করুন
           </p>
-          <p className="text-[10px] font-mono text-pink-400 truncate opacity-90 font-bold">
+          <p className="text-[10px] font-mono text-cyan-400 truncate opacity-85">
             {shareUrl}
           </p>
         </div>
@@ -76,35 +58,33 @@ export const ShareAndFooter: React.FC<Props> = ({ onShowToast, themeStyle }) => 
         <button
           type="button"
           onClick={handleCopy}
-          className={`share-action-btn px-3 py-2 active:scale-95 border text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
+          className={`share-action-btn px-3 py-1.5 active:scale-95 border text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
             copied
-              ? 'bg-emerald-500 border-emerald-400 text-slate-950'
-              : isIgnitronSpace
-              ? 'bg-cyan-400 hover:bg-pink-500 text-slate-950 hover:text-white border-cyan-300'
+              ? 'bg-emerald-600 border-emerald-500 text-white'
               : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-white'
           }`}
           title="লিংক কপি করুন"
         >
           {copied ? (
             <>
-              <Check className="w-3.5 h-3.5 text-slate-950" />
-              <span>[ COPIED ]</span>
+              <Check className="w-3.5 h-3.5 text-white" />
+              <span>কপি হয়েছে</span>
             </>
           ) : (
             <>
-              <Share2 className="w-3.5 h-3.5 text-slate-950 group-hover:text-white" />
-              <span>{isIgnitronSpace ? '[ COPY_URL ]' : 'শেয়ার লিংক'}</span>
+              <Share2 className="w-3.5 h-3.5 text-cyan-400" />
+              <span>শেয়ার লিংক</span>
             </>
           )}
         </button>
       </div>
 
       {/* Footer */}
-      <div className="pt-3 pb-2 text-center border-t border-slate-900/90 font-mono">
-        <p className="text-[11px] text-cyan-400/90 font-bold tracking-wider">
-          © 2026 // IGNITRON CYBER SPACE MATRIX • ⚡ 乂 ＳＨＵＶＯ 乂 ⚡
+      <div className="pt-3 pb-2 text-center border-t border-slate-900/90">
+        <p className="text-[11px] text-slate-500 font-medium">
+          © 2026 ⚡ 乂 ＳＨＵＶＯ 乂 ⚡ • All Rights Reserved
         </p>
-        <p className="text-[10px] text-slate-500 mt-1">
+        <p className="text-[10px] text-slate-600 mt-0.5">
           Controlled via Telegram Bot • @djhakar007ff
         </p>
       </div>
