@@ -34,11 +34,10 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
   next();
 });
+
+app.use('/uploads', express.static(path.resolve(process.cwd(), 'public', 'uploads')));
 
 // Storage directory & files
 const DATA_DIR = path.resolve(process.cwd(), 'data');
@@ -805,24 +804,25 @@ app.post('/api/telegram-webhook', async (req, res) => {
       const sender = msg.from?.first_name || 'User';
       if (msg.photo && Array.isArray(msg.photo) && msg.photo.length > 0) {
         const state = userStates[chatId];
-        if (state && (
-          state.step === 'add_image' ||
-          state.step === 'edit_service_val' ||
-          state.step === 'prof_edit_avatar' ||
-          state.step === 'prof_edit_banner' ||
-          state.step === 'admin_wizard_logo' ||
-          state.step === 'client_srv_image' ||
-          state.step === 'client_prof_avatar' ||
-          state.step === 'client_prof_banner'
-        )) {
-          const bestPhoto = msg.photo[msg.photo.length - 1];
-          const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
-          if (fileInfo.ok && fileInfo.result?.file_path) {
-            const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
-            await handleUserMessage(chatId, directPhotoUrl, sender);
-            return res.json({ ok: true });
+          if (state && (
+            state.step === 'add_image' ||
+            state.step === 'edit_service_val' ||
+            state.step === 'prof_edit_avatar' ||
+            state.step === 'prof_edit_banner' ||
+            state.step === 'admin_wizard_logo' ||
+            state.step === 'client_srv_image' ||
+            state.step === 'client_srv_edit_val' ||
+            state.step === 'client_prof_avatar' ||
+            state.step === 'client_prof_banner'
+          )) {
+            const bestPhoto = msg.photo[msg.photo.length - 1];
+            const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
+            if (fileInfo.ok && fileInfo.result?.file_path) {
+              const permanentPhotoUrl = await processTelegramPhoto(fileInfo.result.file_path);
+              await handleUserMessage(chatId, permanentPhotoUrl, sender);
+              return res.json({ ok: true });
+            }
           }
-        }
       }
       if (msg.text) {
         await handleUserMessage(chatId, msg.text, sender);
@@ -1070,6 +1070,40 @@ async function telegramRequest(method: string, body: any) {
   }
 }
 
+async function processTelegramPhoto(filePath: string): Promise<string> {
+  const telegramFileUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${filePath}`;
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const res = await fetch(telegramFileUrl, { signal: controller.signal });
+    clearTimeout(timeoutId);
+    if (res.ok) {
+      const buffer = await res.arrayBuffer();
+      const nodeBuffer = Buffer.from(buffer);
+      const ext = filePath.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+      const base64Str = nodeBuffer.toString('base64');
+      const dataUri = `data:image/${ext};base64,${base64Str}`;
+
+      // Save local disk backup under public/uploads
+      try {
+        const uploadsDir = path.resolve(process.cwd(), 'public', 'uploads');
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        const filename = `${Date.now()}_${path.basename(filePath)}`;
+        fs.writeFileSync(path.join(uploadsDir, filename), nodeBuffer);
+      } catch (e) {
+        console.error('Error saving local upload backup:', e);
+      }
+
+      return dataUri;
+    }
+  } catch (err) {
+    console.error('Failed to download photo from Telegram:', err);
+  }
+  return telegramFileUrl;
+}
+
 async function setTelegramWebhook(baseUrl: string) {
   try {
     let target = baseUrl.trim();
@@ -1090,7 +1124,7 @@ async function setTelegramWebhook(baseUrl: string) {
 
     const res = await telegramRequest('setWebhook', {
       url: fullWebhookUrl,
-      drop_pending_updates: true
+      drop_pending_updates: false
     });
 
     console.log(`🌐 Telegram Webhook set to ${fullWebhookUrl}:`, res);
@@ -1106,7 +1140,7 @@ async function deleteTelegramWebhook() {
     botState.isWebhookMode = false;
     botState.isPolling = false;
     globalThis.__telegram_polling_active = false;
-    const res = await telegramRequest('deleteWebhook', { drop_pending_updates: true });
+    const res = await telegramRequest('deleteWebhook', { drop_pending_updates: false });
     startTelegramPolling().catch(() => {});
     return { ok: !!res.ok, result: res };
   } catch (err) {
@@ -4766,14 +4800,15 @@ app.post('/api/telegram-webhook', async (req, res) => {
             state.step === 'prof_edit_banner' ||
             state.step === 'admin_wizard_logo' ||
             state.step === 'client_srv_image' ||
+            state.step === 'client_srv_edit_val' ||
             state.step === 'client_prof_avatar' ||
             state.step === 'client_prof_banner'
           )) {
             const bestPhoto = msg.photo[msg.photo.length - 1];
             const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
             if (fileInfo.ok && fileInfo.result?.file_path) {
-              const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
-              await handleUserMessage(chatId, directPhotoUrl, sender);
+              const permanentPhotoUrl = await processTelegramPhoto(fileInfo.result.file_path);
+              await handleUserMessage(chatId, permanentPhotoUrl, sender);
             }
           }
         } else if (msg.text) {
@@ -4814,7 +4849,7 @@ async function startTelegramPolling() {
   try {
     const delCtrl = new AbortController();
     const delTimer = setTimeout(() => delCtrl.abort(), 10000);
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=true`, {
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/deleteWebhook?drop_pending_updates=false`, {
       method: 'POST',
       signal: delCtrl.signal
     }).catch(() => {});
@@ -4889,14 +4924,15 @@ async function startTelegramPolling() {
                     state.step === 'prof_edit_banner' ||
                     state.step === 'admin_wizard_logo' ||
                     state.step === 'client_srv_image' ||
+                    state.step === 'client_srv_edit_val' ||
                     state.step === 'client_prof_avatar' ||
                     state.step === 'client_prof_banner'
                   )) {
                     const bestPhoto = msg.photo[msg.photo.length - 1];
                     const fileInfo = await telegramRequest('getFile', { file_id: bestPhoto.file_id });
                     if (fileInfo.ok && fileInfo.result?.file_path) {
-                      const directPhotoUrl = `https://api.telegram.org/file/bot${TELEGRAM_BOT_TOKEN}/${fileInfo.result.file_path}`;
-                      await handleUserMessage(chatId, directPhotoUrl, sender);
+                      const permanentPhotoUrl = await processTelegramPhoto(fileInfo.result.file_path);
+                      await handleUserMessage(chatId, permanentPhotoUrl, sender);
                       continue;
                     }
                   }
