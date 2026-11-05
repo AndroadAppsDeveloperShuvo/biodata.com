@@ -549,7 +549,7 @@ function createNewClient(
   appName: string,
   shortName: string,
   logoUrl: string,
-  layoutStyle: string = 'classic_stacked'
+  layoutStyle: 'social_first' | 'services_first' = 'social_first'
 ): ClientRecord {
   const id = 'c_' + Date.now();
   const name = appName.replace(/[-|•].*$/, '').trim() || 'My Bio';
@@ -1640,39 +1640,21 @@ function getClientLayoutThemeSubMenuKeyboard(client: ClientRecord) {
 }
 
 function getClientLayoutOnlyKeyboard(client: ClientRecord) {
-  const current = client.layoutStyle || 'classic_stacked';
+  const isServicesFirst = client.layoutStyle === 'services_first';
   return {
     inline_keyboard: [
       [
-        { text: '📐 --- আর্কিটেকচার লেআউট মডেল (UI Models) ---', callback_data: `cl_noop` }
+        { text: '📐 --- লেআউট সাজানো (Section Order) ---', callback_data: `cl_noop` }
       ],
       [
         {
-          text: (current === 'classic_stacked' || current === 'social_first' ? '🟢 ' : '⚪ ') + '📱 ১. ক্লাসিক বায়ো কার্ড (Classic Stacked Card)',
-          callback_data: `cl_set_layout:classic_stacked:${client.id}`
+          text: (isServicesFirst ? '⚪ ' : '🟢 ') + '১. সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)',
+          callback_data: `cl_set_layout:social_first:${client.id}`
         }
       ],
       [
         {
-          text: (current === 'drawer_dock_nav' ? '🟢 ' : '⚪ ') + '🎛️ ২. থ্রি-ডট নেভ ড্রয়ার & ডক (3-Dot Drawer & Floating Dock)',
-          callback_data: `cl_set_layout:drawer_dock_nav:${client.id}`
-        }
-      ],
-      [
-        {
-          text: (current === 'grid_dashboard' ? '🟢 ' : '⚪ ') + '📊 ৩. মডার্ন গ্রিড ড্যাশবোর্ড (Bento Grid Dashboard)',
-          callback_data: `cl_set_layout:grid_dashboard:${client.id}`
-        }
-      ],
-      [
-        {
-          text: (current === 'tabbed_app_layout' ? '🟢 ' : '⚪ ') + '📑 ৪. মাল্টি-ট্যাব অ্যাপ (Multi-Tab PWA App)',
-          callback_data: `cl_set_layout:tabbed_app_layout:${client.id}`
-        }
-      ],
-      [
-        {
-          text: (current === 'services_first' ? '🟢 ' : '⚪ ') + '🛠️ ৫. সার্ভিস ও টুলস আগে (Services First)',
+          text: (isServicesFirst ? '🟢 ' : '⚪ ') + '২. সার্ভিস ও টুলস আগে (সার্ভিস স্টাইল)',
           callback_data: `cl_set_layout:services_first:${client.id}`
         }
       ],
@@ -2035,25 +2017,13 @@ async function sendClientLayoutThemeMainMenu(chatId: string, client: ClientRecor
 
 async function sendClientLayoutOnlyMenu(chatId: string, client: ClientRecord) {
   userStates[chatId] = { step: 'idle' };
-  const current = client.layoutStyle || 'classic_stacked';
-  const layoutNames: Record<string, string> = {
-    classic_stacked: '📱 ১. ক্লাসিক বায়ো কার্ড (Classic Stacked Card)',
-    social_first: '📱 ১. ক্লাসিক বায়ো কার্ড (Classic Stacked Card)',
-    drawer_dock_nav: '🎛️ ২. থ্রি-ডট নেভ ড্রয়ার & ডক (3-Dot Drawer & Floating Dock)',
-    grid_dashboard: '📊 ৩. মডার্ন গ্রিড ড্যাশবোর্ড (Bento Grid Dashboard)',
-    tabbed_app_layout: '📑 ৪. মাল্টি-ট্যাব অ্যাপ (Multi-Tab PWA App)',
-    services_first: '🛠️ ৫. সার্ভিস ও টুলস আগে (Services First)'
-  };
-
-  const text = `📐 <b>ওয়েবসাইটের সেকশন & ইউজার ইন্টারফেস লেআউট মডেল:</b>\n\n`
-    + `বর্তমান লেআউট: <b>${layoutNames[current] || '📱 ক্লাসিক বায়ো কার্ড'}</b>\n\n`
-    + `<b>উপলব্ধ লেআউট মডেলসমূহ:</b>\n`
-    + `১️⃣ <b>ক্লাসিক বায়ো কার্ড</b>: একক সুন্দর স্কেলিং বায়ো কার্ড।\n`
-    + `২️⃣ <b>থ্রি-ডট নেভ ড্রয়ার & ডক</b>: থ্রি-ডট (•••) বাটন চেপে ড্রয়ার মেন্যু (Home, Social, Bio, Skills, Services, Contact) এবং নিচে ফ্লোটিং নেভিগেশন ডক।\n`
-    + `৩️⃣ <b>মডার্ন গ্রিড ড্যাশবোর্ড</b>: Bento Grid ড্যাশবোর্ড আর্কিটেকচার।\n`
-    + `৪️⃣ <b>মাল্টি-ট্যাব অ্যাপ</b>: টপ অ্যাপ বার ও সেগমেন্টেড অপশন ট্যাব (বায়ো, সোশ্যাল, সার্ভিস, কন্টাক্ট)।\n`
-    + `৫️⃣ <b>সার্ভিস আগে</b>: সার্ভিস সেকশন প্রথমে রেখে ভার্টিক্যাল ভিউ।\n\n`
-    + `<i>নিচের অপশন থেকে নির্বাচন করুন (লাইভ ওয়েবসাইটে সাথে সাথে নতুন ডিজাইনে বদলে যাবে):</i>`;
+  const isServicesFirst = client.layoutStyle === 'services_first';
+  const text = `📐 <b>ওয়েবসাইটের সেকশন লেআউট সাজানো:</b>\n\n`
+    + `বর্তমান লেআউট: <b>${isServicesFirst ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)'}</b>\n\n`
+    + `<b>লেআউট অপশনসমূহ:</b>\n`
+    + `১️⃣ <b>সোশ্যাল মিডিয়া আগে</b>: প্রোফাইল ➔ সোশ্যাল লিংক ➔ সার্ভিস সমূহ ➔ যোগাযোগ\n\n`
+    + `২️⃣ <b>সার্ভিস ও টুলস আগে</b>: প্রোফাইল ➔ সার্ভিস সমূহ ➔ সোশ্যাল লিংক ➔ যোগাযোগ\n\n`
+    + `<i>নিচের অপশন থেকে নির্বাচন করুন (লাইভ ওয়েবসাইটে সাথে সাথে পরিবর্তন হবে):</i>`;
   await sendTelegramMessage(chatId, text, { reply_markup: getClientLayoutOnlyKeyboard(client) });
   return text;
 }
@@ -2542,7 +2512,7 @@ async function handleClientUserMessage(chatId: string, text: string, senderName:
 async function completeClientCreation(
   chatId: string,
   tempData: any,
-  layoutStyle: string,
+  layoutStyle: 'social_first' | 'services_first',
   senderName: string
 ) {
   const newClient = createNewClient(
@@ -4112,26 +4082,19 @@ async function handleCallbackQuery(cb: any) {
   // 9. Client Set Layout Choice
   if (data.startsWith('cl_set_layout:')) {
     const parts = data.split(':');
-    const style = parts[1];
+    const style = parts[1] as 'social_first' | 'services_first';
     const clientId = parts[2];
     const client = resolveClientForChat(chatId, clientId);
     if (client) {
       updateClientData(client.id, c => {
-        c.layoutStyle = style as any;
+        c.layoutStyle = style;
       });
       const updated = getClientById(client.id) || client;
       saveThemeConfig(updated.themeStyle, style);
-      const layoutNames: Record<string, string> = {
-        classic_stacked: '📱 ১. ক্লাসিক বায়ো কার্ড (Classic Stacked Card)',
-        social_first: '📱 ১. ক্লাসিক বায়ো কার্ড (Classic Stacked Card)',
-        drawer_dock_nav: '🎛️ ২. থ্রি-ডট নেভ ড্রয়ার & ডক (3-Dot Drawer & Floating Dock)',
-        grid_dashboard: '📊 ৩. মডার্ন গ্রিড ড্যাশবোর্ড (Bento Grid Dashboard)',
-        tabbed_app_layout: '📑 ৪. মাল্টি-ট্যাব অ্যাপ (Multi-Tab PWA App)',
-        services_first: '🛠️ ৫. সার্ভিস ও টুলস আগে (Services First)'
-      };
+      const styleName = style === 'services_first' ? '🛠️ সার্ভিস ও টুলস আগে' : '🌐 সোশ্যাল মিডিয়া আগে (অ্যাডমিন স্টাইল)';
       await sendTelegramMessage(
         chatId,
-        `✅ <b>ওয়েবসাইট লেআউট মডেল সফলভাবে পরিবর্তন হয়েছে!</b>\n\n📐 বর্তমান লেআউট: <b>${layoutNames[style] || style}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই নতুন ইউজার ইন্টারফেস আর্কিটেকচার কার্যকর হয়ে গেছে! 🚀</i>`,
+        `✅ <b>লেআউট সফলভাবে পরিবর্তন হয়েছে!</b>\n\n📐 বর্তমান সাজানো: <b>${styleName}</b>\n\n<i>আপনার লাইভ ওয়েবসাইটে তাৎক্ষণিকভাবে এই লেআউট কার্যকর হয়ে গেছে! 🚀</i>`,
         { reply_markup: getClientLayoutOnlyKeyboard(updated) }
       );
     }

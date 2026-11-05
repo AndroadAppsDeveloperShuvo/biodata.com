@@ -40,8 +40,8 @@ export interface ClientRecord {
     telegramUsername: string;
     customNote: string;
   };
-  layoutStyle?: 'classic_stacked' | 'social_first' | 'services_first' | 'drawer_dock_nav' | 'grid_dashboard' | 'tabbed_app_layout' | string;
-  themeStyle?: string;
+  layoutStyle?: 'social_first' | 'services_first';
+  themeStyle?: 'classic_dark' | 'dark_glassmorphism' | string;
 }
 
 function escapeHtml(text: string): string {
@@ -1060,29 +1060,6 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     ⚠️ আপনি বর্তমানে অফলাইনে আছেন। সংরক্ষিত তথ্য দেখানো হচ্ছে।
   </div>
 
-  <!-- THREE-DOT DRAWER TOP NAV HEADER -->
-  <header id="pwaTopNavDrawer" class="w-full max-w-md my-2 z-30 hidden items-center justify-between px-4 py-2.5 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl">
-    <div class="flex items-center gap-2.5">
-      <img id="pwaNavAvatar" src="${escapeHtml(client.profile.avatarUrl || client.logoUrl)}" alt="Avatar" class="w-8 h-8 rounded-full object-cover border border-cyan-400/60 shadow-md" />
-      <div class="flex flex-col text-left">
-        <span id="pwaNavTitle" class="text-xs font-bold text-white tracking-tight leading-tight">${escapeHtml(client.profile.name || client.appName)}</span>
-        <span id="pwaNavHandle" class="text-[10px] text-cyan-400 font-mono leading-tight">${escapeHtml(client.profile.handle || '@official')}</span>
-      </div>
-    </div>
-    <button id="btnOpenThreeDotDrawer" type="button" class="p-2 bg-slate-800/90 hover:bg-slate-700 text-cyan-400 rounded-xl border border-cyan-400/30 shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1 font-bold text-xs cursor-pointer">
-      <span class="text-lg leading-none tracking-widest">•••</span>
-      <span class="text-[11px] font-semibold hidden sm:inline">মেন্যু</span>
-    </button>
-  </header>
-
-  <!-- MULTI-TAB APP SEGMENTED NAV BAR -->
-  <nav id="pwaTabNav" class="w-full max-w-md my-2 z-30 hidden items-center p-1 bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-xl gap-1">
-    <button type="button" data-tab="all" class="pwa-tab-btn flex-1 py-2 px-1 text-center rounded-xl text-xs font-bold transition-all bg-cyan-400 text-black shadow-lg shadow-cyan-400/30">🏠 বায়ো</button>
-    <button type="button" data-tab="social" class="pwa-tab-btn flex-1 py-2 px-1 text-center rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800/60">🌐 সোশ্যাল</button>
-    <button type="button" data-tab="services" class="pwa-tab-btn flex-1 py-2 px-1 text-center rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800/60">🛠️ সার্ভিস</button>
-    <button type="button" data-tab="contact" class="pwa-tab-btn flex-1 py-2 px-1 text-center rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white hover:bg-slate-800/60">📞 কন্টাক্ট</button>
-  </nav>
-
   <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24">
     
     <!-- Profile Banner & Header -->
@@ -1236,64 +1213,6 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     </footer>
   </main>
 
-  <!-- FLOATING BOTTOM DOCK -->
-  <div id="pwaFloatingDock" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 hidden items-center gap-1.5 px-3 py-2 bg-slate-900/90 backdrop-blur-2xl border border-cyan-400/40 rounded-full shadow-2xl">
-    <button type="button" data-tab="all" class="pwa-dock-btn p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 bg-cyan-400 text-black shadow-lg shadow-cyan-400/40" title="Home All View">🏠</button>
-    <button type="button" data-tab="social" class="pwa-dock-btn p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 text-slate-300 hover:text-white" title="Social Links">🌐</button>
-    <button type="button" data-tab="services" class="pwa-dock-btn p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 text-slate-300 hover:text-white" title="Services">🛠️</button>
-    <button type="button" data-tab="contact" class="pwa-dock-btn p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 text-slate-300 hover:text-white" title="Contact">📞</button>
-    <button type="button" id="btnDockOpenDrawer" class="p-2 bg-purple-600/80 hover:bg-purple-600 text-white rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 shadow-md active:scale-95 cursor-pointer" title="Three-Dot Menu Drawer">•••</button>
-  </div>
-
-  <!-- SLIDE-OVER NAVIGATION DRAWER MODAL -->
-  <div id="pwaNavDrawerModal" class="hidden fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-md transition-all duration-300">
-    <div id="pwaDrawerBackdrop" class="fixed inset-0"></div>
-    <aside class="relative w-full max-w-[300px] h-full bg-slate-950/95 border-l border-white/15 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto z-10 text-white">
-      <div class="space-y-6">
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
-          <div class="flex items-center gap-3">
-            <img id="pwaDrawerAvatar" src="${escapeHtml(client.profile.avatarUrl || client.logoUrl)}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-cyan-400 shadow-md" />
-            <div>
-              <h3 id="pwaDrawerName" class="font-bold text-xs text-white">${escapeHtml(client.profile.name || client.appName)}</h3>
-              <p id="pwaDrawerHandle" class="text-[10px] text-cyan-400 font-mono">${escapeHtml(client.profile.handle || '@official')}</p>
-            </div>
-          </div>
-          <button id="btnCloseThreeDotDrawer" type="button" class="w-8 h-8 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full flex items-center justify-center text-xs font-bold transition-all cursor-pointer">✕</button>
-        </div>
-
-        <nav class="space-y-2">
-          <p class="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">দ্রুত নেভিগেশন মেন্যু</p>
-          <button type="button" data-tab="all" class="pwa-drawer-nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/30">
-            <span class="flex items-center gap-2">🏠 সম্পূর্ণ হোম ভিউ</span>
-            <span class="text-[10px] font-mono opacity-80">All</span>
-          </button>
-          <button type="button" data-tab="bio" class="pwa-drawer-nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400">
-            <span class="flex items-center gap-2">👤 প্রোফাইল & স্কিলস</span>
-            <span class="text-[10px] font-mono opacity-80">Bio</span>
-          </button>
-          <button type="button" data-tab="social" class="pwa-drawer-nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400">
-            <span class="flex items-center gap-2">🌐 সোশ্যাল মিডিয়া</span>
-            <span class="text-[10px] font-mono opacity-80">Social</span>
-          </button>
-          <button type="button" data-tab="services" class="pwa-drawer-nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400">
-            <span class="flex items-center gap-2">🛠️ সাভিস & টুলস</span>
-            <span class="text-[10px] font-mono opacity-80">Services</span>
-          </button>
-          <button type="button" data-tab="contact" class="pwa-drawer-nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-semibold text-xs transition-all bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400">
-            <span class="flex items-center gap-2">📞 সরাসরি যোগাযোগ</span>
-            <span class="text-[10px] font-mono opacity-80">Contact</span>
-          </button>
-        </nav>
-      </div>
-
-      <div class="pt-4 border-t border-white/10 space-y-2">
-        <button id="pwaDrawerShareBtn" type="button" class="w-full py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs shadow-lg flex items-center justify-center gap-2 cursor-pointer">
-          📤 লিংক শেয়ার করুন
-        </button>
-      </div>
-    </aside>
-  </div>
-
   <!-- PWA Floating Install Prompt Bar -->
   <div id="pwaFloatingBanner" class="fixed bottom-4 inset-x-4 max-w-md mx-auto bg-zinc-900/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-3 transform translate-y-28 opacity-0 transition-all duration-300 z-40">
     <div class="flex items-center gap-3 min-w-0">
@@ -1372,22 +1291,10 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
 
     function renderProfile(p) {
       if (!p) return;
-      if (p.name) {
-        var pNameEl = document.getElementById('profileName');
-        if (pNameEl) pNameEl.textContent = p.name;
-        var pNavTitle = document.getElementById('pwaNavTitle');
-        if (pNavTitle) pNavTitle.textContent = p.name;
-        var pDrawerName = document.getElementById('pwaDrawerName');
-        if (pDrawerName) pDrawerName.textContent = p.name;
-      }
+      if (p.name) document.getElementById('profileName').textContent = p.name;
       if (p.handle) {
         var h = p.handle.startsWith('@') ? p.handle : '@' + p.handle;
-        var pHandleEl = document.getElementById('profileHandle');
-        if (pHandleEl) pHandleEl.textContent = h;
-        var pNavHandle = document.getElementById('pwaNavHandle');
-        if (pNavHandle) pNavHandle.textContent = h;
-        var pDrawerHandle = document.getElementById('pwaDrawerHandle');
-        if (pDrawerHandle) pDrawerHandle.textContent = h;
+        document.getElementById('profileHandle').textContent = h;
       }
       if (p.title) document.getElementById('profileTitle').textContent = p.title;
       if (p.location) document.getElementById('profileLocation').textContent = p.location;
@@ -1397,10 +1304,6 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       if (avBox) {
         var avUrl = (p.avatarUrl && p.avatarUrl.trim() !== '') ? p.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg';
         avBox.innerHTML = '<img id="profileAvatar" src="' + avUrl + '" alt="Avatar" class="w-full h-full object-cover rounded-full" />';
-        var navAv = document.getElementById('pwaNavAvatar');
-        if (navAv) navAv.src = avUrl;
-        var drawerAv = document.getElementById('pwaDrawerAvatar');
-        if (drawerAv) drawerAv.src = avUrl;
       }
 
       var bnContainer = document.getElementById('profileBannerContainer') || document.querySelector('.profile-banner-container');
@@ -1547,92 +1450,18 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       box.innerHTML = html;
     }
 
-    function switchActiveTab(tab) {
-      var bioBox = document.getElementById('profileInfoBox');
-      var socSec = document.getElementById('sectionSocial');
-      var srvSec = document.getElementById('sectionServices');
-      var cntSec = document.getElementById('contactContainer');
-      var cntBox = cntSec ? cntSec.parentElement : null;
-
-      if (tab === 'all') {
-        if (bioBox) bioBox.style.display = 'flex';
-        if (socSec) socSec.style.display = 'block';
-        if (srvSec) srvSec.style.display = 'block';
-        if (cntBox) cntBox.style.display = 'block';
-      } else if (tab === 'bio') {
-        if (bioBox) bioBox.style.display = 'flex';
-        if (socSec) socSec.style.display = 'none';
-        if (srvSec) srvSec.style.display = 'none';
-        if (cntBox) cntBox.style.display = 'none';
-      } else if (tab === 'social') {
-        if (bioBox) bioBox.style.display = 'none';
-        if (socSec) socSec.style.display = 'block';
-        if (srvSec) srvSec.style.display = 'none';
-        if (cntBox) cntBox.style.display = 'none';
-      } else if (tab === 'services') {
-        if (bioBox) bioBox.style.display = 'none';
-        if (socSec) socSec.style.display = 'none';
-        if (srvSec) srvSec.style.display = 'block';
-        if (cntBox) cntBox.style.display = 'none';
-      } else if (tab === 'contact') {
-        if (bioBox) bioBox.style.display = 'none';
-        if (socSec) socSec.style.display = 'none';
-        if (srvSec) srvSec.style.display = 'none';
-        if (cntBox) cntBox.style.display = 'block';
-      }
-
-      var activeBtns = document.querySelectorAll('.pwa-tab-btn, .pwa-dock-btn, .pwa-drawer-nav-item');
-      for (var i = 0; i < activeBtns.length; i++) {
-        var btn = activeBtns[i];
-        var bTab = btn.getAttribute('data-tab');
-        if (bTab === tab) {
-          btn.classList.add('bg-cyan-500', 'text-black', 'font-bold');
-          btn.classList.remove('text-slate-300', 'bg-slate-900/80');
-        } else {
-          btn.classList.remove('bg-cyan-500', 'text-black');
-          btn.classList.add('text-slate-300');
-        }
-      }
-    }
-
     function applyLayoutStyle(style) {
       var container = document.getElementById('contentSections');
       var srv = document.getElementById('sectionServices');
       var soc = document.getElementById('sectionSocial');
-      var mainEl = document.querySelector('main');
-      var st = style || 'classic_stacked';
-      if (mainEl) mainEl.setAttribute('data-layout', st);
-      document.body.setAttribute('data-layout', st);
-
-      if (container && srv && soc) {
-        if (st === 'services_first') {
-          container.appendChild(srv);
-          container.appendChild(soc);
-        } else {
-          container.appendChild(soc);
-          container.appendChild(srv);
-        }
+      if (!container || !srv || !soc) return;
+      if (style === 'services_first') {
+        container.appendChild(srv);
+        container.appendChild(soc);
+      } else {
+        container.appendChild(soc);
+        container.appendChild(srv);
       }
-
-      var topNav = document.getElementById('pwaTopNavDrawer');
-      var floatingDock = document.getElementById('pwaFloatingDock');
-      var tabNav = document.getElementById('pwaTabNav');
-
-      if (topNav) topNav.style.display = (st === 'drawer_dock_nav') ? 'flex' : 'none';
-      if (floatingDock) floatingDock.style.display = (st === 'drawer_dock_nav') ? 'flex' : 'none';
-      if (tabNav) tabNav.style.display = (st === 'tabbed_app_layout') ? 'flex' : 'none';
-
-      if (mainEl) {
-        if (st === 'grid_dashboard') {
-          mainEl.classList.add('lg:max-w-[980px]');
-          if (container) container.classList.add('lg:grid', 'lg:grid-cols-2', 'lg:gap-5');
-        } else {
-          mainEl.classList.remove('lg:max-w-[980px]');
-          if (container) container.classList.remove('lg:grid', 'lg:grid-cols-2', 'lg:gap-5');
-        }
-      }
-
-      switchActiveTab('all');
     }
 
     function applyThemeStyle(theme) {
@@ -1913,50 +1742,6 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
         fetchFromFirebase(true);
       });
     } catch (e) {}
-
-    // Slide Drawer & Layout Nav Event Handlers
-    var pwaDrawerModal = document.getElementById('pwaNavDrawerModal');
-    var btnOpenThreeDotDrawer = document.getElementById('btnOpenThreeDotDrawer');
-    var btnDockOpenDrawer = document.getElementById('btnDockOpenDrawer');
-    var btnCloseThreeDotDrawer = document.getElementById('btnCloseThreeDotDrawer');
-    var pwaDrawerBackdrop = document.getElementById('pwaDrawerBackdrop');
-    var pwaDrawerShareBtn = document.getElementById('pwaDrawerShareBtn');
-
-    function openThreeDotDrawer() {
-      if (pwaDrawerModal) pwaDrawerModal.classList.remove('hidden');
-    }
-    function closeThreeDotDrawer() {
-      if (pwaDrawerModal) pwaDrawerModal.classList.add('hidden');
-    }
-
-    if (btnOpenThreeDotDrawer) btnOpenThreeDotDrawer.addEventListener('click', openThreeDotDrawer);
-    if (btnDockOpenDrawer) btnDockOpenDrawer.addEventListener('click', openThreeDotDrawer);
-    if (btnCloseThreeDotDrawer) btnCloseThreeDotDrawer.addEventListener('click', closeThreeDotDrawer);
-    if (pwaDrawerBackdrop) pwaDrawerBackdrop.addEventListener('click', closeThreeDotDrawer);
-
-    if (pwaDrawerShareBtn) {
-      pwaDrawerShareBtn.addEventListener('click', function() {
-        if (navigator.share) {
-          navigator.share({ title: document.title, url: window.location.href }).catch(function() {});
-        } else {
-          navigator.clipboard.writeText(window.location.href).then(function() {
-            showToast('📋 প্রোফাইল লিংক কপি করা হয়েছে!');
-          });
-        }
-        closeThreeDotDrawer();
-      });
-    }
-
-    var allNavBtns = document.querySelectorAll('.pwa-tab-btn, .pwa-dock-btn, .pwa-drawer-nav-item');
-    for (var nb = 0; nb < allNavBtns.length; nb++) {
-      allNavBtns[nb].addEventListener('click', function() {
-        var targetTab = this.getAttribute('data-tab');
-        if (targetTab) {
-          switchActiveTab(targetTab);
-          closeThreeDotDrawer();
-        }
-      });
-    }
 
     // Share Button Event
     var btnShare = document.getElementById('btnShareProfile');
