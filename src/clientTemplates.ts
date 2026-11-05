@@ -1624,9 +1624,11 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
 
       if (mainEl) {
         if (st === 'grid_dashboard') {
-          mainEl.classList.add('lg:grid', 'lg:grid-cols-12', 'lg:gap-5', 'lg:max-w-[980px]');
+          mainEl.classList.add('lg:max-w-[980px]');
+          if (container) container.classList.add('lg:grid', 'lg:grid-cols-2', 'lg:gap-5');
         } else {
-          mainEl.classList.remove('lg:grid', 'lg:grid-cols-12', 'lg:gap-5', 'lg:max-w-[980px]');
+          mainEl.classList.remove('lg:max-w-[980px]');
+          if (container) container.classList.remove('lg:grid', 'lg:grid-cols-2', 'lg:gap-5');
         }
       }
 
