@@ -40,8 +40,8 @@ export interface ClientRecord {
     telegramUsername: string;
     customNote: string;
   };
-  layoutStyle?: 'social_first' | 'services_first' | 'app_drawer_3dot' | 'split_sidebar_grid' | 'bento_box_grid' | string;
-  themeStyle?: 'classic_dark' | 'dark_glassmorphism' | string;
+  layoutStyle?: 'classic_stacked' | 'social_first' | 'services_first' | 'drawer_dock_nav' | 'grid_dashboard' | 'tabbed_app_layout' | string;
+  themeStyle?: string;
 }
 
 function escapeHtml(text: string): string {

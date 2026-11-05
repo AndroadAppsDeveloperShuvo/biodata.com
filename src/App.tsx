@@ -11,7 +11,6 @@ import { DirectContact } from './components/DirectContact';
 import { ShareAndFooter } from './components/ShareAndFooter';
 import { CyberSpaceCanvas } from './components/CyberSpaceCanvas';
 import { BoidsWireframeCanvas } from './components/BoidsWireframeCanvas';
-import { NavigationDrawer } from './components/NavigationDrawer';
 import { HighlightService, SocialLink, ContactInfo, PersonalInfo, Badge } from './types/bio';
 
 const CACHE_KEY = 'shuvo_bio_live_cache_v2';
@@ -52,17 +51,20 @@ function setLocalCache(data: Partial<CachedBioData>) {
 export default function App() {
   const initialCache = getLocalCache();
 
-  // All state is purely driven by Bot / Database (no hardcoded defaults)
+  // All state is purely driven by Bot / Database
   const [profile, setProfile] = useState<PersonalInfo | null>(initialCache?.profile || null);
   const [badges, setBadges] = useState<Badge[]>(initialCache?.badges || []);
   const [services, setServices] = useState<HighlightService[]>(initialCache?.services || []);
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
   const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
   const [themeStyle, setThemeStyle] = useState<string>(initialCache?.themeStyle || 'dark_glassmorphism');
-  const [layoutStyle, setLayoutStyle] = useState<string>(initialCache?.layoutStyle || 'social_first');
-  const [activeTab, setActiveTab] = useState<string>('all');
+  const [layoutStyle, setLayoutStyle] = useState<string>(initialCache?.layoutStyle || 'classic_stacked');
   const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+  // Layout View State (Active Tab & Three-Dot Drawer Toggle)
+  const [activeTab, setActiveTab] = useState<'all' | 'bio' | 'social' | 'services' | 'contact'>('all');
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -128,30 +130,26 @@ export default function App() {
       console.warn('API fetch failed, falling back to Firebase:', err);
     }
 
-    // Direct Firebase fallback (for GitHub Pages or when API is cold)
     try {
       const fbRes = await fetch(FIREBASE_FALLBACK_URL);
       if (fbRes.ok) {
         const fbData = await fbRes.json();
-        if (fbData) {
-          applyData(fbData);
-        }
+        applyData(fbData);
       }
-    } catch (fbErr) {
-      console.error('Firebase fallback also failed:', fbErr);
-    } finally {
-      setIsLoading(false);
+    } catch (err) {
+      console.error('Firebase fallback error:', err);
     }
   }, [applyData]);
 
   useEffect(() => {
     fetchData();
 
-    // Listen to real-time events via Server-Sent Events (SSE)
+    // SSE Realtime Updates from Backend Bot
     let eventSource: EventSource | null = null;
     try {
       const apiBase = getApiBase();
       eventSource = new EventSource(`${apiBase}/api/events`);
+      
       eventSource.onmessage = (event) => {
         try {
           const payload = JSON.parse(event.data);
@@ -195,9 +193,11 @@ export default function App() {
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.body.setAttribute('data-theme', themeStyle);
+      document.body.setAttribute('data-layout', layoutStyle);
       document.documentElement.setAttribute('data-theme', themeStyle);
+      document.documentElement.setAttribute('data-layout', layoutStyle);
     }
-  }, [themeStyle]);
+  }, [themeStyle, layoutStyle]);
 
   const isWireframe = themeStyle === 'ignitron_wireframe';
   const isIgnitronSpace = themeStyle === 'ignitron_cyber_space';
@@ -208,9 +208,16 @@ export default function App() {
   const isPopArt = themeStyle === 'bold_flat_popart';
   const isUltraGlass = themeStyle === 'ultra_cyber_glass';
 
+  // Layout Models
+  const isDrawerDockNav = layoutStyle === 'drawer_dock_nav';
+  const isGridDashboard = layoutStyle === 'grid_dashboard';
+  const isTabbedApp = layoutStyle === 'tabbed_app_layout';
+  const isServicesFirst = layoutStyle === 'services_first';
+
   return (
     <div
       data-theme={themeStyle}
+      data-layout={layoutStyle}
       className={`min-h-screen transition-colors duration-500 flex flex-col items-center py-4 sm:py-8 px-3 sm:px-4 selection:bg-cyan-400 selection:text-black relative overflow-hidden ${
       isWireframe
         ? 'bg-[#050505] text-white font-mono'
@@ -240,26 +247,19 @@ export default function App() {
       {/* SHUVOX Lightning Cyber 3D Background Orbs & Lightning Bolts */}
       {isShuvoxLightning && (
         <>
-          {/* 3D Glass Depth Effect Background Orbs */}
           <div className="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-            {/* Top Left Purple Orb */}
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" />
-            {/* Bottom Right Cyan Orb */}
             <div className="absolute top-[40%] right-[-10%] w-96 h-96 bg-cyan-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style={{ animationDelay: '2s' }} />
-            {/* Center Blue Orb */}
             <div className="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[150px] animate-blob" style={{ animationDelay: '4s' }} />
           </div>
 
-          {/* LIGHTNING EFFECT LAYERS */}
           <div className="fixed inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen lightning-bg-flash" />
           <div className="fixed top-0 left-[70%] md:left-[80%] -translate-x-1/2 w-32 h-[60vh] z-0 pointer-events-none flex justify-center">
-            {/* Lightning Bolt SVG */}
             <svg className="lightning-bolt-svg w-full h-full text-cyan-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
               <path d="M60 0 L20 120 L50 130 L10 230 L45 220 L25 300 L90 150 L55 160 L85 60 Z" fill="currentColor" />
             </svg>
           </div>
           <div className="fixed top-0 left-[20%] md:left-[15%] -translate-x-1/2 w-20 h-[40vh] z-0 pointer-events-none flex justify-center" style={{ animationDelay: '0.5s' }}>
-            {/* Smaller Secondary Lightning Bolt SVG */}
             <svg className="lightning-bolt-svg w-full h-full text-purple-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style={{ animationDelay: '0.2s' }}>
               <path d="M50 0 L10 90 L40 100 L0 180 L35 170 L15 250 L80 120 L45 130 L75 40 Z" fill="currentColor" />
             </svg>
@@ -277,40 +277,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Pop Art Comic Dots Ambient Background */}
-      {isPopArt && (
-        <div className="fixed inset-0 pointer-events-none z-0 opacity-15 bg-[radial-gradient(#000000_12%,transparent_12%)] [background-size:16px_16px]" />
-      )}
-
-      {/* Organic Nature Ambient Leaf Silhouettes */}
-      {isOrganic && (
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <svg className="absolute -top-10 -left-10 w-72 h-72 text-[#597762]/20 transform rotate-12" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/>
-          </svg>
-          <svg className="absolute -bottom-10 -right-10 w-80 h-80 text-[#c09367]/20 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/>
-          </svg>
-        </div>
-      )}
-
-      {/* Ambient Glassmorphism Glow Orbs */}
-      {isGlass && (
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute top-10 -left-10 w-72 h-72 bg-sky-300/35 rounded-full blur-2xl animate-float-orb" />
-          <div className="absolute top-1/3 -right-10 w-80 h-80 bg-pink-300/30 rounded-full blur-2xl animate-float-orb" style={{ animationDelay: '2s' }} />
-          <div className="absolute -bottom-10 left-1/4 w-72 h-72 bg-amber-300/30 rounded-full blur-2xl animate-float-orb" style={{ animationDelay: '4s' }} />
-        </div>
-      )}
-
-      {/* Cyberpunk Glow Orbs */}
-      {isCyber && (
-        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-cyan-500/15 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-10 -right-20 w-80 h-80 bg-purple-600/20 rounded-full blur-3xl" />
-        </div>
-      )}
-
       {/* Toast Notification */}
       <div
         className={`fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white border border-cyan-400 px-4 py-2 rounded-2xl text-xs sm:text-sm font-semibold shadow-2xl backdrop-blur-md transition-all duration-300 flex items-center gap-2 ${
@@ -322,110 +288,248 @@ export default function App() {
         <span>{toastMsg}</span>
       </div>
 
-      {/* Top App Bar & Navigation Drawer with 3-Dot Menu */}
-      <NavigationDrawer
-        profile={profile}
-        themeStyle={themeStyle}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        layoutStyle={layoutStyle}
-      />
-
-      {/* Dynamic Layout Models Container */}
-      {layoutStyle === 'split_sidebar_grid' ? (
-        /* Model 3: Split Sidebar & Tabbed Grid */
-        <main
-          data-theme={themeStyle}
-          className="w-full max-w-5xl rounded-3xl transition-all duration-500 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-start"
-        >
-          {/* Left Column: Sticky Profile Card */}
-          <div className={`md:col-span-5 md:sticky md:top-6 rounded-3xl overflow-hidden transition-all shadow-2xl ${
-            isUltraGlass
-              ? 'glass-premium rounded-[2.5rem] border border-white/10 shadow-[0_0_40px_rgba(34,211,238,0.25)]'
-              : isPopArt
-              ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000]'
-              : isOrganic
-              ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323]'
-              : isGlass
-              ? 'bg-white/80 backdrop-blur-2xl border-2 border-white/90 text-slate-900'
-              : 'bg-slate-950/90 border border-slate-800'
-          }`}>
-            <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
+      {/* THREE-DOT DRAWER & FLOATING DOCK MODEL TOP BAR */}
+      {isDrawerDockNav && (
+        <header className="w-full max-w-[620px] mb-3 z-30 flex items-center justify-between px-4 py-2.5 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl">
+          <div className="flex items-center gap-2.5">
+            <img
+              src={profile?.avatarUrl || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10'}
+              alt="Avatar"
+              className="w-8 h-8 rounded-full object-cover border border-cyan-400/60 shadow-md"
+            />
+            <div className="flex flex-col">
+              <span className="text-xs font-bold text-white tracking-tight leading-tight">
+                {profile?.name || 'My Bio'}
+              </span>
+              <span className="text-[10px] text-cyan-400 font-mono leading-tight">
+                {profile?.handle || '@bio'}
+              </span>
+            </div>
           </div>
 
-          {/* Right Column: Sections Panel */}
-          <div className="md:col-span-7 space-y-5">
-            {(activeTab === 'all' || activeTab === 'social') && (
-              <div id="sec-social">
-                <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="p-2 bg-slate-800/90 hover:bg-slate-700 text-cyan-400 rounded-xl border border-cyan-400/30 shadow-lg active:scale-95 transition-all flex items-center justify-center gap-1 font-bold text-xs"
+            title="Open Three-Dot Navigation Menu"
+          >
+            <span className="text-lg leading-none tracking-widest">•••</span>
+            <span className="text-[11px] font-semibold hidden sm:inline">মেন্যু</span>
+          </button>
+        </header>
+      )}
+
+      {/* SLIDE-OVER NAVIGATION DRAWER MODAL */}
+      {isDrawerOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-md transition-all duration-300 animate-fadeIn">
+          <div
+            className="fixed inset-0"
+            onClick={() => setIsDrawerOpen(false)}
+          />
+          <aside className="relative w-full max-w-[320px] h-full bg-slate-950/95 border-l border-white/15 p-6 shadow-2xl flex flex-col justify-between overflow-y-auto z-10 text-white">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={profile?.avatarUrl}
+                    alt="Profile Avatar"
+                    className="w-12 h-12 rounded-full object-cover border-2 border-cyan-400 shadow-md"
+                  />
+                  <div>
+                    <h3 className="font-bold text-sm text-white">{profile?.name}</h3>
+                    <p className="text-xs text-cyan-400 font-mono">{profile?.handle}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsDrawerOpen(false)}
+                  className="w-8 h-8 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-full flex items-center justify-center text-sm font-bold transition-all"
+                >
+                  ✕
+                </button>
               </div>
-            )}
-            {(activeTab === 'all' || activeTab === 'services') && (
-              <div id="sec-services">
-                <HighlightsServices services={services} themeStyle={themeStyle} />
-              </div>
-            )}
-            {(activeTab === 'all' || activeTab === 'contact') && (
-              <div id="sec-contact">
-                <DirectContact contact={contact} themeStyle={themeStyle} />
-              </div>
-            )}
-            {(activeTab === 'all' || activeTab === 'share') && (
-              <div id="sec-share">
-                <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
-              </div>
-            )}
-          </div>
-        </main>
-      ) : layoutStyle === 'bento_box_grid' ? (
-        /* Model 4: Bento Box Cyber Matrix Grid */
+
+              <nav className="space-y-2">
+                <p className="text-[10px] font-bold tracking-widest text-slate-400 uppercase mb-2">
+                  দ্রুত নেভিগেশন মেন্যু
+                </p>
+                <button
+                  onClick={() => { setActiveTab('all'); setIsDrawerOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
+                    activeTab === 'all'
+                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/30'
+                      : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">🏠 সম্পূর্ণ হোম ভিউ</span>
+                  <span className="text-[10px] font-mono opacity-80">All</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('bio'); setIsDrawerOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
+                    activeTab === 'bio'
+                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/30'
+                      : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">👤 প্রোফাইল & স্কিলস</span>
+                  <span className="text-[10px] font-mono opacity-80">{badges.length} Badges</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('social'); setIsDrawerOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
+                    activeTab === 'social'
+                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/30'
+                      : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">🌐 সোশ্যাল মিডিয়া অ্যাকাউন্ট</span>
+                  <span className="text-[10px] font-mono opacity-80">{socialLinks.length} Links</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('services'); setIsDrawerOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
+                    activeTab === 'services'
+                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/30'
+                      : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">🛠️ সাভিস & টুলস</span>
+                  <span className="text-[10px] font-mono opacity-80">{services.length} Live</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveTab('contact'); setIsDrawerOpen(false); }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-xs transition-all ${
+                    activeTab === 'contact'
+                      ? 'bg-cyan-500 text-black font-bold shadow-lg shadow-cyan-500/30'
+                      : 'bg-slate-900/80 text-slate-200 hover:bg-slate-800 hover:text-cyan-400'
+                  }`}
+                >
+                  <span className="flex items-center gap-2.5">📞 সরাসরি যোগাযোগ</span>
+                  <span className="text-[10px] font-mono opacity-80">Contact</span>
+                </button>
+              </nav>
+            </div>
+
+            <div className="pt-6 border-t border-white/10 space-y-3">
+              <button
+                onClick={() => {
+                  if (typeof navigator !== 'undefined' && navigator.share) {
+                    navigator.share({ title: profile?.name, url: window.location.href });
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    showToast('🔗 প্রোফাইল লিংক কপি করা হয়েছে!');
+                  }
+                  setIsDrawerOpen(false);
+                }}
+                className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl text-xs shadow-lg flex items-center justify-center gap-2"
+              >
+                📤 লিংক শেয়ার করুন
+              </button>
+              <p className="text-[10px] text-center text-slate-400">
+                PWA Dynamic Bio Layout Engine
+              </p>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* MULTI-TAB APP LAYOUT SEGMENTED TABS */}
+      {isTabbedApp && (
+        <nav className="w-full max-w-[620px] mb-4 z-30 flex items-center p-1 bg-slate-900/90 backdrop-blur-2xl border border-white/15 rounded-2xl shadow-xl gap-1">
+          <button
+            onClick={() => setActiveTab('bio')}
+            className={`flex-1 py-2 px-2 text-center rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'bio' || activeTab === 'all'
+                ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            🏠 বায়ো
+          </button>
+          <button
+            onClick={() => setActiveTab('social')}
+            className={`flex-1 py-2 px-2 text-center rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'social'
+                ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            🌐 সোশ্যাল
+          </button>
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`flex-1 py-2 px-2 text-center rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'services'
+                ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            🛠️ সার্ভিস
+          </button>
+          <button
+            onClick={() => setActiveTab('contact')}
+            className={`flex-1 py-2 px-2 text-center rounded-xl text-xs font-bold transition-all ${
+              activeTab === 'contact'
+                ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/30'
+                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
+            }`}
+          >
+            📞 কন্টাক্ট
+          </button>
+        </nav>
+      )}
+
+      {/* MAIN CONTAINER LAYOUT SWITCHER */}
+      {isGridDashboard ? (
+        /* BENTO GRID DASHBOARD LAYOUT */
         <main
           data-theme={themeStyle}
-          className="w-full max-w-[680px] rounded-3xl transition-all duration-500 relative z-10 space-y-4"
+          className="w-full max-w-[980px] rounded-3xl transition-all duration-500 relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-5"
         >
-          {/* Bento Box 1: Profile Card */}
-          {(activeTab === 'all' || activeTab === 'bio') && (
-            <div id="sec-header" className={`rounded-3xl transition-all overflow-hidden ${
+          {/* Left Column: Profile Card */}
+          <div className="lg:col-span-4 space-y-5">
+            <div className={`rounded-3xl p-1 transition-all ${
               isUltraGlass
-                ? 'glass-premium rounded-[2.5rem] border border-cyan-500/30 shadow-[0_0_40px_rgba(34,211,238,0.25)]'
+                ? 'glass-premium rounded-[2rem]'
                 : isPopArt
-                ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000]'
+                ? 'bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000]'
                 : isOrganic
                 ? 'bg-[#e2ece0] border border-[#9cb09a] text-[#1e3323]'
-                : isGlass
-                ? 'bg-white/80 backdrop-blur-2xl border-2 border-white/90 text-slate-900'
-                : 'bg-slate-950/85 border border-slate-800'
+                : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
             }`}>
               <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
             </div>
-          )}
 
-          {/* Bento Grid Split Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {(activeTab === 'all' || activeTab === 'social') && (
-              <div id="sec-social" className="sm:col-span-2">
-                <SocialLinks links={socialLinks} themeStyle={themeStyle} />
-              </div>
-            )}
-            {(activeTab === 'all' || activeTab === 'services') && (
-              <div id="sec-services" className="sm:col-span-2">
-                <HighlightsServices services={services} themeStyle={themeStyle} />
-              </div>
-            )}
-            {(activeTab === 'all' || activeTab === 'contact') && (
-              <div id="sec-contact" className="sm:col-span-2">
-                <DirectContact contact={contact} themeStyle={themeStyle} />
-              </div>
-            )}
-            {(activeTab === 'all' || activeTab === 'share') && (
-              <div id="sec-share" className="sm:col-span-2">
-                <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
-              </div>
-            )}
+            <div className={`p-4 rounded-3xl ${
+              isUltraGlass ? 'glass-card' : 'bg-slate-900/80 border border-slate-800'
+            }`}>
+              <p className="text-xs font-bold text-cyan-400 mb-2">⚡ কুইক অ্যাকশন</p>
+              <DirectContact contact={contact} themeStyle={themeStyle} />
+            </div>
+          </div>
+
+          {/* Right Column: Services, Socials & Share */}
+          <div className="lg:col-span-8 space-y-5">
+            <div className={`p-5 rounded-3xl ${
+              isUltraGlass ? 'glass-card' : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
+            }`}>
+              <HighlightsServices services={services} themeStyle={themeStyle} />
+            </div>
+
+            <div className={`p-5 rounded-3xl ${
+              isUltraGlass ? 'glass-card' : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
+            }`}>
+              <SocialLinks links={socialLinks} themeStyle={themeStyle} />
+            </div>
+
+            <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
           </div>
         </main>
       ) : (
-        /* Model 1 & 2 & 5: Standard Bio / 3-Dot App / Services First */
+        /* STANDARD OR TABBED / DRAWER CONTAINER */
         <main
           data-theme={themeStyle}
           className={`w-full max-w-[620px] rounded-3xl transition-all duration-500 relative z-10 ${
@@ -446,68 +550,35 @@ export default function App() {
               : 'bg-slate-950/80 border border-slate-800/80 backdrop-blur-2xl'
           }`}
         >
-          {/* Active Tab Breadcrumb Notification Bar */}
-          {activeTab !== 'all' && (
-            <div className="mx-4 mt-4 p-3 rounded-2xl bg-cyan-500/10 border border-cyan-400/40 text-cyan-300 flex items-center justify-between text-xs font-semibold backdrop-blur-md animate-fadeIn shadow-lg">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping" />
-                <span>📍 ফিল্টারড সেকশন: <strong className="text-white uppercase tracking-wider">{activeTab}</strong></span>
-              </div>
-              <button
-                onClick={() => setActiveTab('all')}
-                className="px-3 py-1 rounded-xl bg-cyan-500 text-slate-950 font-bold hover:bg-cyan-400 transition-all text-[11px] shadow"
-              >
-                সবগুলো দেখুন (Show All)
-              </button>
-            </div>
-          )}
-
-          {/* Profile Header & Avatar (Fully Dynamic from Bot) */}
+          {/* Profile Header & Avatar */}
           {(activeTab === 'all' || activeTab === 'bio') && (
-            <div id="sec-header">
-              <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
-            </div>
+            <BioHeader profile={profile} badges={badges} themeStyle={themeStyle} />
           )}
 
           {/* Content Sections */}
           <div className="px-4 sm:px-5 pb-6 space-y-5">
-            {layoutStyle === 'services_first' ? (
+            {isServicesFirst ? (
               <>
-                {/* Services Grid First */}
                 {(activeTab === 'all' || activeTab === 'services') && (
-                  <div id="sec-services">
-                    <HighlightsServices services={services} themeStyle={themeStyle} />
-                  </div>
+                  <HighlightsServices services={services} themeStyle={themeStyle} />
                 )}
-                {/* Social Links Second */}
                 {(activeTab === 'all' || activeTab === 'social') && (
-                  <div id="sec-social">
-                    <SocialLinks links={socialLinks} themeStyle={themeStyle} />
-                  </div>
+                  <SocialLinks links={socialLinks} themeStyle={themeStyle} />
                 )}
               </>
             ) : (
               <>
-                {/* Social Links First */}
                 {(activeTab === 'all' || activeTab === 'social') && (
-                  <div id="sec-social">
-                    <SocialLinks links={socialLinks} themeStyle={themeStyle} />
-                  </div>
+                  <SocialLinks links={socialLinks} themeStyle={themeStyle} />
                 )}
-                {/* Services Grid Second */}
                 {(activeTab === 'all' || activeTab === 'services') && (
-                  <div id="sec-services">
-                    <HighlightsServices services={services} themeStyle={themeStyle} />
-                  </div>
+                  <HighlightsServices services={services} themeStyle={themeStyle} />
                 )}
               </>
             )}
 
-            {/* Direct Contact Buttons */}
             {(activeTab === 'all' || activeTab === 'contact') && (
-              <div id="sec-contact">
-                <DirectContact contact={contact} themeStyle={themeStyle} />
-              </div>
+              <DirectContact contact={contact} themeStyle={themeStyle} />
             )}
 
             {/* Skeleton placeholder during first visit */}
@@ -519,13 +590,58 @@ export default function App() {
             )}
 
             {/* QR Code & Share Box */}
-            {(activeTab === 'all' || activeTab === 'share') && (
-              <div id="sec-share">
-                <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
-              </div>
-            )}
+            <ShareAndFooter onShowToast={showToast} themeStyle={themeStyle} />
           </div>
         </main>
+      )}
+
+      {/* FLOATING GLASS BOTTOM DOCK (for 3-Dot Drawer & Dock Layout) */}
+      {isDrawerDockNav && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 flex items-center gap-1.5 px-3 py-2 bg-slate-900/90 backdrop-blur-2xl border border-cyan-400/40 rounded-full shadow-2xl">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={`p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 ${
+              activeTab === 'all' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-300 hover:text-white'
+            }`}
+            title="Home All View"
+          >
+            🏠
+          </button>
+          <button
+            onClick={() => setActiveTab('social')}
+            className={`p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 ${
+              activeTab === 'social' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-300 hover:text-white'
+            }`}
+            title="Social Links"
+          >
+            🌐
+          </button>
+          <button
+            onClick={() => setActiveTab('services')}
+            className={`p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 ${
+              activeTab === 'services' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-300 hover:text-white'
+            }`}
+            title="Services"
+          >
+            🛠️
+          </button>
+          <button
+            onClick={() => setActiveTab('contact')}
+            className={`p-2 rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 ${
+              activeTab === 'contact' ? 'bg-cyan-400 text-black shadow-lg shadow-cyan-400/40' : 'text-slate-300 hover:text-white'
+            }`}
+            title="Contact"
+          >
+            📞
+          </button>
+          <button
+            onClick={() => setIsDrawerOpen(true)}
+            className="p-2 bg-purple-600/80 hover:bg-purple-600 text-white rounded-full transition-all text-xs font-bold flex items-center justify-center w-9 h-9 shadow-md active:scale-95"
+            title="Three-Dot Menu Drawer"
+          >
+            •••
+          </button>
+        </div>
       )}
     </div>
   );
