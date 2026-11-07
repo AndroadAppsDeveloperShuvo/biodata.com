@@ -40,8 +40,8 @@ export interface ClientRecord {
     telegramUsername: string;
     customNote: string;
   };
-  layoutStyle?: 'social_first' | 'services_first';
-  themeStyle?: 'classic_dark' | 'dark_glassmorphism' | string;
+  layoutStyle?: 'ultra_bento_3d' | 'shuvox_lightning_cyber' | 'classic_stacked' | 'services_first' | 'editorial_minimalist' | string;
+  themeStyle?: string;
 }
 
 function escapeHtml(text: string): string {
@@ -64,8 +64,8 @@ export function generateClientManifest(client: ClientRecord): string {
     scope: "./",
     display: "standalone",
     orientation: "portrait",
-    background_color: "#09090b",
-    theme_color: "#09090b",
+    background_color: "#050505",
+    theme_color: "#050505",
     icons: [
       {
         src: client.logoUrl || "pwa-192x192.png",
@@ -94,7 +94,7 @@ export function generateClientManifest(client: ClientRecord): string {
 export function generateClientServiceWorker(client: ClientRecord): string {
   const safeId = client.id.replace(/[^a-zA-Z0-9_-]/g, '_');
   return `// PWA Service Worker for ${client.appName}
-const CACHE_NAME = 'biodata-pwa-${safeId}-v1';
+const CACHE_NAME = 'biodata-pwa-${safeId}-v2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -166,23 +166,29 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     services: client.services,
     socialLinks: client.socialLinks,
     contact: client.contact,
-    layoutStyle: client.layoutStyle || 'social_first',
-    themeStyle: client.themeStyle || 'ultra_cyber_glass',
+    layoutStyle: client.layoutStyle || 'ultra_bento_3d',
+    themeStyle: client.themeStyle || 'shuvox_lightning_cyber',
     updatedAt: client.createdAt
   });
 
+  const defaultAvatar = client.profile?.avatarUrl || client.logoUrl || 'https://placehold.co/400x400/ffffff/1e293b?text=SP';
+  const defaultName = client.profile?.name || client.appName || 'MD SHUVO P.K.';
+  const defaultTitle = client.profile?.title || 'Frontend Developer & Poultry Farm Manager';
+  const defaultLocation = client.profile?.location || 'Natore, Bangladesh';
+  const defaultBio = client.profile?.bio || 'Hi! I am a passionate developer and agricultural manager who loves blending technical logic with practical problem-solving. My dual expertise allows me to build pixel-perfect, high-performance web applications while also scaling real-world operations. I focus on clean code, seamless UX, and sustainable growth.';
+
   return `<!DOCTYPE html>
-<!-- Generated Build Signature: ${Date.now()} -->
+<!-- Generated Ultra-Premium PWA: ${Date.now()} -->
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(client.appName)}</title>
-  <meta name="description" content="Official Social Bio & Portfolio of ${escapeHtml(client.profile.name)}">
-  <meta property="og:title" content="${escapeHtml(client.appName)}">
-  <meta property="og:description" content="Official Social Bio & Portfolio of ${escapeHtml(client.profile.name)}">
-  <meta property="og:image" content="${escapeHtml(client.logoUrl)}">
-  <link rel="icon" type="image/png" href="${escapeHtml(client.logoUrl)}">
+  <title>${escapeHtml(client.appName || defaultName)}</title>
+  <meta name="description" content="Official Social Bio & Portfolio of ${escapeHtml(defaultName)}">
+  <meta property="og:title" content="${escapeHtml(client.appName || defaultName)}">
+  <meta property="og:description" content="Official Social Bio & Portfolio of ${escapeHtml(defaultName)}">
+  <meta property="og:image" content="${escapeHtml(client.logoUrl || defaultAvatar)}">
+  <link rel="icon" type="image/png" href="${escapeHtml(client.logoUrl || defaultAvatar)}">
   
   <!-- PWA & Mobile Web App Meta -->
   <link rel="manifest" href="manifest.json" id="manifestLink">
@@ -190,69 +196,249 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="${escapeHtml(client.shortName)}" id="appleTitleMeta">
-  <link rel="apple-touch-icon" href="${escapeHtml(client.logoUrl)}" id="appleTouchIcon">
+  <meta name="apple-mobile-web-app-title" content="${escapeHtml(client.shortName || 'BIO DATA')}" id="appleTitleMeta">
+  <link rel="apple-touch-icon" href="${escapeHtml(client.logoUrl || defaultAvatar)}" id="appleTouchIcon">
   
-  <!-- Google Fonts & Tailwind CDN -->
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome 6 -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Google Fonts: Inter & Orbitron & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Animation Libraries: Vanilla Tilt & Typed.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
+            sans: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            tech: ['"Orbitron"', 'monospace', 'sans-serif'],
           },
-          colors: {
-            wireBlue: '#00f0ff',
-            wireRed: '#ff003c',
-            darkBg: '#050505',
+          boxShadow: {
+            'premium': '0 10px 40px -10px rgba(0,0,0,0.08)',
+            'premium-hover': '0 20px 40px -10px rgba(0,0,0,0.12)',
+            'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
           }
         }
       }
-    }
+    };
   </script>
   
   <style>
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
-      background-color: #09090b;
-      color: #f4f4f5;
-      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      background-color: #F9FAFB;
+      color: #0F172A;
       overflow-x: hidden;
-    }
-    .font-tech {
-      font-family: 'Orbitron', monospace, sans-serif;
+      cursor: auto;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    /* --- Scroll Reveal Animations --- */
-    .reveal {
+    /* Enable custom cursor on desktop */
+    @media (hover: hover) and (pointer: fine) {
+      body.has-magic-cursor {
+        cursor: none;
+      }
+    }
+
+    /* ---------------- Magical Cursor ---------------- */
+    .magic-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+      background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: multiply;
+      transition: width 0.2s, height 0.2s, background-color 0.2s;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.6);
+      display: none;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .magic-cursor { display: block; }
+    }
+    .magic-cursor.hovering {
+      width: 60px;
+      height: 60px;
+      background: rgba(59, 130, 246, 0.15);
+      mix-blend-mode: normal;
+      border: 2px solid #3b82f6;
+      box-shadow: none;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ---------------- Animated Background Orbs ---------------- */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      z-index: 0;
+      animation: floatOrb 20s infinite alternate ease-in-out;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .orb-1 { top: -10%; left: -10%; width: 420px; height: 420px; background: #93c5fd; }
+    .orb-2 { bottom: -10%; right: -10%; width: 520px; height: 520px; background: #c4b5fd; animation-delay: -5s; }
+    .orb-3 { top: 40%; left: 40%; width: 320px; height: 320px; background: #a7f3d0; animation-delay: -10s; }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -50px) scale(1.1); }
+      66% { transform: translate(-20px, 20px) scale(0.9); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* ---------------- Premium Cards ---------------- */
+    .premium-card {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 1);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
       opacity: 0;
-      transform: translateY(40px);
-      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(35px) scale(0.96);
+      animation: popIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      transform-style: preserve-3d;
+      transition: box-shadow 0.3s ease, border-color 0.3s ease;
     }
-    .reveal.active {
-      opacity: 1;
-      transform: translateY(0);
+    .premium-card:hover {
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.09);
     }
 
-    /* --- Wireframe Box Styles (Debug Look) --- */
-    .wire-box {
-      position: relative;
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(4px);
-      transition: background 0.3s ease;
+    @keyframes popIn {
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
-    .wire-box:hover {
-      background: rgba(255, 255, 255, 0.05);
+
+    .delay-1 { animation-delay: 0.05s; }
+    .delay-2 { animation-delay: 0.15s; }
+    .delay-3 { animation-delay: 0.25s; }
+    .delay-4 { animation-delay: 0.35s; }
+    .delay-5 { animation-delay: 0.45s; }
+
+    .float-el { transform: translateZ(20px); }
+    .float-el-high { transform: translateZ(40px); }
+
+    /* ---------------- Avatar Morph Animation ---------------- */
+    .avatar-morph {
+      animation: morphBlob 8s ease-in-out infinite;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      transition: all 0.8s ease-in-out;
     }
-    
-    /* Blue Wireframe */
+    .avatar-morph:hover {
+      border-radius: 50%;
+      box-shadow: 0 0 35px rgba(59, 130, 246, 0.45);
+    }
+    @keyframes morphBlob {
+      0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+      100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    }
+
+    /* Gradient Shine Text */
+    .animate-gradient-text {
+      background: linear-gradient(to right, #2563eb, #7c3aed, #2563eb);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      animation: textShine 3s linear infinite;
+    }
+    @keyframes textShine {
+      to { background-position: 200% center; }
+    }
+
+    /* Pulse Ring */
+    .pulse-ring {
+      position: absolute;
+      bottom: 0.25rem;
+      right: 0.25rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+    .pulse-ring::before {
+      content: '';
+      position: absolute;
+      left: -4px; top: -4px; right: -4px; bottom: -4px;
+      border-radius: 50%;
+      border: 2px solid #22c55e;
+      animation: pulsateRing 2s ease-out infinite;
+    }
+    @keyframes pulsateRing {
+      0% { transform: scale(0.5); opacity: 1; }
+      100% { transform: scale(2); opacity: 0; }
+    }
+
+    /* Custom Progress Bars */
+    .progress-container {
+      width: 100%;
+      background-color: #f1f5f9;
+      border-radius: 9999px;
+      height: 6px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 1.2s ease-out;
+      width: 0%;
+    }
+
+    /* ---------------- Dark / Cyber Theme Modes ---------------- */
+    body.theme-cyber {
+      background-color: #050505;
+      color: #f4f4f5;
+    }
+    body.theme-cyber .bg-crosshairs {
+      background-image: radial-gradient(#333 1px, transparent 0);
+      background-size: 40px 40px;
+      background-position: -19px -19px;
+    }
+    body.theme-cyber .premium-card {
+      background: rgba(18, 18, 24, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+      color: #f4f4f5;
+    }
+    body.theme-cyber .premium-card:hover {
+      box-shadow: 0 10px 40px rgba(6, 182, 212, 0.2);
+    }
+    body.theme-cyber .progress-container {
+      background-color: #1e293b;
+    }
+
+    /* Roaming Canvas */
+    #boidsCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.8;
+      display: none;
+    }
+
+    /* Wireframe Debug Corners */
     .wire-blue {
-      border: 1px solid rgba(0, 240, 255, 0.3);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      position: relative;
     }
     .wire-blue::before, .wire-blue::after {
       content: '';
@@ -264,1602 +450,701 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
     .wire-blue::before { top: -4px; left: -4px; }
     .wire-blue::after { bottom: -4px; right: -4px; }
 
-    /* Red Wireframe */
-    .wire-red {
-      border: 1px solid rgba(255, 0, 60, 0.4);
-    }
-    .wire-red::before, .wire-red::after {
-      content: '';
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      border: 1px solid #ff003c;
-    }
-    .wire-red::before { top: -4px; right: -4px; }
-    .wire-red::after { bottom: -4px; left: -4px; }
-
-    /* Crosshairs Background Pattern */
-    .bg-crosshairs {
-      background-image: radial-gradient(#333 1px, transparent 0);
-      background-size: 40px 40px;
-      background-position: -19px -19px;
-    }
-    
-    /* Background Canvas */
-    #boidsCanvas {
+    /* Lightning flash overlay */
+    #lightningCanvas {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
+      inset: 0;
       pointer-events: none;
-      opacity: 0.8;
-    }
-    .glass-card {
-      background: rgba(18, 18, 24, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .neon-glow {
-      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.35);
-    }
-    .avatar-glow {
-      box-shadow: 0 0 0 3px #09090b, 0 0 0 5px rgba(6, 182, 212, 0.6), 0 10px 25px -5px rgba(6, 182, 212, 0.4);
-      border-radius: 9999px !important;
-      overflow: hidden !important;
-    }
-    .avatar-glow img,
-    #avatarImgBox img,
-    #profileAvatar {
-      border-radius: 9999px !important;
-      object-fit: cover !important;
-    }
-    @keyframes pulseSlow {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.05); opacity: 0.85; }
-    }
-    .animate-pulse-slow {
-      animation: pulseSlow 3s ease-in-out infinite;
-    }
-    /* Hover Scale Interactions */
-    .social-link-card,
-    #socialLinksContainer > a,
-    .service-card,
-    #servicesGrid > div {
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease !important;
-    }
-    .social-link-card:hover,
-    #socialLinksContainer > a:hover {
-      transform: scale(1.025) translateY(-2px) !important;
-    }
-    .service-card:hover,
-    #servicesGrid > div:hover {
-      transform: scale(1.03) !important;
-    }
-    /* Liquid Crystal White Glass (Theme 2: dark_glassmorphism) */
-    [data-theme="dark_glassmorphism"] {
-      background: linear-gradient(135deg, #e0f2fe 0%, #fef3c7 35%, #fce7f3 70%, #f3e8ff 100%) !important;
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] main {
-      background: rgba(255, 255, 255, 0.75) !important;
-      backdrop-filter: blur(28px) !important;
-      -webkit-backdrop-filter: blur(28px) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.9) !important;
-      box-shadow: 0 30px 70px rgba(100, 116, 139, 0.2), inset 0 1px 2px rgba(255, 255, 255, 0.9) !important;
-      border-radius: 2.5rem !important;
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #profileName {
-      color: #0f172a !important;
-      font-weight: 900 !important;
-      text-shadow: 0 2px 10px rgba(255, 255, 255, 0.8) !important;
-      background: none !important;
-      -webkit-background-clip: initial !important;
-      -webkit-text-fill-color: initial !important;
-    }
-    [data-theme="dark_glassmorphism"] #profileHandle {
-      background: rgba(224, 242, 254, 0.85) !important;
-      border: 1px solid rgba(186, 230, 253, 0.9) !important;
-      color: #0284c7 !important;
-      font-weight: 700 !important;
-    }
-    [data-theme="dark_glassmorphism"] #profileTitle {
-      color: #334155 !important;
-      font-weight: 600 !important;
-    }
-    [data-theme="dark_glassmorphism"] #profileLocationWrapper {
-      color: #475569 !important;
-    }
-    [data-theme="dark_glassmorphism"] #profileBio,
-    [data-theme="dark_glassmorphism"] .glass-card {
-      background: rgba(255, 255, 255, 0.7) !important;
-      backdrop-filter: blur(16px) !important;
-      border: 1.5px solid rgba(254, 243, 199, 0.85) !important;
-      color: #1e293b !important;
-    }
-    [data-theme="dark_glassmorphism"] #socialLinksContainer > a {
-      background: rgba(255, 255, 255, 0.82) !important;
-      backdrop-filter: blur(16px) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-      color: #0f172a !important;
-      box-shadow: 0 10px 25px rgba(148, 163, 184, 0.12) !important;
-      border-radius: 1.25rem !important;
-    }
-    [data-theme="dark_glassmorphism"] #socialLinksContainer > a h3 {
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #socialLinksContainer > a p {
-      color: #475569 !important;
-    }
-    [data-theme="dark_glassmorphism"] #socialLinksContainer > a span {
-      background: linear-gradient(135deg, #38bdf8, #818cf8) !important;
-      color: #ffffff !important;
-      font-weight: 800 !important;
-    }
-    [data-theme="dark_glassmorphism"] #servicesGrid > div {
-      background: rgba(255, 255, 255, 0.85) !important;
-      backdrop-filter: blur(16px) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #servicesGrid h4 {
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #servicesGrid p {
-      color: #475569 !important;
-    }
-    [data-theme="dark_glassmorphism"] #contactContainer {
-      background: rgba(255, 255, 255, 0.75) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-    }
-    [data-theme="dark_glassmorphism"] #contactContainer h3 {
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #contactContainer a:first-child {
-      background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%) !important;
-      color: #052e16 !important;
-      font-weight: 800 !important;
-      border: none !important;
-      border-radius: 9999px !important;
-    }
-    [data-theme="dark_glassmorphism"] #contactContainer a:last-child {
-      background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%) !important;
-      color: #ffffff !important;
-      font-weight: 800 !important;
-      border: none !important;
-      border-radius: 9999px !important;
-    }
-    [data-theme="dark_glassmorphism"] #btnShareProfile > div {
-      background: rgba(255, 255, 255, 0.75) !important;
-      border: 1.5px solid rgba(255, 255, 255, 0.95) !important;
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #btnShareProfile h3,
-    [data-theme="dark_glassmorphism"] #btnShareProfile h4 {
-      color: #0f172a !important;
-    }
-    [data-theme="dark_glassmorphism"] #btnShareProfile p,
-    [data-theme="dark_glassmorphism"] footer p {
-      color: #475569 !important;
-    }
-
-    /* Cyberpunk Neon Theme Rules */
-    [data-theme="cyberpunk_neon"] {
-      background-color: #030712 !important;
-      background-image: radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.2), transparent 70%),
-                        linear-gradient(to bottom, rgba(147, 51, 234, 0.15), rgba(3, 7, 18, 0.98)) !important;
-    }
-    [data-theme="cyberpunk_neon"] main {
-      background: #080d1e !important;
-      border: 2px solid rgba(34, 211, 238, 0.8) !important;
-      box-shadow: 0 0 35px rgba(34, 211, 238, 0.35), inset 0 0 25px rgba(147, 51, 234, 0.15) !important;
-      border-radius: 1.5rem !important;
-    }
-    [data-theme="cyberpunk_neon"] .glass-card {
-      background: rgba(12, 19, 44, 0.85) !important;
-      border: 1px solid rgba(34, 211, 238, 0.5) !important;
-      box-shadow: 0 0 20px rgba(34, 211, 238, 0.2), inset 0 0 15px rgba(34, 211, 238, 0.1) !important;
-    }
-    [data-theme="cyberpunk_neon"] .avatar-glow {
-      box-shadow: 0 0 0 3px #080d1e, 0 0 0 6px #22d3ee, 0 0 25px #22d3ee !important;
-    }
-    [data-theme="cyberpunk_neon"] #servicesGrid > div {
-      background: #0b1329 !important;
-      border: 1px solid rgba(34, 211, 238, 0.6) !important;
-      box-shadow: 0 0 15px rgba(34, 211, 238, 0.25) !important;
-    }
-    [data-theme="cyberpunk_neon"] #socialLinksContainer > a {
-      background: rgba(11, 19, 41, 0.9) !important;
-      border: 1px solid rgba(34, 211, 238, 0.4) !important;
-      box-shadow: 0 0 12px rgba(34, 211, 238, 0.15) !important;
-    }
-    [data-theme="cyberpunk_neon"] #contactContainer a:first-child {
-      background: linear-gradient(135deg, #10b981, #34d399) !important;
-      color: #020617 !important;
-      font-weight: 800 !important;
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4) !important;
-    }
-    [data-theme="cyberpunk_neon"] #contactContainer a:last-child {
-      background: linear-gradient(135deg, #06b6d4, #3b82f6) !important;
-      color: #ffffff !important;
-      font-weight: 800 !important;
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4) !important;
-    }
-    /* Organic Nature Theme Rules */
-    [data-theme="organic_nature"] {
-      background-color: #dce6d8 !important;
-      background-image: radial-gradient(circle at 10% 20%, rgba(107, 142, 115, 0.2), transparent 50%),
-                        radial-gradient(circle at 90% 80%, rgba(201, 155, 112, 0.2), transparent 50%) !important;
-      color: #1e3323 !important;
-    }
-    [data-theme="organic_nature"] main {
-      background: #e2ece0 !important;
-      border: 1px solid #9cb09a !important;
-      box-shadow: 0 20px 40px rgba(45, 68, 48, 0.15) !important;
-      border-radius: 2rem !important;
-      color: #1e3323 !important;
-    }
-    [data-theme="organic_nature"] .profile-banner-container {
-      background-color: #c0d1be !important;
-    }
-    [data-theme="organic_nature"] .profile-banner-overlay {
-      background: linear-gradient(to top, #e2ece0 0%, rgba(226, 236, 224, 0.5) 55%, transparent 100%) !important;
-    }
-    [data-theme="organic_nature"] #profileName {
-      color: #1a2e1f !important;
-      background: none !important;
-      -webkit-text-fill-color: #1a2e1f !important;
-    }
-    [data-theme="organic_nature"] #profileHandle {
-      background: #c8dac6 !important;
-      border: 1px solid #9bb198 !important;
-      color: #2b4530 !important;
-    }
-    [data-theme="organic_nature"] #profileTitle {
-      color: #2e4533 !important;
-    }
-    [data-theme="organic_nature"] #profileLocationWrapper {
-      color: #4a634e !important;
-    }
-    [data-theme="organic_nature"] #profileBio {
-      color: #233b28 !important;
-    }
-    [data-theme="organic_nature"] h1, 
-    [data-theme="organic_nature"] h2, 
-    [data-theme="organic_nature"] h3, 
-    [data-theme="organic_nature"] h4 {
-      color: #1a2e1f !important;
-    }
-    [data-theme="organic_nature"] p {
-      color: #2d4231 !important;
-    }
-    [data-theme="organic_nature"] .glass-card {
-      background: rgba(255, 255, 255, 0.8) !important;
-      backdrop-filter: blur(12px) !important;
-      border: 1px solid rgba(142, 168, 140, 0.5) !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.03) !important;
-    }
-    [data-theme="organic_nature"] .avatar-glow {
-      box-shadow: 0 0 0 3px #e2ece0, 0 0 0 6px #597762, 0 10px 25px rgba(89, 119, 98, 0.3) !important;
-      background-color: #e2ece0 !important;
-      border-color: #597762 !important;
-    }
-    [data-theme="organic_nature"] #badgesContainer span {
-      background: #cddecd !important;
-      border: 1px solid #8ca28a !important;
-      color: #1a2d1d !important;
-    }
-    [data-theme="organic_nature"] #servicesGrid > div:nth-child(odd) {
-      background: linear-gradient(135deg, #597762, #476350) !important;
-      border: 1px solid #718f7a !important;
-    }
-    [data-theme="organic_nature"] #servicesGrid > div:nth-child(even) {
-      background: linear-gradient(135deg, #c09367, #a87e55) !important;
-      border: 1px solid #d4a97f !important;
-    }
-    [data-theme="organic_nature"] #servicesGrid h4,
-    [data-theme="organic_nature"] #servicesGrid p {
-      color: #ffffff !important;
-    }
-    [data-theme="organic_nature"] #socialLinksContainer > a {
-      background: #ffffff !important;
-      border: 1px solid #b2c4b0 !important;
-      color: #1a2d1d !important;
-      box-shadow: 0 4px 14px rgba(45, 68, 48, 0.06) !important;
-    }
-    [data-theme="organic_nature"] #socialLinksContainer > a h3 {
-      color: #1a2d1d !important;
-    }
-    [data-theme="organic_nature"] #socialLinksContainer > a p {
-      color: #48614a !important;
-    }
-    [data-theme="organic_nature"] #socialLinksContainer > a span {
-      background: #597762 !important;
-      color: #ffffff !important;
-      box-shadow: 0 2px 8px rgba(89, 119, 98, 0.35) !important;
-    }
-    [data-theme="organic_nature"] #socialLinksContainer > a:hover span {
-      background: #476350 !important;
-      color: #ffffff !important;
-    }
-    [data-theme="organic_nature"] #btnShareProfile > div {
-      background: #ffffff !important;
-      border: 1px solid #b2c4b0 !important;
-      box-shadow: 0 4px 14px rgba(45, 68, 48, 0.08) !important;
-    }
-    [data-theme="organic_nature"] #btnShareProfile h3,
-    [data-theme="organic_nature"] #btnShareProfile h4 {
-      color: #1a2d1d !important;
-    }
-    [data-theme="organic_nature"] #btnShareProfile p {
-      color: #48614a !important;
-    }
-    [data-theme="organic_nature"] #btnShareProfile span {
-      background: linear-gradient(135deg, #597762, #476350) !important;
-      color: #ffffff !important;
-      box-shadow: 0 2px 8px rgba(89, 119, 98, 0.3) !important;
-    }
-    [data-theme="organic_nature"] #btnShareProfile svg {
-      color: #597762 !important;
-    }
-    [data-theme="organic_nature"] #btnShareProfile span svg {
-      color: #ffffff !important;
-    }
-    [data-theme="organic_nature"] #contactContainer {
-      background: #ffffff !important;
-      border: 1px solid #b2c4b0 !important;
-    }
-    [data-theme="organic_nature"] #contactContainer h3 {
-      color: #2b4530 !important;
-    }
-    [data-theme="organic_nature"] #contactContainer a:first-child {
-      background: linear-gradient(135deg, #597762, #476350) !important;
-      color: #ffffff !important;
-      border-radius: 9999px !important;
-      font-weight: 700 !important;
-      box-shadow: 0 4px 12px rgba(89, 119, 98, 0.3) !important;
-    }
-    [data-theme="organic_nature"] #contactContainer a:last-child {
-      background: linear-gradient(135deg, #c09367, #a87e55) !important;
-      color: #ffffff !important;
-      border-radius: 9999px !important;
-      font-weight: 700 !important;
-      box-shadow: 0 4px 12px rgba(192, 147, 103, 0.3) !important;
-    }
-    [data-theme="organic_nature"] footer p {
-      color: #4a634e !important;
-    }
-    /* Bold Flat (Pop Art) Theme Rules */
-    [data-theme="bold_flat_popart"] {
-      background-color: #facc15 !important;
-      background-image: radial-gradient(#000000 12%, transparent 12%) !important;
-      background-size: 16px 16px !important;
-      color: #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] main {
-      background-color: #fef08a !important;
-      border: 4px solid #000000 !important;
-      box-shadow: 8px 8px 0px #000000 !important;
-      border-radius: 1.5rem !important;
-      color: #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] .profile-banner-container {
-      background: linear-gradient(115deg, #ef4444 50%, #2563eb 50%) !important;
-      border-bottom: 4px solid #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] .profile-banner-overlay {
-      background: linear-gradient(to top, #fef08a 0%, transparent 80%) !important;
-    }
-    [data-theme="bold_flat_popart"] #profileName {
-      color: #000000 !important;
-      font-weight: 900 !important;
-      text-shadow: 2px 2px 0px #facc15 !important;
-    }
-    [data-theme="bold_flat_popart"] #profileHandle {
-      background: #fde047 !important;
-      border: 2px solid #000000 !important;
-      color: #000000 !important;
-      font-weight: 800 !important;
-      box-shadow: 2px 2px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #profileTitle,
-    [data-theme="bold_flat_popart"] #profileLocationWrapper,
-    [data-theme="bold_flat_popart"] #profileBio {
-      color: #000000 !important;
-      font-weight: 700 !important;
-    }
-    [data-theme="bold_flat_popart"] h1, 
-    [data-theme="bold_flat_popart"] h2, 
-    [data-theme="bold_flat_popart"] h3, 
-    [data-theme="bold_flat_popart"] h4,
-    [data-theme="bold_flat_popart"] p {
-      color: #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] .glass-card {
-      background: #ffffff !important;
-      border: 3px solid #000000 !important;
-      box-shadow: 4px 4px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] .avatar-glow {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
-      background-color: #ffffff !important;
-      border: 3px solid #000000 !important;
-      border-radius: 9999px !important;
-    }
-    [data-theme="bold_flat_popart"] .avatar-glow img {
-      border-radius: 9999px !important;
-    }
-    [data-theme="bold_flat_popart"] #badgesContainer span {
-      background: #38bdf8 !important;
-      border: 2px solid #000000 !important;
-      color: #000000 !important;
-      font-weight: 800 !important;
-      box-shadow: 2px 2px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #servicesGrid > div {
-      border: 3px solid #000000 !important;
-      box-shadow: 4px 4px 0px #000000 !important;
-      border-radius: 1rem !important;
-    }
-    [data-theme="bold_flat_popart"] #servicesGrid > div:nth-child(3n+1) { background: #ef4444 !important; }
-    [data-theme="bold_flat_popart"] #servicesGrid > div:nth-child(3n+2) { background: #3b82f6 !important; }
-    [data-theme="bold_flat_popart"] #servicesGrid > div:nth-child(3n+3) { background: #eab308 !important; }
-    [data-theme="bold_flat_popart"] #servicesGrid h4,
-    [data-theme="bold_flat_popart"] #servicesGrid p {
-      color: #ffffff !important;
-      font-weight: 800 !important;
-      text-shadow: 1px 1px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #socialLinksContainer > a {
-      background: #ffffff !important;
-      border: 3px solid #000000 !important;
-      color: #000000 !important;
-      box-shadow: 4px 4px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #socialLinksContainer > a h3,
-    [data-theme="bold_flat_popart"] #socialLinksContainer > a p {
-      color: #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #socialLinksContainer > a span {
-      background: #ef4444 !important;
-      border: 2px solid #000000 !important;
-      color: #ffffff !important;
-      font-weight: 800 !important;
-      box-shadow: 2px 2px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #btnShareProfile > div {
-      background: #ffffff !important;
-      border: 3px solid #000000 !important;
-      box-shadow: 4px 4px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #btnShareProfile h3,
-    [data-theme="bold_flat_popart"] #btnShareProfile h4,
-    [data-theme="bold_flat_popart"] #btnShareProfile p {
-      color: #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] .share-action-btn {
-      background: #2563eb !important;
-      border: 2px solid #000000 !important;
-      color: #ffffff !important;
-      font-weight: 700 !important;
-      box-shadow: none !important;
-      text-shadow: none !important;
-    }
-    [data-theme="bold_flat_popart"] #btnShareProfile > div > div:last-child > span {
-      background: #2563eb !important;
-      border: 2px solid #000000 !important;
-      color: #ffffff !important;
-      font-weight: 700 !important;
-      box-shadow: none !important;
-      text-shadow: none !important;
-    }
-    [data-theme="bold_flat_popart"] .share-action-btn span,
-    [data-theme="bold_flat_popart"] #btnShareProfile span span {
-      border: none !important;
-      box-shadow: none !important;
-      background: transparent !important;
-      color: #ffffff !important;
-      font-weight: 700 !important;
-      text-shadow: none !important;
-      -webkit-text-stroke: 0px !important;
-    }
-    [data-theme="bold_flat_popart"] #contactContainer {
-      background: #ffffff !important;
-      border: 3px solid #000000 !important;
-      box-shadow: 4px 4px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #contactContainer h3 {
-      color: #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #contactContainer a:first-child {
-      background: #22c55e !important;
-      color: #000000 !important;
-      border: 2px solid #000000 !important;
-      font-weight: 800 !important;
-      box-shadow: 3px 3px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] #contactContainer a:last-child {
-      background: #38bdf8 !important;
-      color: #000000 !important;
-      border: 2px solid #000000 !important;
-      font-weight: 800 !important;
-      box-shadow: 3px 3px 0px #000000 !important;
-    }
-    [data-theme="bold_flat_popart"] footer p {
-      color: #000000 !important;
-      font-weight: 700 !important;
-    }
-    /* Keyframe Animations for Ultra Cyber Glass */
-    @keyframes spinSlow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    @keyframes spinReverse {
-      from { transform: rotate(360deg); }
-      to { transform: rotate(0deg); }
-    }
-    @keyframes floatOrb {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
-    }
-    @keyframes pulseGlowOrb {
-      0%, 100% { opacity: 1; filter: brightness(1); }
-      50% { opacity: 0.6; filter: brightness(1.5); }
-    }
-    @keyframes gradientX {
-      0%, 100% { background-size: 200% 200%; background-position: left center; }
-      50% { background-size: 200% 200%; background-position: right center; }
-    }
-    .animate-spin-slow { animation: spinSlow 12s linear infinite !important; }
-    .animate-spin-reverse { animation: spinReverse 8s linear infinite !important; }
-    .animate-float-orb { animation: floatOrb 6s ease-in-out infinite !important; }
-    .animate-pulse-glow-orb { animation: pulseGlowOrb 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite !important; }
-    .animate-gradient-x { animation: gradientX 3.5s ease infinite !important; }
-
-    /* Technical Grid Background */
-    .bg-grid {
-      background-size: 36px 36px;
-      background-image: 
-        linear-gradient(to right, rgba(34, 211, 238, 0.2) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(34, 211, 238, 0.2) 1px, transparent 1px);
-    }
-
-    /* Ultra Premium Glassmorphism */
-    .glass-premium {
-      background: linear-gradient(145deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.88) 100%) !important;
-      backdrop-filter: blur(28px) !important;
-      -webkit-backdrop-filter: blur(28px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.18) !important;
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(34, 211, 238, 0.3) !important;
-      position: relative;
       z-index: 1;
+      opacity: 0;
+      transition: opacity 0.1s ease;
     }
 
-    /* Ultra Cyber Glass Theme Rules */
-    [data-theme="ultra_cyber_glass"],
-    body[data-theme="ultra_cyber_glass"] {
-      background-color: #030712 !important;
-      color: #f8fafc !important;
+    /* PWA Install Banner */
+    #pwaInstallPrompt {
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
     }
-    [data-theme="ultra_cyber_glass"] main,
-    main[data-theme="ultra_cyber_glass"] {
-      background: rgba(3, 7, 18, 0.88) !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
-      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8) !important;
-      border-radius: 2.5rem !important;
-      overflow: hidden !important;
-      transform: translateZ(0);
-    }
-    [data-theme="ultra_cyber_glass"] .profile-banner-overlay {
-      background: linear-gradient(to bottom, transparent 30%, rgba(3, 7, 18, 0.95) 100%) !important;
-    }
-    [data-theme="ultra_cyber_glass"] #profileName,
-    main[data-theme="ultra_cyber_glass"] #profileName {
-      color: #ffffff !important;
-      text-shadow: 0 0 20px rgba(34, 211, 238, 0.7), 0 0 10px rgba(168, 85, 247, 0.5) !important;
-      font-weight: 800 !important;
-      background: none !important;
-      -webkit-background-clip: initial !important;
-      -webkit-text-fill-color: initial !important;
-      border: none !important;
-      padding: 0 !important;
-      background-color: transparent !important;
-    }
-    [data-theme="ultra_cyber_glass"] #profileHandle,
-    main[data-theme="ultra_cyber_glass"] #profileHandle {
-      background: rgba(34, 211, 238, 0.15) !important;
-      border: 1px solid rgba(34, 211, 238, 0.4) !important;
-      color: #22d3ee !important;
-      box-shadow: 0 0 15px rgba(34, 211, 238, 0.3) !important;
-    }
-    [data-theme="ultra_cyber_glass"] .glass-card,
-    main[data-theme="ultra_cyber_glass"] .glass-card {
-      background: rgba(15, 23, 42, 0.75) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      color: #e2e8f0 !important;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
-      transform: translateZ(0);
-    }
-    [data-theme="ultra_cyber_glass"] .social-link-card,
-    [data-theme="ultra_cyber_glass"] #socialLinksContainer > a,
-    main[data-theme="ultra_cyber_glass"] #socialLinksContainer > a {
-      background: rgba(30, 41, 59, 0.8) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
-      transform: translateZ(0);
-    }
-    [data-theme="ultra_cyber_glass"] .social-link-card:hover,
-    [data-theme="ultra_cyber_glass"] #socialLinksContainer > a:hover {
-      border-color: rgba(34, 211, 238, 0.8) !important;
-      box-shadow: 0 0 25px rgba(34, 211, 238, 0.45) !important;
-      transform: scale(1.03) translateY(-3px) !important;
-    }
-    [data-theme="ultra_cyber_glass"] #socialLinksContainer > a span {
-      background: linear-gradient(135deg, #22d3ee, #0284c7) !important;
-      color: #000000 !important;
-      font-weight: 700 !important;
-      box-shadow: 0 0 15px rgba(34, 211, 238, 0.5) !important;
-    }
-    [data-theme="ultra_cyber_glass"] #servicesGrid > div {
-      background: rgba(30, 41, 59, 0.85) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
-      transform: translateZ(0);
-    }
-    [data-theme="ultra_cyber_glass"] #servicesGrid > div:hover {
-      border-color: rgba(168, 85, 247, 0.8) !important;
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.45) !important;
-      transform: scale(1.04) translateY(-3px) !important;
-    }
-    [data-theme="ultra_cyber_glass"] #contactContainer {
-      background: rgba(30, 41, 59, 0.8) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4) !important;
-      transform: translateZ(0);
-    }
-    /* Keyframes & Classes for SHUVOX Lightning Cyber Theme */
-    @keyframes blob {
-      0% { transform: translate(0px, 0px) scale(1); }
-      33% { transform: translate(30px, -50px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
-      100% { transform: translate(0px, 0px) scale(1); }
-    }
-    @keyframes lightningFlash {
-      0%, 100% { background-color: transparent; }
-      8%, 12% { background-color: rgba(200, 230, 255, 0.12); }
-      10% { background-color: rgba(180, 230, 255, 0.28); }
-      14%, 18% { background-color: rgba(200, 230, 255, 0.15); }
-      16% { background-color: rgba(255, 255, 255, 0.22); }
-    }
-    @keyframes lightningStrike {
-      0%, 6%, 20%, 100% { opacity: 0; transform: scaleY(0.7) translateY(-20px); }
-      8% { opacity: 0.85; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 25px #0ff) drop-shadow(0 0 40px #06b6d4); }
-      10% { opacity: 1; transform: scaleY(1.1) translateY(10px); filter: drop-shadow(0 0 50px #fff) brightness(2.2); }
-      12% { opacity: 0.4; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 15px #0ff); }
-      14% { opacity: 0.8; transform: scaleY(1) translateY(0); filter: drop-shadow(0 0 25px #a855f7); }
-      16% { opacity: 1; transform: scaleY(1.12) translateY(5px); filter: drop-shadow(0 0 45px #fff) brightness(2); }
-      18% { opacity: 0.3; transform: scaleY(1) translateY(0); }
-    }
-    .animate-blob { animation: blob 7s infinite; }
-    .lightning-bg-flash { animation: lightningFlash 9s linear infinite; }
-    .lightning-bolt-svg { animation: lightningStrike 9s linear infinite; transform-origin: top center; }
-
-    /* Animated Gradient Border Wrapper for Profile */
-    .gradient-border-wrapper {
-      position: relative;
-      border-radius: 1.5rem; 
-      padding: 2px; 
-      overflow: hidden;
-    }
-    .gradient-border-wrapper::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: conic-gradient(
-          from 0deg, 
-          transparent 0%, 
-          transparent 30%, 
-          #a855f7 50%,
-          #06b6d4 70%,
-          transparent 100%
-      );
-      animation: spinSlow 4s linear infinite;
-      z-index: 0;
-    }
-    .gradient-border-inner {
-      position: relative;
-      background: rgba(15, 23, 42, 0.7); 
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 1.4rem; 
-      z-index: 1;
-      width: 100%;
-      height: 100%;
+    #pwaInstallPrompt.translate-y-full {
+      transform: translateY(150%);
+      opacity: 0;
+      pointer-events: none;
     }
 
-    /* SHUVOX Lightning Cyber Theme Rules */
-    [data-theme="shuvox_lightning_cyber"],
-    body[data-theme="shuvox_lightning_cyber"] {
-      background-color: #020617 !important;
-      color: #ffffff !important;
+    /* Toast Notification */
+    #liveSyncToast {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    [data-theme="shuvox_lightning_cyber"] main,
-    main[data-theme="shuvox_lightning_cyber"] {
-      background: transparent !important;
-      border: none !important;
-      box-shadow: none !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] .glass-card,
-    main[data-theme="shuvox_lightning_cyber"] .glass-card {
-      background: rgba(15, 23, 42, 0.7) !important;
-      backdrop-filter: blur(20px) !important;
-      -webkit-backdrop-filter: blur(20px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
-      border-radius: 1.25rem !important;
-      color: #ffffff !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] #socialLinksContainer > a {
-      background: rgba(255, 255, 255, 0.05) !important;
-      backdrop-filter: blur(16px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
-      border-radius: 1rem !important;
-      color: #ffffff !important;
-      transition: all 0.3s ease !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] #socialLinksContainer > a:hover {
-      transform: scale(1.02) !important;
-      background: rgba(255, 255, 255, 0.1) !important;
-      box-shadow: 0 0 20px rgba(59, 130, 246, 0.4) !important;
-      border-color: rgba(96, 165, 250, 0.5) !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] #servicesGrid > div {
-      background: rgba(255, 255, 255, 0.05) !important;
-      backdrop-filter: blur(16px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
-      border-radius: 1rem !important;
-      transition: all 0.3s ease !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] #servicesGrid > div:hover {
-      transform: scale(1.04) !important;
-      background: rgba(255, 255, 255, 0.1) !important;
-      box-shadow: 0 0 25px rgba(168, 85, 247, 0.4) !important;
-      border-color: rgba(192, 132, 252, 0.5) !important;
-    }
-    [data-theme="shuvox_lightning_cyber"] #btnShareProfile > div {
-      background: rgba(15, 23, 42, 0.8) !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    #liveSyncToast.translate-y-12 {
+      transform: translateY(48px);
+      opacity: 0;
+      pointer-events: none;
     }
   </style>
 </head>
-<body class="min-h-screen bg-zinc-950 bg-crosshairs text-zinc-100 flex flex-col items-center selection:bg-cyan-500 selection:text-zinc-950" data-theme="${escapeHtml(client.themeStyle || 'shuvox_lightning_cyber')}">
+<body class="antialiased has-magic-cursor min-h-screen flex flex-col items-center justify-center p-4 md:p-8 lg:p-10 selection:bg-blue-200">
 
-  <!-- Background Boids Particles Canvas (Systems That Hold Up) -->
+  <!-- Magical Custom Cursor -->
+  <div class="magic-cursor" id="magicCursor"></div>
+
+  <!-- Animated Background Orbs -->
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <!-- Roaming Boids & Lightning Background for Cyber Theme -->
   <canvas id="boidsCanvas"></canvas>
+  <canvas id="lightningCanvas"></canvas>
 
-  <!-- Ambient 3D Orbs & Lightning Layers -->
-  <div class="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>
-    <div class="absolute top-[40%] right-[-10%] w-96 h-96 bg-cyan-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style="animation-delay: 2s;"></div>
-    <div class="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[150px] animate-blob" style="animation-delay: 4s;"></div>
-  </div>
-  <div class="fixed inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen lightning-bg-flash"></div>
-  <div class="fixed top-0 left-[70%] md:left-[80%] -translate-x-1/2 w-32 h-[60vh] z-0 pointer-events-none flex justify-center">
-    <svg class="lightning-bolt-svg w-full h-full text-cyan-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M60 0 L20 120 L50 130 L10 230 L45 220 L25 300 L90 150 L55 160 L85 60 Z" fill="currentColor" />
-    </svg>
-  </div>
-
-  <!-- Offline Status Bar Indicator -->
-  <div id="offlineIndicator" class="hidden fixed top-0 inset-x-0 bg-amber-500 text-zinc-950 text-xs font-bold py-1 text-center z-50 shadow-md">
-    ⚠️ আপনি বর্তমানে অফলাইনে আছেন। সংরক্ষিত তথ্য দেখানো হচ্ছে।
-  </div>
-
-  <main class="w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24">
+  <!-- ============================================================== -->
+  <!-- 1. ULTRA-PREMIUM 3D BENTO PORTFOLIO (Flagship Model)         -->
+  <!-- ============================================================== -->
+  <main id="layoutUltraBento" class="w-full max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-5 lg:gap-6 auto-rows-[minmax(200px,auto)] relative z-10">
     
-    <!-- Profile Banner & Header -->
-    <div id="profileBannerContainer" class="profile-banner-container relative w-full h-44 sm:h-48 overflow-hidden bg-zinc-900 ${client.profile.bannerUrl && client.profile.bannerUrl.trim() !== '' ? '' : 'hidden'}" style="${client.profile.bannerUrl && client.profile.bannerUrl.trim() !== '' ? '' : 'display:none;'}">
-      <img id="profileBanner" src="${escapeHtml(client.profile.bannerUrl || '')}" alt="Banner" class="w-full h-full object-cover opacity-80" />
-      <div class="profile-banner-overlay absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
-    </div>
-
-    <!-- Profile Info Box -->
-    <div id="profileInfoBox" class="relative px-5 flex flex-col items-center text-center ${client.profile.bannerUrl && client.profile.bannerUrl.trim() !== '' ? '-mt-16' : 'mt-4 pt-4'}">
-      <!-- Avatar with Live Indicator & Spinning Rings -->
-      <div id="avatarContainerWrapper" class="relative my-3 w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center">
-        <!-- Outer Spinning Rings for Ultra Cyber Glass -->
-        <div id="avatarSpinRing1" class="hidden absolute inset-0 rounded-full border-2 border-dashed border-cyan-400 pointer-events-none z-0 shadow-[0_0_20px_rgba(34,211,238,0.7)]" style="animation: spinSlow 12s linear infinite;"></div>
-        <div id="avatarSpinRing2" class="hidden absolute -inset-3 sm:-inset-3.5 rounded-full border-2 border-dashed border-purple-500 pointer-events-none z-0 shadow-[0_0_25px_rgba(168,85,247,0.6)]" style="animation: spinReverse 8s linear infinite;"></div>
-        <div id="avatarGlowOrb" class="hidden absolute inset-2 rounded-full bg-cyan-400/20 blur-xl pointer-events-none z-0 animate-pulse"></div>
-
-        <div id="avatarImgBox" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300">
-          <img id="profileAvatar" src="${escapeHtml(client.profile.avatarUrl || client.logoUrl)}" alt="Avatar" class="w-full h-full object-cover rounded-full" onerror="this.src='${escapeHtml(client.logoUrl)}'" />
-        </div>
-        <div class="absolute bottom-0 right-0 bg-emerald-500 text-zinc-950 text-[10px] font-extrabold px-1.5 py-0.5 rounded-full border-2 border-zinc-950 flex items-center gap-1 shadow-lg z-20">
-          <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
-          <span>LIVE</span>
-        </div>
-      </div>
-
-      <!-- Name & Verified Check -->
-      <div class="flex items-center justify-center gap-1.5 mb-1">
-        <h1 id="profileName" class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">${escapeHtml(client.profile.name || client.appName)}</h1>
-        <svg class="w-5 h-5 text-cyan-400 fill-current shrink-0" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-      </div>
-
-      <!-- Handle / Username -->
-      <p id="profileHandle" class="text-xs font-mono font-medium text-cyan-400/90 mb-1.5 bg-cyan-950/40 px-2.5 py-0.5 rounded-full border border-cyan-800/40">${escapeHtml(client.profile.handle || '@official')}</p>
-
-      <!-- Professional Title -->
-      <p id="profileTitle" class="text-xs sm:text-sm font-semibold text-zinc-300 mb-1">${escapeHtml(client.profile.title || 'Developer & Creator')}</p>
-
-      <!-- Location -->
-      <div id="profileLocationWrapper" class="flex items-center gap-1 text-[11px] text-zinc-400 mb-3">
-        <svg class="w-3.5 h-3.5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        <span id="profileLocation">${escapeHtml(client.profile.location || 'Bangladesh')}</span>
-      </div>
-
-      <!-- Badges Pills Container -->
-      <div id="badgesContainer" class="flex flex-wrap items-center justify-center gap-1.5 mb-3.5"></div>
-
-      <!-- Bio Paragraph -->
-      <div class="glass-card rounded-2xl p-3.5 w-full text-left mb-6">
-        <p id="profileBio" class="text-xs sm:text-[13px] text-zinc-300 leading-relaxed">${escapeHtml(client.profile.bio || 'স্বাগতম আমার অফিসিয়াল বায়ো ডাটা ও প্রোফাইল পেজে!')}</p>
-      </div>
-    </div>
-
-    <!-- Reorderable Sections Container -->
-    <div id="contentSections" class="flex flex-col">
-      ${client.layoutStyle === 'services_first' ? `
-      <!-- Section: Services Grid -->
-      <div id="sectionServices" class="px-5 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সাভিস ও টুলস সমূহ</h2>
+    <!-- 1. Main Profile & Detailed Bio Box -->
+    <div class="premium-card col-span-1 md:col-span-4 lg:col-span-4 row-span-2 p-8 lg:p-10 flex flex-col justify-between delay-1 interactive" data-tilt data-tilt-max="2" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.1">
+      <div class="flex flex-col sm:flex-row items-start justify-between gap-6 mb-8 float-el">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div class="relative flex-shrink-0">
+            <!-- Morphing Avatar -->
+            <div class="w-24 h-24 sm:w-28 sm:h-28 bg-gradient-to-br from-blue-100 to-purple-100 p-1 avatar-morph flex items-center justify-center overflow-hidden border border-white shadow-sm">
+              <img id="bentoAvatarImg" src="${escapeHtml(defaultAvatar)}" alt="${escapeHtml(defaultName)}" class="w-full h-full object-cover rounded-full mix-blend-multiply">
+            </div>
+            <div class="pulse-ring">
+              <div class="w-full h-full bg-green-500 rounded-full border-4 border-white shadow-sm relative z-10"></div>
+            </div>
           </div>
-          <span id="servicesCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-cyan-400 font-bold">লাইভ</span>
-        </div>
-        <div id="servicesGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
-      </div>
-
-      <!-- Section: Social Links List -->
-      <div id="sectionSocial" class="px-5 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সোশ্যাল মিডিয়া প্রোফাইল</h2>
+          <div>
+            <div class="bg-white/90 backdrop-blur text-gray-600 text-xs font-semibold px-4 py-1.5 rounded-full inline-flex items-center gap-2 shadow-sm border border-gray-100 mb-3">
+              <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+              <span id="bentoLocation">${escapeHtml(defaultLocation)}</span>
+            </div>
+            <h1 id="bentoProfileName" class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-2 animate-gradient-text">${escapeHtml(defaultName)}</h1>
+            <!-- Typed.js Text Container -->
+            <p class="text-lg sm:text-xl font-semibold text-gray-700 min-h-[1.75rem]"><span id="typed-text"></span></p>
           </div>
-          <span class="text-[10px] text-zinc-500 font-mono">Connect</span>
         </div>
-        <div id="socialLinksContainer" class="flex flex-col gap-2.5"></div>
       </div>
-      ` : `
-      <!-- Section: Social Links List -->
-      <div id="sectionSocial" class="px-5 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সোশ্যাল মিডিয়া প্রোফাইল</h2>
-          </div>
-          <span class="text-[10px] text-zinc-500 font-mono">Connect</span>
-        </div>
-        <div id="socialLinksContainer" class="flex flex-col gap-2.5"></div>
-      </div>
-
-      <!-- Section: Services Grid -->
-      <div id="sectionServices" class="px-5 mb-6">
-        <div class="flex items-center justify-between mb-3">
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
-            <h2 class="text-sm font-bold uppercase tracking-wider text-white">সাভিস ও টুলস সমূহ</h2>
-          </div>
-          <span id="servicesCountBadge" class="text-[11px] font-mono px-2 py-0.5 rounded-full bg-zinc-900 border border-zinc-800 text-cyan-400 font-bold">লাইভ</span>
-        </div>
-        <div id="servicesGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
-      </div>
-      `}
-    </div>
-
-    <!-- Section 3: Direct Contact Box -->
-    <div class="px-5 mb-4">
-      <div id="contactContainer" class="glass-card rounded-2xl p-4 flex flex-col gap-3"></div>
-    </div>
-
-    <!-- Section 4: Premium Glowing Share Profile Card -->
-    <div class="px-5 mb-8">
-      <button id="btnShareProfile" type="button" class="w-full relative group overflow-hidden rounded-2xl p-[1px] transition-all duration-300 active:scale-[0.98] shadow-xl hover:shadow-cyan-500/20">
-        <!-- Animated glowing gradient border layer -->
-        <span class="absolute inset-0 bg-gradient-to-r from-cyan-500 via-sky-400 to-purple-500 group-hover:opacity-100 opacity-75 transition-opacity blur-[1px]"></span>
+      
+      <div class="float-el-high border-t border-gray-100 pt-6">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+          <i class="fa-solid fa-user-astronaut text-blue-500"></i> About Me
+        </h3>
+        <p id="bentoProfileBio" class="text-gray-600 leading-relaxed text-sm sm:text-base">${escapeHtml(defaultBio)}</p>
         
-        <!-- Inner glassmorphism button content -->
-        <div class="relative w-full bg-zinc-950/90 group-hover:bg-zinc-900/95 rounded-[15px] p-3.5 flex items-center justify-between gap-3 transition-colors">
-          <div class="flex items-center gap-3 min-w-0">
-            <!-- Icon Box with Glow -->
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-sky-500/10 border border-cyan-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-inner">
-              <svg class="w-5 h-5 text-cyan-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-              </svg>
-            </div>
-            <div class="text-left min-w-0">
-              <h3 class="text-xs sm:text-sm font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">প্রোফাইল শেয়ার করুন</h3>
-              <p class="text-[10.5px] text-zinc-400 truncate">এক ক্লিকে লিঙ্ক শেয়ার বা কপি করুন</p>
-            </div>
-          </div>
-          
-          <!-- Right action badge -->
-          <div class="shrink-0">
-            <span class="inline-flex items-center gap-1.5 text-[11px] font-extrabold px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 text-zinc-950 group-hover:from-cyan-400 group-hover:to-sky-400 transition-all shadow-md">
-              <span>শেয়ার</span>
-              <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </span>
-          </div>
-        </div>
-      </button>
+        <!-- Badges Container -->
+        <div id="bentoBadgesContainer" class="flex flex-wrap gap-2 mt-4"></div>
+      </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="mt-auto px-5 py-4 border-t border-zinc-900/80 text-center flex flex-col items-center gap-1">
-      <p class="text-[11px] text-zinc-500">© <span id="currentYear"></span> ${escapeHtml(client.appName)} • All Rights Reserved</p>
-      <div class="flex items-center gap-1.5 text-[10px] text-zinc-600 font-mono">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-        <span>Firebase Realtime Cloud Active</span>
+    <!-- 2. Services Box -->
+    <div class="premium-card col-span-1 md:col-span-4 lg:col-span-2 row-span-2 p-8 flex flex-col delay-2 interactive" data-tilt data-tilt-max="4">
+      <div class="flex items-center justify-between mb-6 float-el">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+          <i class="fa-solid fa-briefcase text-purple-500"></i> Services
+        </h3>
+        <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-100">Live</span>
       </div>
-    </footer>
+      
+      <div id="bentoServicesContainer" class="space-y-6 flex-1 float-el-high flex flex-col justify-center">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+
+    <!-- 3. Projects Box -->
+    <div class="premium-card col-span-1 md:col-span-2 lg:col-span-3 row-span-1 p-8 delay-3 interactive" data-tilt data-tilt-max="3">
+      <div class="flex items-center justify-between mb-5 float-el">
+        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+          <i class="fa-solid fa-sparkles text-yellow-400"></i> Featured Projects
+        </h3>
+        <span class="text-xs font-bold text-blue-500 flex items-center gap-1 group cursor-pointer">
+          Portfolio <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition-transform"></i>
+        </span>
+      </div>
+      
+      <div id="bentoProjectsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4 float-el-high">
+        <!-- Project 1 -->
+        <div class="p-4 rounded-2xl bg-white/90 hover:bg-blue-50 transition-all duration-300 border border-gray-100 hover:border-blue-200 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 group">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-xl transition-all group-hover:rotate-12 group-hover:scale-110 shadow-sm">
+            <i class="fa-solid fa-toolbox"></i>
+          </div>
+          <div class="min-w-0">
+            <h4 class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors text-sm truncate">shuvoalltool</h4>
+            <p class="text-xs text-gray-500 truncate">Utility toolkit web app</p>
+          </div>
+        </div>
+        <!-- Project 2 -->
+        <div class="p-4 rounded-2xl bg-white/90 hover:bg-emerald-50 transition-all duration-300 border border-gray-100 hover:border-emerald-200 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 group">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl transition-all group-hover:-rotate-12 group-hover:scale-110 shadow-sm">
+            <i class="fa-solid fa-calculator"></i>
+          </div>
+          <div class="min-w-0">
+            <h4 class="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors text-sm truncate">amarhisab</h4>
+            <p class="text-xs text-gray-500 truncate">Financial management</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Skills Box with Animated Progress Bars -->
+    <div class="premium-card col-span-1 md:col-span-2 lg:col-span-3 row-span-1 p-8 delay-3 interactive flex flex-col justify-center" data-tilt data-tilt-max="3">
+      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-5 float-el flex items-center gap-1.5">
+        <i class="fa-solid fa-bolt text-amber-500"></i> Core Skills
+      </h3>
+      <div class="grid grid-cols-2 gap-x-6 gap-y-4 float-el-high">
+        <!-- Skill 1 -->
+        <div>
+          <div class="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+            <span class="flex items-center gap-1.5"><i class="fa-brands fa-html5 text-orange-500"></i> HTML/CSS</span>
+            <span class="font-mono text-gray-500">95%</span>
+          </div>
+          <div class="progress-container"><div class="progress-bar bg-gradient-to-r from-orange-400 to-red-500" data-width="95%"></div></div>
+        </div>
+        <!-- Skill 2 -->
+        <div>
+          <div class="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-wind text-cyan-500"></i> Tailwind CSS</span>
+            <span class="font-mono text-gray-500">90%</span>
+          </div>
+          <div class="progress-container"><div class="progress-bar bg-gradient-to-r from-cyan-400 to-blue-500" data-width="90%"></div></div>
+        </div>
+        <!-- Skill 3 -->
+        <div>
+          <div class="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+            <span class="flex items-center gap-1.5"><i class="fa-brands fa-js text-yellow-500"></i> JavaScript</span>
+            <span class="font-mono text-gray-500">85%</span>
+          </div>
+          <div class="progress-container"><div class="progress-bar bg-gradient-to-r from-yellow-400 to-orange-400" data-width="85%"></div></div>
+        </div>
+        <!-- Skill 4 -->
+        <div>
+          <div class="flex justify-between text-xs font-semibold text-gray-700 mb-1">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-fire text-amber-500"></i> Firebase</span>
+            <span class="font-mono text-gray-500">80%</span>
+          </div>
+          <div class="progress-container"><div class="progress-bar bg-gradient-to-r from-amber-400 to-red-400" data-width="80%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Stats Box -->
+    <div class="premium-card col-span-1 md:col-span-2 lg:col-span-2 row-span-1 p-8 delay-4 interactive flex items-center justify-center gap-6 sm:gap-10 text-center" data-tilt data-tilt-max="6">
+      <div class="float-el transform hover:scale-110 transition-transform cursor-default">
+        <h3 class="text-4xl font-extrabold text-blue-600 mb-1 animate-pulse">2+</h3>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Years Exp.</p>
+      </div>
+      <div class="w-px h-16 bg-gray-200 float-el"></div>
+      <div class="float-el transform hover:scale-110 transition-transform cursor-default">
+        <h3 class="text-4xl font-extrabold text-emerald-500 mb-1">10+</h3>
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Projects</p>
+      </div>
+    </div>
+
+    <!-- 6. Poultry Farm / Agri Manager Box -->
+    <div class="premium-card col-span-1 md:col-span-2 lg:col-span-2 row-span-1 p-8 relative overflow-hidden group delay-4 interactive flex flex-col justify-center" data-tilt data-tilt-max="8">
+      <!-- Animated background tractor watermark -->
+      <i class="fa-solid fa-tractor absolute -right-6 -bottom-6 text-7xl text-gray-50 opacity-40 group-hover:scale-125 group-hover:text-orange-50 group-hover:-rotate-12 transition-all duration-700 ease-out z-0"></i>
+      
+      <div class="relative z-10 flex items-center gap-4 float-el">
+        <div class="w-14 h-14 bg-white text-orange-500 rounded-2xl flex items-center justify-center text-2xl border border-orange-100 shadow-sm group-hover:animate-spin flex-shrink-0">
+          <i class="fa-solid fa-egg"></i>
+        </div>
+        <div class="float-el-high min-w-0">
+          <h3 class="text-lg font-bold text-gray-900 mb-0.5 group-hover:text-orange-600 transition-colors truncate">Agri-Manager</h3>
+          <p class="text-xs text-gray-500 leading-tight">Managing real-world poultry operations & agriculture.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Social Media Connect Box -->
+    <div class="premium-card col-span-1 md:col-span-4 lg:col-span-2 row-span-1 p-8 flex flex-col justify-center delay-4 interactive" data-tilt data-tilt-max="8">
+      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 text-center float-el">Connect</h3>
+      <div id="bentoSocialContainer" class="flex justify-center flex-wrap gap-3 float-el-high">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- 8. Dark Contrast CTA Card -->
+    <div class="col-span-1 md:col-span-4 lg:col-span-6 row-span-1 delay-5 interactive rounded-3xl" data-tilt data-tilt-max="2" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+      <div id="bentoCtaBox" class="block w-full h-full rounded-3xl p-8 sm:p-10 shadow-premium transition-all relative overflow-hidden group border border-transparent hover:border-gray-700 bg-gray-900 text-white cursor-pointer">
+        <!-- Animated Background Gradients inside card -->
+        <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out bg-gradient-to-r from-blue-600/80 via-purple-600/80 to-indigo-600/80"></div>
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-500 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 animate-pulse"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row items-center justify-between h-full float-el text-center md:text-left gap-6">
+          <div>
+            <h3 class="text-2xl sm:text-4xl font-bold text-white mb-2 transform group-hover:translate-x-2 transition-transform duration-300">Let's work together</h3>
+            <p class="text-gray-400 text-xs sm:text-sm group-hover:text-blue-100 transition-colors">Open for freelance opportunities & technical collaborations.</p>
+          </div>
+          <div id="bentoCtaBtnWrapper" class="flex items-center gap-3 bg-white/10 backdrop-blur border border-white/10 pr-2 pl-5 py-2 rounded-full hover:bg-white/20 transition-colors shrink-0">
+            <span id="bentoCtaBtnText" class="text-white font-semibold text-xs sm:text-sm">যোগাযোগ করুন</span>
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-gray-900 text-lg group-hover:text-blue-600 group-hover:-rotate-12 transition-all duration-500 shadow-md">
+              <i class="fa-solid fa-paper-plane"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
-  <!-- PWA Floating Install Prompt Bar -->
-  <div id="pwaFloatingBanner" class="fixed bottom-4 inset-x-4 max-w-md mx-auto bg-zinc-900/95 backdrop-blur-xl border border-cyan-500/40 rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-3 transform translate-y-28 opacity-0 transition-all duration-300 z-40">
+  <!-- ============================================================== -->
+  <!-- 2. SHUVOX LIGHTNING CYBER 3D LAYOUT (High-Tech Mode)          -->
+  <!-- ============================================================== -->
+  <main id="layoutCyberLightning" class="w-full max-w-4xl mx-auto space-y-6 relative z-10 hidden">
+    <!-- Top Cyber Terminal Header -->
+    <div class="wire-box wire-blue p-6 sm:p-8 rounded-2xl bg-zinc-950/90 backdrop-blur-xl border border-cyan-500/30 text-white">
+      <div class="flex flex-col sm:flex-row items-center gap-6">
+        <div class="relative w-24 h-24 rounded-2xl p-1 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 shrink-0">
+          <img id="cyberAvatarImg" src="${escapeHtml(defaultAvatar)}" class="w-full h-full object-cover rounded-xl" alt="${escapeHtml(defaultName)}">
+          <span class="absolute -bottom-2 -right-2 px-2 py-0.5 text-[10px] font-mono font-bold bg-cyan-400 text-black rounded-md">SYS.OK</span>
+        </div>
+        <div class="text-center sm:text-left flex-1">
+          <div class="inline-flex items-center gap-2 text-xs font-mono text-cyan-400 mb-1">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span> SHUVOX // CYBER_3D_LIVE
+          </div>
+          <h1 id="cyberProfileName" class="text-3xl sm:text-4xl font-extrabold font-tech tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-purple-400">${escapeHtml(defaultName)}</h1>
+          <p id="cyberProfileTitle" class="text-sm font-mono text-zinc-400 mt-1">${escapeHtml(defaultTitle)}</p>
+          <p id="cyberProfileBio" class="text-xs text-zinc-300 mt-3 max-w-xl leading-relaxed">${escapeHtml(defaultBio)}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cyber Services & Tools -->
+    <div class="wire-box wire-blue p-6 rounded-2xl bg-zinc-950/90 backdrop-blur-xl border border-cyan-500/20 text-white">
+      <h3 class="text-xs font-mono text-cyan-400 tracking-widest uppercase mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-microchip"></i> DEPLOYED_SERVICES // TOOLS
+      </h3>
+      <div id="cyberServicesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+    </div>
+
+    <!-- Cyber Social Matrix -->
+    <div class="wire-box wire-blue p-6 rounded-2xl bg-zinc-950/90 backdrop-blur-xl border border-cyan-500/20 text-white">
+      <h3 class="text-xs font-mono text-purple-400 tracking-widest uppercase mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-satellite-dish"></i> CONNECT_CHANNELS
+      </h3>
+      <div id="cyberSocialGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3"></div>
+    </div>
+
+    <!-- Cyber Direct Contact Box -->
+    <div id="cyberContactBox" class="p-6 rounded-2xl bg-gradient-to-r from-cyan-950/50 via-zinc-900 to-purple-950/50 border border-cyan-400/40 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <h4 class="font-bold text-lg font-tech text-cyan-300">INITIALIZE TRANSMISSION</h4>
+        <p class="text-xs text-zinc-400">Direct secure encrypted communication channel.</p>
+      </div>
+      <a id="cyberContactBtn" href="#" target="_blank" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-zinc-950 font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-opacity">
+        CONNECT NOW
+      </a>
+    </div>
+  </main>
+
+  <!-- ============================================================== -->
+  <!-- 3. CLASSIC STACKED LUXURY BIO LAYOUT                           -->
+  <!-- ============================================================== -->
+  <main id="layoutClassicStacked" class="w-full max-w-[560px] mx-auto space-y-5 relative z-10 hidden">
+    <!-- Header Card -->
+    <div class="premium-card p-8 rounded-3xl text-center flex flex-col items-center">
+      <div class="relative w-24 h-24 mb-4">
+        <img id="classicAvatarImg" src="${escapeHtml(defaultAvatar)}" class="w-full h-full object-cover rounded-full border-4 border-white shadow-md" alt="${escapeHtml(defaultName)}">
+        <div class="pulse-ring"><div class="w-full h-full bg-green-500 rounded-full border-2 border-white"></div></div>
+      </div>
+      <span id="classicLocationBadge" class="text-xs font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 mb-2">${escapeHtml(defaultLocation)}</span>
+      <h1 id="classicProfileName" class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-1">${escapeHtml(defaultName)}</h1>
+      <p id="classicProfileTitle" class="text-xs sm:text-sm font-medium text-gray-500 mb-3">${escapeHtml(defaultTitle)}</p>
+      <p id="classicProfileBio" class="text-xs sm:text-sm text-gray-600 leading-relaxed max-w-md">${escapeHtml(defaultBio)}</p>
+      <div id="classicBadgesContainer" class="flex flex-wrap justify-center gap-1.5 mt-4"></div>
+    </div>
+
+    <!-- Social Links Stack -->
+    <div id="classicSocialContainer" class="space-y-3"></div>
+
+    <!-- Services Grid -->
+    <div class="premium-card p-6 rounded-3xl">
+      <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Services & Highlights</h3>
+      <div id="classicServicesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+    </div>
+
+    <!-- Direct Contact Button -->
+    <div id="classicContactBox" class="p-5 rounded-3xl bg-gray-900 text-white text-center">
+      <h4 class="font-bold text-base mb-1">সরাসরি যোগাযোগ করুন</h4>
+      <p class="text-xs text-gray-400 mb-4">যে কোনো প্রজেক্ট বা প্রয়োজনে সরাসরি মেসেজ পাঠান।</p>
+      <a id="classicContactBtn" href="#" target="_blank" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs shadow-md transition-all">
+        <i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp Message
+      </a>
+    </div>
+  </main>
+
+  <!-- PWA Install Prompt Banner -->
+  <div id="pwaInstallPrompt" class="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-50 translate-y-full bg-zinc-950/95 backdrop-blur-2xl text-white border border-cyan-400/30 rounded-2xl p-4 shadow-2xl flex items-center justify-between gap-3">
     <div class="flex items-center gap-3 min-w-0">
-      <img id="pwaInstallIcon" src="${escapeHtml(client.logoUrl)}" alt="Logo" class="w-10 h-10 rounded-xl object-cover shrink-0 border border-zinc-800" />
+      <img id="pwaInstallIcon" src="${escapeHtml(client.logoUrl || defaultAvatar)}" class="w-10 h-10 rounded-xl object-cover border border-cyan-400/40 shrink-0" alt="App Icon">
       <div class="min-w-0">
-        <h4 id="pwaInstallTitle" class="text-xs font-bold text-white truncate">${escapeHtml(client.shortName)} অ্যাপ</h4>
-        <p class="text-[10px] text-zinc-400 truncate">হোমস্ক্রিনে ইনস্টল করে সহজে ওপেন করুন</p>
+        <h4 id="pwaInstallTitle" class="text-xs sm:text-sm font-bold text-white truncate">${escapeHtml(client.shortName || 'BIO DATA')} অ্যাপ</h4>
+        <p class="text-[11px] text-zinc-400 truncate">হোম স্ক্রিনে ইনস্টল করে সরাসরি চালান</p>
       </div>
     </div>
     <div class="flex items-center gap-2 shrink-0">
-      <button id="pwaFloatingInstallBtn" class="bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-extrabold text-xs px-3 py-1.5 rounded-xl shadow transition-all active:scale-95">ইনস্টল</button>
-      <button onclick="dismissPWABanner()" class="text-zinc-400 hover:text-white p-1 text-sm font-bold leading-none">✕</button>
+      <button id="btnDismissPWA" type="button" class="px-2.5 py-1.5 text-xs text-zinc-400 hover:text-white transition-colors">পরে</button>
+      <button id="btnAcceptPWA" type="button" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 text-zinc-950 font-bold text-xs shadow-md hover:brightness-110 active:scale-95 transition-all">ইনস্টল</button>
     </div>
   </div>
 
-  <!-- iOS PWA Manual Install Instructions Modal -->
-  <div id="iosInstallModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4">
-    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 max-w-sm w-full text-center flex flex-col items-center gap-3 shadow-2xl">
-      <img src="${escapeHtml(client.logoUrl)}" alt="Icon" class="w-14 h-14 rounded-2xl shadow-lg border border-zinc-700" />
-      <h3 class="text-base font-bold text-white">অ্যাপটি আপনার iPhone এ যোগ করুন</h3>
-      <p class="text-xs text-zinc-400 leading-relaxed">নিচের সাফারি ব্রাউজারের <b>Share বাটন ( <svg class="inline w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg> )</b> চাপুন এবং <b>'Add to Home Screen'</b> নির্বাচন করুন।</p>
-      <button onclick="closeIOSModal()" class="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-white transition-colors mt-2">ঠিক আছে, বুঝেছি</button>
-    </div>
+  <!-- Realtime Live Sync Toast -->
+  <div id="liveSyncToast" class="fixed bottom-4 right-4 z-50 translate-y-12 bg-zinc-950/90 text-white border border-cyan-400/30 rounded-xl px-4 py-2 text-xs font-semibold shadow-xl flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+    <span id="toastMsg">লাইভ সিঙ্ক সম্পন্ন হয়েছে</span>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toastNotification" class="fixed top-5 left-1/2 -translate-x-1/2 bg-zinc-900/95 text-white border border-cyan-500/50 text-xs font-semibold px-4 py-2 rounded-full shadow-2xl opacity-0 pointer-events-none transition-all duration-300 z-50 flex items-center gap-2">
-    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-    <span id="toastMessage"></span>
-  </div>
-
-  <!-- Client Application Engine -->
+  <!-- Scripts -->
   <script>
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-    var CLIENT_ID = "${client.id}";
-    var FIREBASE_URL = "${cleanFbBase}";
-    var cleanFb = "${clientEndpoint}";
+    var CLIENT_ID = "${escapeHtml(client.id)}";
+    var FIREBASE_URL = "${escapeHtml(clientEndpoint)}";
     var initialEmbeddedData = ${initialDataJson};
 
-    function showToast(msg) {
-      var toast = document.getElementById('toastNotification');
-      var toastMsg = document.getElementById('toastMessage');
-      if (!toast || !toastMsg) return;
-      toastMsg.textContent = msg;
-      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-2');
-      toast.classList.add('opacity-100', 'translate-y-0');
-      setTimeout(function() {
-        toast.classList.remove('opacity-100', 'translate-y-0');
-        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-2');
-      }, 3000);
-    }
-
-    function toBengaliNumber(n) {
-      var bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-      return String(n).split('').map(function(d) {
-        return bnDigits[parseInt(d, 10)] !== undefined ? bnDigits[parseInt(d, 10)] : d;
-      }).join('');
-    }
-
-    function toArray(val) {
-      if (!val) return [];
-      if (Array.isArray(val)) return val;
-      if (typeof val === 'object') return Object.values(val);
-      return [];
-    }
-
-    function getInitials(name) {
-      if (!name) return 'SX';
-      var parts = String(name).trim().split(/\s+/);
-      if (parts.length >= 2) {
-        return (parts[0][0] + parts[1][0]).toUpperCase();
-      }
-      return String(name).substring(0, 2).toUpperCase();
-    }
-
-    function renderProfile(p) {
-      if (!p) return;
-      if (p.name) document.getElementById('profileName').textContent = p.name;
-      if (p.handle) {
-        var h = p.handle.startsWith('@') ? p.handle : '@' + p.handle;
-        document.getElementById('profileHandle').textContent = h;
-      }
-      if (p.title) document.getElementById('profileTitle').textContent = p.title;
-      if (p.location) document.getElementById('profileLocation').textContent = p.location;
-      if (p.bio) document.getElementById('profileBio').textContent = p.bio;
-
-      var avBox = document.getElementById('avatarImgBox');
-      if (avBox) {
-        var avUrl = (p.avatarUrl && p.avatarUrl.trim() !== '') ? p.avatarUrl : 'https://i.ibb.co/bRWhx1Lf/4880.jpg';
-        avBox.innerHTML = '<img id="profileAvatar" src="' + avUrl + '" alt="Avatar" class="w-full h-full object-cover rounded-full" />';
-      }
-
-      var bnContainer = document.getElementById('profileBannerContainer') || document.querySelector('.profile-banner-container');
-      var bn = document.getElementById('profileBanner');
-      var infoBox = document.getElementById('profileInfoBox');
-      if (bnContainer) {
-        if (p.bannerUrl && p.bannerUrl.trim() !== '') {
-          bnContainer.style.display = 'block';
-          if (bn) {
-            bn.style.display = 'block';
-            bn.src = p.bannerUrl;
-          }
-          if (infoBox) {
-            infoBox.classList.remove('mt-4', 'pt-4');
-            infoBox.classList.add('-mt-16');
-          }
-        } else {
-          bnContainer.style.display = 'none';
-          if (infoBox) {
-            infoBox.classList.remove('-mt-16');
-            infoBox.classList.add('mt-4', 'pt-4');
-          }
-        }
-      }
-    }
-
-    function renderBadges(badges) {
-      var container = document.getElementById('badgesContainer');
-      if (!container) return;
-      var list = toArray(badges);
-      var html = '';
-      list.forEach(function(b) {
-        var text = typeof b === 'string' ? b : (b.text || '');
-        if (!text) return;
-        html += '<span class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-zinc-900 text-zinc-200 border border-zinc-800 flex items-center gap-1 shadow-sm">'
-          + text
-          + '</span>';
+    // 1. Magical Cursor Logic
+    var cursor = document.getElementById('magicCursor');
+    if (cursor && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+      document.addEventListener('mousemove', function(e) {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
       });
-      container.innerHTML = html;
-    }
 
-    function getSocialIconSvg(platform) {
-      if (platform === 'facebook') {
-        return '<svg class="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
-      } else if (platform === 'telegram') {
-        return '<svg class="w-5 h-5 text-sky-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.121l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.942z"/></svg>';
-      } else if (platform === 'youtube') {
-        return '<svg class="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>';
-      } else if (platform === 'instagram') {
-        return '<svg class="w-5 h-5 text-pink-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.13-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>';
-      } else if (platform === 'tiktok') {
-        return '<svg class="w-5 h-5 text-[#25F4EE]" style="filter: drop-shadow(-1px -1px 0px #25F4EE) drop-shadow(1px 1px 0px #FE2C55);" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 3 15.68 6.33 6.33 0 0 0 9.33 22a6.33 6.33 0 0 0 6.33-6.33V9a8.16 8.16 0 0 0 4.71 1.48v-3.79a4.85 4.85 0 0 1-.78 0z"/></svg>';
-      } else if (platform === 'snapchat') {
-        return '<svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12.002 2c-3.882 0-6.19 2.85-6.19 6.223 0 1.258.334 2.68.73 3.633.155.372.235.636.084.851-.158.227-.58.351-1.07.49-.661.189-1.488.425-1.928.981-.365.46-.275 1.05.215 1.442.502.402 1.341.527 2.067.636.219.033.435.066.623.104.223.045.367.143.434.331.096.269-.033.722-.224 1.388-.231.808-.557 1.948.243 2.583.438.348 1.026.417 1.745.205.811-.239 1.838-.937 3.27-1.121.282-.036.568-.054.852-.054.284 0 .57.018.852.054 1.432.184 2.459.882 3.27 1.121.719.212 1.307.143 1.745-.205.8-.635.474-1.775.243-2.583-.191-.666-.32-1.119-.224-1.388.067-.188.211-.286.434-.331.188-.038.404-.071.623-.104.726-.109 1.565-.234 2.067-.636.49-.392.58-.982.215-1.442-.44-.556-1.267-.792-1.928-.981-.49-.139-.912-.263-1.07-.49-.151-.215-.071-.479.084-.851.396-.953.73-2.375.73-3.633C18.192 4.85 15.884 2 12.002 2z"/></svg>';
-      } else if (platform === 'twitter') {
-        return '<svg class="w-5 h-5 text-zinc-100" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>';
-      } else if (platform === 'github') {
-        return '<svg class="w-5 h-5 text-purple-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>';
-      } else {
-        return '<svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>';
+      function bindCursorHover() {
+        var interactables = document.querySelectorAll('a, button, .interactive');
+        interactables.forEach(function(el) {
+          el.addEventListener('mouseenter', function() { cursor.classList.add('hovering'); });
+          el.addEventListener('mouseleave', function() { cursor.classList.remove('hovering'); });
+        });
       }
+      bindCursorHover();
     }
 
-    function renderSocialLinks(links) {
-      var container = document.getElementById('socialLinksContainer');
-      if (!container) return;
-      var raw = toArray(links);
-      var activeLinks = raw.filter(function(l) { return l && l.enabled !== false; });
-      var html = '';
-      activeLinks.forEach(function(link) {
-        html += '<a href="' + link.url + '" target="_blank" rel="noopener noreferrer" class="social-link-card w-full flex items-center justify-between p-3 rounded-2xl bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 transition-all duration-300 ease-out hover:scale-[1.025] hover:-translate-y-0.5 hover:shadow-xl group">'
-          + '<div class="flex items-center gap-3 min-w-0">'
-          + '<div class="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700/60 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">'
-          + getSocialIconSvg(link.platform)
-          + '</div>'
-          + '<div class="min-w-0">'
-          + '<h3 class="font-bold text-xs sm:text-sm text-white group-hover:text-cyan-300 transition-colors truncate">' + link.title + '</h3>'
-          + '<p class="text-[11px] text-zinc-400 truncate">' + (link.subtitle || '') + '</p>'
-          + '</div>'
-          + '</div>'
-          + '<div class="shrink-0 pl-2">'
-          + '<span class="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-xl bg-white/10 group-hover:bg-cyan-500 group-hover:text-zinc-950 text-white transition-all">'
-          + (link.buttonText || 'যুক্ত হোন')
-          + '<svg class="w-3 h-3 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>'
-          + '</span>'
-          + '</div>'
-          + '</a>';
-      });
-      container.innerHTML = html;
-    }
-
-    function renderServices(services) {
-      var grid = document.getElementById('servicesGrid');
-      if (!grid) return;
-      var list = toArray(services);
-      var html = '';
-      list.forEach(function(service, index) {
-        var numBn = toBengaliNumber(index + 1);
-        html += '<div class="service-card group relative rounded-xl overflow-hidden aspect-square border border-zinc-800 hover:border-cyan-400/80 transition-all duration-300 ease-out hover:scale-[1.03] bg-zinc-900 shadow-md">'
-          + '<a href="' + service.linkUrl + '" target="_blank" rel="noopener noreferrer" class="w-full h-full block cursor-pointer" title="' + service.title + '">'
-          + '<img src="' + service.imageUrl + '" alt="' + service.title + '" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out" onerror="this.src=\\'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10\\'" />'
-          + '<div class="absolute top-0 left-0 bg-gradient-to-br from-cyan-500 via-sky-600 to-blue-700 text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-br-xl shadow-md border-b border-r border-cyan-300/40 font-tech tracking-wider pointer-events-none z-10 flex items-center justify-center min-w-[24px]">'
-          + '<span>' + numBn + '</span>'
-          + '</div>'
-          + '<div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent flex flex-col justify-end p-2 transition-opacity group-hover:from-black/90">'
-          + '<div class="flex items-center justify-between gap-1">'
-          + '<h4 class="text-[11px] font-bold text-white leading-tight truncate group-hover:text-cyan-300 transition-colors">' + service.title + '</h4>'
-          + '<svg class="w-3 h-3 text-cyan-400 shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>'
-          + '</div>'
-          + '<p class="text-[9px] text-cyan-300/90 truncate font-medium mt-0.5">' + (service.subtitle || '') + '</p>'
-          + '</div>'
-          + '</a>'
-          + '</div>';
-      });
-      grid.innerHTML = html;
-      var countBadge = document.getElementById('servicesCountBadge');
-      if (countBadge) countBadge.textContent = list.length + 'টি সাভিস';
-    }
-
-    function renderContact(c) {
-      var box = document.getElementById('contactContainer');
-      if (!box || !c) return;
-      var cleanWa = (c.whatsappNumber || '').replace(/[^0-9]/g, '');
-      var encodedWaMsg = encodeURIComponent(c.whatsappMessage || '');
-
-      var html = '<div class="flex items-center justify-between">'
-        + '<h3 class="text-xs font-bold text-cyan-400 uppercase tracking-wider">সরাসরি যোগাযোগ করুন</h3>'
-        + '<span class="text-[10px] text-zinc-500 font-mono">Direct Message</span>'
-        + '</div>'
-        + '<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">'
-        + '<a href="https://wa.me/' + cleanWa + '?text=' + encodedWaMsg + '" target="_blank" rel="noopener noreferrer" class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md transition-all active:scale-95 group">'
-        + '<svg class="w-4 h-4 fill-current text-white group-hover:scale-110 transition-transform" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>'
-        + '<span>WhatsApp মেসেজ</span>'
-        + '</a>'
-        + '<a href="mailto:' + (c.email || 'info@gmail.com') + '" class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-semibold text-xs border border-zinc-700 transition-all active:scale-95 group">'
-        + '<svg class="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>'
-        + '<span>ইমেইল পাঠান</span>'
-        + '</a>'
-        + '</div>';
-
-      if (c.customNote) {
-        html += '<p class="text-[10.5px] text-zinc-400 italic text-center pt-1">&ldquo;' + c.customNote + '&rdquo;</p>';
+    // 2. Typed.js Initialization
+    var typedInstance = null;
+    function initTypedText(titles) {
+      var strings = titles && titles.length ? titles : ['Frontend Developer', 'Poultry Farm Manager', 'UI/UX Enthusiast', 'Tech & Agri Blender'];
+      var target = document.getElementById('typed-text');
+      if (!target) return;
+      if (typedInstance) {
+        try { typedInstance.destroy(); } catch(e) {}
       }
-      box.innerHTML = html;
-    }
-
-    function applyLayoutStyle(style) {
-      var container = document.getElementById('contentSections');
-      var srv = document.getElementById('sectionServices');
-      var soc = document.getElementById('sectionSocial');
-      if (!container || !srv || !soc) return;
-      if (style === 'services_first') {
-        container.appendChild(srv);
-        container.appendChild(soc);
-      } else {
-        container.appendChild(soc);
-        container.appendChild(srv);
-      }
-    }
-
-    function applyThemeStyle(theme) {
-      var themeClass = theme || 'shuvox_lightning_cyber';
-      document.body.setAttribute('data-theme', themeClass);
-      var mainEl = document.querySelector('main');
-      var glassBg = document.getElementById('glassmorphismMeshBg');
-      var organicBg = document.getElementById('organicLeafBg');
-      var ultraBg = document.getElementById('ultraCyberGridBg');
-      var shuvoxBg = document.getElementById('shuvoxLightningBg');
-
-      var ring1 = document.getElementById('avatarSpinRing1');
-      var ring2 = document.getElementById('avatarSpinRing2');
-      var glowOrb = document.getElementById('avatarGlowOrb');
-      var avatarBox = document.getElementById('avatarImgBox');
-      var avatarImg = document.getElementById('profileAvatar');
-
-      if (themeClass === 'shuvox_lightning_cyber') {
-        if (glassBg) glassBg.style.display = 'none';
-        if (organicBg) organicBg.style.display = 'none';
-        if (ultraBg) ultraBg.style.display = 'none';
-        if (!shuvoxBg) {
-          shuvoxBg = document.createElement('div');
-          shuvoxBg.id = 'shuvoxLightningBg';
-          shuvoxBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
-          shuvoxBg.innerHTML = 
-            '<div class="fixed inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">'
-            + '<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-purple-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>'
-            + '<div class="absolute top-[40%] right-[-10%] w-96 h-96 bg-cyan-600/40 rounded-full mix-blend-screen filter blur-[120px] animate-blob" style="animation-delay: 2s;"></div>'
-            + '<div class="absolute bottom-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/30 rounded-full mix-blend-screen filter blur-[150px] animate-blob" style="animation-delay: 4s;"></div>'
-            + '</div>'
-            + '<div class="fixed inset-0 w-full h-full z-0 pointer-events-none mix-blend-screen lightning-bg-flash"></div>'
-            + '<div class="fixed top-0 left-[70%] md:left-[80%] -translate-x-1/2 w-32 h-[60vh] z-0 pointer-events-none flex justify-center">'
-            + '<svg class="lightning-bolt-svg w-full h-full text-cyan-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M60 0 L20 120 L50 130 L10 230 L45 220 L25 300 L90 150 L55 160 L85 60 Z" fill="currentColor" /></svg>'
-            + '</div>'
-            + '<div class="fixed top-0 left-[20%] md:left-[15%] -translate-x-1/2 w-20 h-[40vh] z-0 pointer-events-none flex justify-center" style="animation-delay: 0.5s;">'
-            + '<svg class="lightning-bolt-svg w-full h-full text-purple-300 opacity-0" viewBox="0 0 100 300" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" style="animation-delay: 0.2s;"><path d="M50 0 L10 90 L40 100 L0 180 L35 170 L15 250 L80 120 L45 130 L75 40 Z" fill="currentColor" /></svg>'
-            + '</div>';
-          document.body.insertBefore(shuvoxBg, document.body.firstChild);
-        }
-        shuvoxBg.style.display = 'block';
-
-        if (ring1) ring1.classList.remove('hidden');
-        if (ring2) ring2.classList.remove('hidden');
-        if (glowOrb) glowOrb.classList.remove('hidden');
-        if (avatarBox) {
-          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)] relative z-10';
-        }
-        if (avatarImg) {
-          avatarImg.className = 'w-full h-full object-cover rounded-full';
-        }
-        if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-transparent border-0 shadow-none relative pb-24 z-10';
-        }
-      } else if (themeClass === 'ultra_cyber_glass') {
-        if (shuvoxBg) shuvoxBg.style.display = 'none';
-        if (glassBg) glassBg.style.display = 'none';
-        if (organicBg) organicBg.style.display = 'none';
-        if (!ultraBg) {
-          ultraBg = document.createElement('div');
-          ultraBg.id = 'ultraCyberGridBg';
-          ultraBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
-          ultraBg.innerHTML = '<div class="fixed inset-0 bg-grid opacity-100"></div>'
-            + '<div class="fixed top-[-10%] left-[-5%] w-[50vw] h-[50vw] max-w-[550px] max-h-[550px] rounded-full bg-purple-600/35 blur-[120px] animate-pulse-glow-orb"></div>'
-            + '<div class="fixed bottom-[-10%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] max-h-[500px] rounded-full bg-cyan-400/35 blur-[120px] animate-float-orb" style="animation-delay: 1s;"></div>'
-            + '<div class="fixed top-[35%] left-[15%] w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] rounded-full bg-fuchsia-500/25 blur-[100px] animate-float-orb" style="animation-delay: 2s;"></div>';
-          document.body.insertBefore(ultraBg, document.body.firstChild);
-        }
-        ultraBg.style.display = 'block';
-
-        if (ring1) ring1.classList.remove('hidden');
-        if (ring2) ring2.classList.remove('hidden');
-        if (glowOrb) glowOrb.classList.remove('hidden');
-        if (avatarBox) {
-          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow p-1 bg-gradient-to-br from-cyan-400 via-purple-500 to-fuchsia-500 shadow-[0_0_40px_rgba(34,211,238,0.6)] relative z-10';
-        }
-        if (avatarImg) {
-          avatarImg.className = 'w-full h-full object-cover rounded-full';
-        }
-        if (mainEl) {
-          mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col glass-premium rounded-[2.5rem] border border-white/18 shadow-[0_0_50px_rgba(34,211,238,0.25)] relative pb-24 z-10';
-        }
-      } else {
-        if (shuvoxBg) shuvoxBg.style.display = 'none';
-        if (ultraBg) ultraBg.style.display = 'none';
-        if (ring1) ring1.classList.add('hidden');
-        if (ring2) ring2.classList.add('hidden');
-        if (glowOrb) glowOrb.classList.add('hidden');
-        if (avatarBox) {
-          avatarBox.className = 'w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden avatar-glow bg-zinc-900 border-2 border-cyan-400/50 relative z-10 transition-all duration-300';
-        }
-        if (avatarImg) {
-          avatarImg.className = 'w-full h-full object-cover rounded-full';
-        }
-
-        if (themeClass === 'bold_flat_popart') {
-          if (glassBg) glassBg.style.display = 'none';
-          if (organicBg) organicBg.style.display = 'none';
-          if (mainEl) {
-            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#fef08a] border-4 border-black text-black shadow-[8px_8px_0px_0px_#000000] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
-          }
-        } else if (themeClass === 'organic_nature') {
-          if (glassBg) glassBg.style.display = 'none';
-          if (!organicBg) {
-            organicBg = document.createElement('div');
-            organicBg.id = 'organicLeafBg';
-            organicBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
-            organicBg.innerHTML = 
-              '<svg class="absolute -top-10 -left-10 w-72 h-72 text-[#597762]/20 transform rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>' +
-              '<svg class="absolute -bottom-10 -right-10 w-80 h-80 text-[#c09367]/20 transform -rotate-45" fill="currentColor" viewBox="0 0 24 24"><path d="M17,8C8,10 5,16 3,22C5,22 13,22 19,16C21,14 22,9 17,8M16.5,14.5C13.5,16.5 9,17.5 5.5,18C6.5,15 9,12 14.5,10.5C16.5,12 16.5,13.5 16.5,14.5Z"/></svg>';
-            document.body.insertBefore(organicBg, document.body.firstChild);
-          }
-          organicBg.style.display = 'block';
-          if (mainEl) {
-            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#e2ece0] border-x border-[#9cb09a] shadow-2xl relative pb-24 text-[#1e3323] z-10';
-          }
-        } else if (themeClass === 'cyberpunk_neon') {
-          if (glassBg) glassBg.style.display = 'none';
-          if (organicBg) organicBg.style.display = 'none';
-          if (mainEl) {
-            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-[#080d1e] border-2 border-cyan-400/90 shadow-[0_0_35px_rgba(34,211,238,0.4)] rounded-3xl relative pb-24 z-10 my-2 overflow-hidden';
-          }
-        } else if (themeClass === 'dark_glassmorphism') {
-          if (organicBg) organicBg.style.display = 'none';
-          if (!glassBg) {
-            glassBg = document.createElement('div');
-            glassBg.id = 'glassmorphismMeshBg';
-            glassBg.className = 'fixed inset-0 pointer-events-none z-0 overflow-hidden';
-            glassBg.innerHTML = '<div class="absolute -top-24 -left-20 w-80 h-80 bg-cyan-500/20 rounded-full blur-3xl animate-pulse"></div>'
-              + '<div class="absolute top-1/3 -right-20 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>'
-              + '<div class="absolute -bottom-20 left-1/4 w-80 h-80 bg-pink-500/15 rounded-full blur-3xl animate-pulse" style="animation-delay: 3s;"></div>';
-            document.body.insertBefore(glassBg, document.body.firstChild);
-          }
-          glassBg.style.display = 'block';
-          if (mainEl) {
-            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-slate-900/60 backdrop-blur-2xl border-x border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.7)] relative pb-24 z-10';
-          }
-        } else {
-          if (glassBg) glassBg.style.display = 'none';
-          if (organicBg) organicBg.style.display = 'none';
-          if (mainEl) {
-            mainEl.className = 'w-full max-w-md mx-auto min-h-screen flex flex-col bg-zinc-950 border-x border-zinc-900/60 shadow-2xl relative pb-24';
-          }
-        }
-      }
-    }
-
-    function updateDynamicPwaMetadata(data) {
-      if (!data) return;
-      var appName = data.appName || (data.profile ? data.profile.name : '') || 'Bio Data';
-      var shortName = data.shortName || appName;
-      var logoUrl = data.logoUrl || (data.profile ? data.profile.avatarUrl : '') || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10';
-
-      document.title = appName;
-
-      var ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', appName);
-
-      var ogImage = document.querySelector('meta[property="og:image"]');
-      if (ogImage) ogImage.setAttribute('content', logoUrl);
-
-      var favIcon = document.querySelector('link[rel="icon"]');
-      if (favIcon) favIcon.setAttribute('href', logoUrl);
-
-      var appleIcon = document.querySelector('link[rel="apple-touch-icon"]') || document.getElementById('appleTouchIcon');
-      if (appleIcon) appleIcon.setAttribute('href', logoUrl);
-
-      var appleTitle = document.querySelector('meta[name="apple-mobile-web-app-title"]') || document.getElementById('appleTitleMeta');
-      if (appleTitle) appleTitle.setAttribute('content', shortName);
-
       try {
-        var dynamicManifest = {
-          id: "./",
-          name: appName,
-          short_name: shortName,
-          description: "Official Social Bio & Developer Portfolio of " + (data.profile ? data.profile.name : appName),
-          start_url: "./",
-          scope: "./",
-          display: "standalone",
-          orientation: "portrait",
-          background_color: "#09090b",
-          theme_color: "#09090b",
-          icons: [
-            { src: logoUrl, sizes: "192x192", type: "image/png", purpose: "any" },
-            { src: logoUrl, sizes: "512x512", type: "image/png", purpose: "any" },
-            { src: logoUrl, sizes: "512x512", type: "image/png", purpose: "maskable" }
-          ]
-        };
-        var manifestBlob = new Blob([JSON.stringify(dynamicManifest, null, 2)], { type: 'application/json' });
-        var manifestUrl = URL.createObjectURL(manifestBlob);
-        var manifestLink = document.getElementById('manifestLink') || document.querySelector('link[rel="manifest"]');
-        if (manifestLink) {
-          manifestLink.setAttribute('href', manifestUrl);
-        }
-      } catch (e) {}
-
-      var pwaBannerTitle = document.getElementById('pwaInstallTitle');
-      if (pwaBannerTitle) pwaBannerTitle.textContent = shortName + ' অ্যাপ';
-
-      var pwaBannerIcon = document.getElementById('pwaInstallIcon');
-      if (pwaBannerIcon && logoUrl) pwaBannerIcon.src = logoUrl;
+        typedInstance = new Typed('#typed-text', {
+          strings: strings,
+          typeSpeed: 50,
+          backSpeed: 30,
+          backDelay: 2200,
+          loop: true,
+          cursorChar: '|'
+        });
+      } catch(e) {
+        target.textContent = strings[0] || '';
+      }
     }
 
-    var lastUpdatedSig = '';
+    // 3. Animate Progress Bars
+    function triggerProgressBars() {
+      setTimeout(function() {
+        var progressBars = document.querySelectorAll('.progress-bar');
+        progressBars.forEach(function(bar) {
+          var targetWidth = bar.getAttribute('data-width') || '85%';
+          bar.style.width = targetWidth;
+        });
+      }, 700);
+    }
+
+    // 4. Toast Notification
+    var toastTimeout = null;
+    function showToast(msg) {
+      var toast = document.getElementById('liveSyncToast');
+      var label = document.getElementById('toastMsg');
+      if (!toast || !label) return;
+      label.textContent = msg;
+      toast.classList.remove('translate-y-12');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(function() {
+        toast.classList.add('translate-y-12');
+      }, 2500);
+    }
+
+    // 5. Renderers for Bento Grid
+    function renderBentoData(data) {
+      var prof = data.profile || {};
+      var nameEl = document.getElementById('bentoProfileName');
+      var bioEl = document.getElementById('bentoProfileBio');
+      var locEl = document.getElementById('bentoLocation');
+      var avatarEl = document.getElementById('bentoAvatarImg');
+
+      if (nameEl && prof.name) nameEl.textContent = prof.name;
+      if (bioEl && prof.bio) bioEl.textContent = prof.bio;
+      if (locEl && prof.location) locEl.textContent = prof.location;
+      if (avatarEl && prof.avatarUrl) avatarEl.src = prof.avatarUrl;
+
+      // Typed.js titles
+      var titles = [];
+      if (prof.title) titles.push(prof.title);
+      if (Array.isArray(data.badges)) {
+        data.badges.forEach(function(b) { if (b.text) titles.push(b.text); });
+      }
+      if (!titles.length) titles = ['Frontend Developer', 'Poultry Farm Manager', 'Full-Stack Creator'];
+      initTypedText(titles);
+
+      // Badges
+      var badgesContainer = document.getElementById('bentoBadgesContainer');
+      if (badgesContainer) {
+        badgesContainer.innerHTML = '';
+        if (Array.isArray(data.badges)) {
+          data.badges.forEach(function(b) {
+            var span = document.createElement('span');
+            span.className = 'text-[11px] font-semibold px-3 py-1 rounded-full bg-blue-50 text-blue-600 border border-blue-100 shadow-sm';
+            span.textContent = b.text;
+            badgesContainer.appendChild(span);
+          });
+        }
+      }
+
+      // Services Box
+      var srvContainer = document.getElementById('bentoServicesContainer');
+      if (srvContainer) {
+        srvContainer.innerHTML = '';
+        var services = Array.isArray(data.services) && data.services.length ? data.services : [
+          { title: 'Web Development', subtitle: 'Modern, responsive, and blazing-fast web applications.' },
+          { title: 'UI/UX Design', subtitle: 'Crafting intuitive and clean user interfaces.' },
+          { title: 'Farm Consulting', subtitle: 'Operational strategies and tech integration.' }
+        ];
+
+        var srvColors = [
+          { bg: 'bg-blue-50', text: 'text-blue-500', hbg: 'group-hover:bg-blue-500', htext: 'group-hover:text-blue-600', border: 'border-blue-100', icon: 'fa-code' },
+          { bg: 'bg-purple-50', text: 'text-purple-500', hbg: 'group-hover:bg-purple-500', htext: 'group-hover:text-purple-600', border: 'border-purple-100', icon: 'fa-pen-nib' },
+          { bg: 'bg-orange-50', text: 'text-orange-500', hbg: 'group-hover:bg-orange-500', htext: 'group-hover:text-orange-600', border: 'border-orange-100', icon: 'fa-wheat-awn' }
+        ];
+
+        services.forEach(function(s, idx) {
+          var c = srvColors[idx % srvColors.length];
+          var div = document.createElement('div');
+          div.className = 'flex items-start gap-4 group cursor-pointer';
+          div.innerHTML = '<div class="w-12 h-12 rounded-2xl ' + c.bg + ' ' + c.text + ' flex items-center justify-center text-xl flex-shrink-0 group-hover:scale-110 transition-transform ' + c.hbg + ' group-hover:text-white shadow-sm border ' + c.border + '">'
+            + '<i class="fa-solid ' + c.icon + '"></i></div>'
+            + '<div class="min-w-0"><h4 class="font-bold text-gray-900 text-sm ' + c.htext + ' transition-colors truncate">' + escapeHtml(s.title) + '</h4>'
+            + '<p class="text-xs text-gray-500 mt-0.5 line-clamp-2 leading-relaxed">' + escapeHtml(s.subtitle || '') + '</p></div>';
+          srvContainer.appendChild(div);
+        });
+      }
+
+      // Social Links Box
+      var socContainer = document.getElementById('bentoSocialContainer');
+      if (socContainer) {
+        socContainer.innerHTML = '';
+        var links = Array.isArray(data.socialLinks) && data.socialLinks.length ? data.socialLinks.filter(function(l){ return l.enabled !== false; }) : [
+          { platform: 'facebook', url: 'https://facebook.com' },
+          { platform: 'github', url: 'https://github.com' },
+          { platform: 'telegram', url: 'https://t.me' }
+        ];
+
+        var platformConfig = {
+          facebook: { icon: 'fa-brands fa-facebook-f', color: 'hover:border-blue-600 hover:text-white', bg: 'bg-blue-600' },
+          github: { icon: 'fa-brands fa-github', color: 'hover:border-gray-900 hover:text-white', bg: 'bg-gray-900' },
+          linkedin: { icon: 'fa-brands fa-linkedin-in', color: 'hover:border-blue-500 hover:text-white', bg: 'bg-blue-500' },
+          telegram: { icon: 'fa-brands fa-telegram', color: 'hover:border-sky-500 hover:text-white', bg: 'bg-sky-500' },
+          youtube: { icon: 'fa-brands fa-youtube', color: 'hover:border-red-600 hover:text-white', bg: 'bg-red-600' },
+          instagram: { icon: 'fa-brands fa-instagram', color: 'hover:border-pink-600 hover:text-white', bg: 'bg-pink-600' },
+          custom: { icon: 'fa-solid fa-link', color: 'hover:border-cyan-500 hover:text-white', bg: 'bg-cyan-500' }
+        };
+
+        links.forEach(function(l) {
+          var cfg = platformConfig[l.platform] || platformConfig.custom;
+          var a = document.createElement('a');
+          a.href = l.url || '#';
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.className = 'w-11 h-11 flex items-center justify-center bg-white rounded-xl border border-gray-100 text-gray-500 ' + cfg.color + ' hover:shadow-lg transition-all text-lg group relative overflow-hidden';
+          a.innerHTML = '<div class="absolute inset-0 ' + cfg.bg + ' transform scale-0 group-hover:scale-100 transition-transform duration-300 rounded-xl z-0"></div>'
+            + '<i class="' + cfg.icon + ' relative z-10 transition-transform group-hover:scale-110"></i>';
+          socContainer.appendChild(a);
+        });
+      }
+
+      // CTA Box Action
+      var ctaBox = document.getElementById('bentoCtaBox');
+      var ctaBtnText = document.getElementById('bentoCtaBtnText');
+      if (ctaBox && data.contact) {
+        ctaBox.onclick = function() {
+          if (data.contact.whatsappNumber) {
+            var msg = encodeURIComponent(data.contact.whatsappMessage || 'Hello ' + (prof.name || ''));
+            window.open('https://wa.me/' + data.contact.whatsappNumber.replace(/[^0-9]/g, '') + '?text=' + msg, '_blank');
+          } else if (data.contact.telegramUsername) {
+            window.open('https://t.me/' + data.contact.telegramUsername.replace('@', ''), '_blank');
+          } else if (data.contact.email) {
+            window.location.href = 'mailto:' + data.contact.email;
+          } else {
+            showToast('কন্টাক্ট ইনফরমেশন শীঘ্রই যুক্ত হচ্ছে');
+          }
+        };
+      }
+    }
+
+    // 6. Layout Style Switcher
+    function applyLayoutStyle(style) {
+      var st = style || 'ultra_bento_3d';
+      var bentoEl = document.getElementById('layoutUltraBento');
+      var cyberEl = document.getElementById('layoutCyberLightning');
+      var classicEl = document.getElementById('layoutClassicStacked');
+      var boidsCanvas = document.getElementById('boidsCanvas');
+
+      if (bentoEl) bentoEl.classList.add('hidden');
+      if (cyberEl) cyberEl.classList.add('hidden');
+      if (classicEl) classicEl.classList.add('hidden');
+      if (boidsCanvas) boidsCanvas.style.display = 'none';
+
+      document.body.classList.remove('theme-cyber');
+
+      if (st === 'shuvox_lightning_cyber') {
+        if (cyberEl) cyberEl.classList.remove('hidden');
+        if (boidsCanvas) boidsCanvas.style.display = 'block';
+        document.body.classList.add('theme-cyber');
+        renderCyberData(initialEmbeddedData);
+      } else if (st === 'classic_stacked') {
+        if (classicEl) classicEl.classList.remove('hidden');
+        renderClassicData(initialEmbeddedData);
+      } else {
+        // Default: Ultra Bento 3D
+        if (bentoEl) bentoEl.classList.remove('hidden');
+        renderBentoData(initialEmbeddedData);
+        triggerProgressBars();
+      }
+    }
+
+    // 7. Cyber Layout Renderer
+    function renderCyberData(data) {
+      var prof = data.profile || {};
+      var nameEl = document.getElementById('cyberProfileName');
+      var titleEl = document.getElementById('cyberProfileTitle');
+      var bioEl = document.getElementById('cyberProfileBio');
+      var avatarEl = document.getElementById('cyberAvatarImg');
+
+      if (nameEl && prof.name) nameEl.textContent = prof.name;
+      if (titleEl && prof.title) titleEl.textContent = prof.title;
+      if (bioEl && prof.bio) bioEl.textContent = prof.bio;
+      if (avatarEl && prof.avatarUrl) avatarEl.src = prof.avatarUrl;
+
+      var srvGrid = document.getElementById('cyberServicesGrid');
+      if (srvGrid && Array.isArray(data.services)) {
+        srvGrid.innerHTML = '';
+        data.services.forEach(function(s) {
+          var div = document.createElement('div');
+          div.className = 'p-3 rounded-xl bg-zinc-900/80 border border-cyan-400/30 flex items-center gap-3';
+          div.innerHTML = '<div class="w-8 h-8 rounded-lg bg-cyan-400/20 text-cyan-400 flex items-center justify-center text-sm font-bold shrink-0"><i class="fa-solid fa-code"></i></div>'
+            + '<div class="min-w-0"><h4 class="font-bold text-xs text-white truncate">' + escapeHtml(s.title) + '</h4>'
+            + '<p class="text-[10px] text-zinc-400 truncate">' + escapeHtml(s.subtitle || '') + '</p></div>';
+          srvGrid.appendChild(div);
+        });
+      }
+
+      var socGrid = document.getElementById('cyberSocialGrid');
+      if (socGrid && Array.isArray(data.socialLinks)) {
+        socGrid.innerHTML = '';
+        data.socialLinks.filter(function(l){ return l.enabled !== false; }).forEach(function(l) {
+          var a = document.createElement('a');
+          a.href = l.url || '#';
+          a.target = '_blank';
+          a.className = 'p-2.5 rounded-xl bg-zinc-900 border border-purple-500/30 hover:border-purple-400 text-center text-xs font-mono text-zinc-300 hover:text-white transition-all truncate block';
+          a.textContent = l.title || l.platform;
+          socGrid.appendChild(a);
+        });
+      }
+
+      var contactBtn = document.getElementById('cyberContactBtn');
+      if (contactBtn && data.contact && data.contact.whatsappNumber) {
+        contactBtn.href = 'https://wa.me/' + data.contact.whatsappNumber.replace(/[^0-9]/g, '');
+      }
+    }
+
+    // 8. Classic Layout Renderer
+    function renderClassicData(data) {
+      var prof = data.profile || {};
+      var nameEl = document.getElementById('classicProfileName');
+      var titleEl = document.getElementById('classicProfileTitle');
+      var bioEl = document.getElementById('classicProfileBio');
+      var locEl = document.getElementById('classicLocationBadge');
+      var avatarEl = document.getElementById('classicAvatarImg');
+
+      if (nameEl && prof.name) nameEl.textContent = prof.name;
+      if (titleEl && prof.title) titleEl.textContent = prof.title;
+      if (bioEl && prof.bio) bioEl.textContent = prof.bio;
+      if (locEl && prof.location) locEl.textContent = prof.location;
+      if (avatarEl && prof.avatarUrl) avatarEl.src = prof.avatarUrl;
+
+      var socContainer = document.getElementById('classicSocialContainer');
+      if (socContainer && Array.isArray(data.socialLinks)) {
+        socContainer.innerHTML = '';
+        data.socialLinks.filter(function(l){ return l.enabled !== false; }).forEach(function(l) {
+          var a = document.createElement('a');
+          a.href = l.url || '#';
+          a.target = '_blank';
+          a.className = 'premium-card p-4 rounded-2xl flex items-center justify-between hover:-translate-y-0.5 transition-all block';
+          a.innerHTML = '<span class="font-bold text-sm text-gray-800">' + escapeHtml(l.title || l.platform) + '</span>'
+            + '<i class="fa-solid fa-arrow-right text-xs text-blue-500"></i>';
+          socContainer.appendChild(a);
+        });
+      }
+
+      var contactBtn = document.getElementById('classicContactBtn');
+      if (contactBtn && data.contact && data.contact.whatsappNumber) {
+        contactBtn.href = 'https://wa.me/' + data.contact.whatsappNumber.replace(/[^0-9]/g, '');
+      }
+    }
+
+    // 9. Apply All Data Live
+    var lastSignature = '';
     function applyAllData(data, shouldToast) {
       if (!data || typeof data !== 'object') return;
-      var currentLayout = data.layoutStyle || 'social_first';
-      var currentTheme = data.themeStyle || 'classic_dark';
-      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + currentTheme + '_' + (data.appName || '') + '_' + (data.shortName || '') + '_' + (data.logoUrl || '') + '_' + JSON.stringify(data.profile || {}) + '_' + (data.services ? JSON.stringify(data.services).length : 0);
-      if (sig === lastUpdatedSig) return;
-      lastUpdatedSig = sig;
+      var currentLayout = data.layoutStyle || 'ultra_bento_3d';
+      var sig = (data.updatedAt || '') + '_' + currentLayout + '_' + (data.profile ? data.profile.name : '') + '_' + (data.services ? data.services.length : 0);
+      if (sig === lastSignature) return;
+      lastSignature = sig;
 
-      updateDynamicPwaMetadata(data);
+      initialEmbeddedData = data;
       applyLayoutStyle(currentLayout);
-      applyThemeStyle(currentTheme);
-      if (data.profile) renderProfile(data.profile);
-      if (data.badges) renderBadges(data.badges);
-      if (data.services) renderServices(data.services);
-      if (data.socialLinks) renderSocialLinks(data.socialLinks);
-      if (data.contact) renderContact(data.contact);
 
       try {
-        localStorage.setItem('bio_data_cache_' + CLIENT_ID, JSON.stringify(data));
-      } catch (e) {}
+        localStorage.setItem('bio_cache_' + CLIENT_ID, JSON.stringify(data));
+      } catch(e) {}
 
       if (shouldToast) {
-        showToast('🔄 PWA & বায়ো তথ্য লাইভ সিঙ্ক হয়েছে!');
+        showToast('🔄 বায়ো ও লেআউট তথ্য লাইভ সিঙ্ক হয়েছে!');
       }
     }
 
-    // 1. Hydrate from Cache or Embedded initial data (0ms instant render)
+    // Hydrate
     try {
-      var cached = localStorage.getItem('bio_data_cache_' + CLIENT_ID);
+      var cached = localStorage.getItem('bio_cache_' + CLIENT_ID);
       if (cached) {
         applyAllData(JSON.parse(cached), false);
       } else {
         applyAllData(initialEmbeddedData, false);
       }
-    } catch (e) {
+    } catch(e) {
       applyAllData(initialEmbeddedData, false);
     }
 
-    // 2. Fetch latest data from Firebase Realtime Database
-    function fetchFromFirebase(isBg) {
-      fetch(cleanFb + '?t=' + Date.now())
-        .then(function(res) {
-          if (res.ok) return res.json();
-          throw new Error('Firebase offline');
-        })
+    // Realtime Firebase polling
+    function fetchFromFirebase() {
+      fetch(FIREBASE_URL + '?t=' + Date.now())
+        .then(function(res) { return res.json(); })
         .then(function(data) {
-          if (data && typeof data === 'object') {
-            applyAllData(data, isBg);
-          }
+          if (data) applyAllData(data, true);
         })
-        .catch(function(err) {});
+        .catch(function() {});
     }
+    setInterval(fetchFromFirebase, 5000);
 
-    fetchFromFirebase(false);
-
-    // 3. Attach Live Firebase Server-Sent Events (SSE) Listener
-    try {
-      var fbStream = new EventSource(cleanFb);
-      fbStream.addEventListener('put', function(e) {
-        try {
-          var payload = JSON.parse(e.data);
-          var data = payload && payload.data !== undefined ? payload.data : payload;
-          var path = payload && payload.path ? payload.path : '/';
-          if (!path || path === '/' || path === '') {
-            if (data && typeof data === 'object') {
-              applyAllData(data, true);
-            }
-          } else {
-            fetchFromFirebase(true);
-          }
-        } catch (err) {}
-      });
-      fbStream.addEventListener('patch', function() {
-        fetchFromFirebase(true);
-      });
-    } catch (e) {}
-
-    // Share Button Event
-    var btnShare = document.getElementById('btnShareProfile');
-    if (btnShare) {
-      btnShare.addEventListener('click', function() {
-        if (navigator.share) {
-          navigator.share({
-            title: document.title,
-            text: 'Check out my official bio!',
-            url: window.location.href
-          }).catch(function() {});
-        } else {
-          navigator.clipboard.writeText(window.location.href).then(function() {
-            showToast('📋 প্রোফাইল লিংক কপি করা হয়েছে!');
-          });
-        }
-      });
-    }
-
-    // PWA Install Prompt Logic
-    var deferredInstallPrompt = null;
-    var pwaFloatingBanner = document.getElementById('pwaFloatingBanner');
-    var pwaFloatingInstallBtn = document.getElementById('pwaFloatingInstallBtn');
-    var iosInstallModal = document.getElementById('iosInstallModal');
-
-    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    var isDismissed = localStorage.getItem('pwa_prompt_dismissed') === 'true';
-
-    function showPWABanner() {
-      if (pwaFloatingBanner && !isDismissed) {
-        pwaFloatingBanner.classList.remove('translate-y-28', 'opacity-0');
-        pwaFloatingBanner.classList.add('translate-y-0', 'opacity-100');
-      }
-    }
-
-    function dismissPWABanner() {
-      if (pwaFloatingBanner) {
-        pwaFloatingBanner.classList.remove('translate-y-0', 'opacity-100');
-        pwaFloatingBanner.classList.add('translate-y-28', 'opacity-0', 'pointer-events-none');
-      }
-      try {
-        localStorage.setItem('pwa_prompt_dismissed', 'true');
-      } catch (e) {}
-    }
-
-    if (!isStandalone && !isDismissed) {
-      if (isIOS) {
-        setTimeout(showPWABanner, 2000);
-        if (pwaFloatingInstallBtn) {
-          pwaFloatingInstallBtn.addEventListener('click', function() {
-            if (iosInstallModal) iosInstallModal.classList.remove('hidden');
-          });
-        }
-      } else {
-        window.addEventListener('beforeinstallprompt', function(e) {
-          e.preventDefault();
-          deferredInstallPrompt = e;
-          setTimeout(showPWABanner, 1800);
-        });
-
-        if (pwaFloatingInstallBtn) {
-          pwaFloatingInstallBtn.addEventListener('click', function() {
-            if (deferredInstallPrompt) {
-              deferredInstallPrompt.prompt();
-              deferredInstallPrompt.userChoice.then(function(choice) {
-                if (choice.outcome === 'accepted') {
-                  showToast('🎉 অ্যাপ ইনস্টল সম্পন্ন হয়েছে!');
-                  dismissPWABanner();
-                }
-                deferredInstallPrompt = null;
-              });
-            } else {
-              showToast('ব্রাউজারের ৩-ডট মেনু থেকে "Install app" চাপুন');
-            }
-          });
-        }
-      }
-    }
-
-    function closeIOSModal() {
-      if (iosInstallModal) iosInstallModal.classList.add('hidden');
-    }
-
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('./sw.js').then(function(reg) {
-          console.log('✅ PWA Service Worker Registered:', reg.scope);
-        }).catch(function(err) {});
-      });
-    }
-
-    // Offline Connectivity Tracking
-    var offlineIndicator = document.getElementById('offlineIndicator');
-    function updateOnlineStatus() {
-      if (offlineIndicator) {
-        if (!navigator.onLine) {
-          offlineIndicator.classList.remove('hidden');
-        } else {
-          offlineIndicator.classList.add('hidden');
-        }
-      }
-    }
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
-    updateOnlineStatus();
-
-    // --- Boids / Constellation Canvas Animation ---
-    (function initBoidsCanvas() {
+    // 10. Boids Animation for Cyber Theme
+    (function initBoids() {
       var canvas = document.getElementById('boidsCanvas');
       if (!canvas) return;
       var ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
       var width, height;
       var boids = [];
-      var numBoids = 60;
+      var numBoids = 45;
       var colors = ['#3b82f6', '#ef4444', '#facc15', '#a855f7', '#2dd4bf'];
 
       function resize() {
@@ -1872,108 +1157,142 @@ export function generateClientIndexHtml(client: ClientRecord, firebaseDbUrl: str
       function Boid() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 4;
-        this.vy = (Math.random() - 0.5) * 4;
+        this.vx = (Math.random() - 0.5) * 3;
+        this.vy = (Math.random() - 0.5) * 3;
         this.color = colors[Math.floor(Math.random() * colors.length)];
-        this.size = Math.random() * 4 + 4;
+        this.size = Math.random() * 3 + 3;
       }
-
       Boid.prototype.update = function() {
         if (this.x < 0) this.x = width;
         if (this.x > width) this.x = 0;
         if (this.y < 0) this.y = height;
         if (this.y > height) this.y = 0;
-
-        this.vx += (Math.random() - 0.5) * 0.2;
-        this.vy += (Math.random() - 0.5) * 0.2;
-
+        this.vx += (Math.random() - 0.5) * 0.15;
+        this.vy += (Math.random() - 0.5) * 0.15;
         var speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        if (speed > 3) {
-          this.vx = (this.vx / speed) * 3;
-          this.vy = (this.vy / speed) * 3;
+        if (speed > 2.5) {
+          this.vx = (this.vx / speed) * 2.5;
+          this.vy = (this.vy / speed) * 2.5;
         }
-
         this.x += this.vx;
         this.y += this.vy;
       };
-
       Boid.prototype.draw = function() {
         var angle = Math.atan2(this.vy, this.vx);
-
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(angle);
-
         ctx.beginPath();
         ctx.moveTo(this.size, 0);
         ctx.lineTo(-this.size, this.size / 1.5);
         ctx.lineTo(-this.size / 2, 0);
         ctx.lineTo(-this.size, -this.size / 1.5);
         ctx.closePath();
-
         ctx.fillStyle = this.color;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = this.color;
         ctx.fill();
-
         ctx.restore();
       };
 
-      for (var i = 0; i < numBoids; i++) {
-        boids.push(new Boid());
-      }
+      for (var i = 0; i < numBoids; i++) boids.push(new Boid());
 
       function animate() {
-        ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
-        ctx.fillRect(0, 0, width, height);
-
-        for (var i = 0; i < boids.length; i++) {
-          for (var j = i + 1; j < boids.length; j++) {
-            var dx = boids[i].x - boids[j].x;
-            var dy = boids[i].y - boids[j].y;
-            var dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 100) {
-              ctx.beginPath();
-              ctx.moveTo(boids[i].x, boids[i].y);
-              ctx.lineTo(boids[j].x, boids[j].y);
-              ctx.strokeStyle = 'rgba(59, 130, 246, ' + (1 - dist / 100) + ')';
-              ctx.lineWidth = 0.5;
-              ctx.stroke();
+        if (canvas.style.display !== 'none') {
+          ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+          ctx.fillRect(0, 0, width, height);
+          for (var i = 0; i < boids.length; i++) {
+            for (var j = i + 1; j < boids.length; j++) {
+              var dx = boids[i].x - boids[j].x;
+              var dy = boids[i].y - boids[j].y;
+              var dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < 85) {
+                ctx.beginPath();
+                ctx.moveTo(boids[i].x, boids[i].y);
+                ctx.lineTo(boids[j].x, boids[j].y);
+                ctx.strokeStyle = 'rgba(59, 130, 246, ' + (1 - dist / 85) * 0.3 + ')';
+                ctx.lineWidth = 0.5;
+                ctx.stroke();
+              }
             }
           }
+          for (var k = 0; k < boids.length; k++) {
+            boids[k].update();
+            boids[k].draw();
+          }
         }
-
-        for (var k = 0; k < boids.length; k++) {
-          boids[k].update();
-          boids[k].draw();
-        }
-
         requestAnimationFrame(animate);
       }
-
       animate();
     })();
 
-    // --- Scroll Reveal Animations ---
-    document.addEventListener('DOMContentLoaded', function() {
-      var revealElements = document.querySelectorAll('.reveal');
-      var revealObserver = new IntersectionObserver(function(entries) {
-        entries.forEach(function(entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, {
-        root: null,
-        threshold: 0.1,
-        rootMargin: "0px 0px -50px 0px"
-      });
+    // 11. Lightning effect slowed down to 8-10 seconds
+    (function initLightning() {
+      var canvas = document.getElementById('lightningCanvas');
+      if (!canvas) return;
+      var ctx = canvas.getContext('2d');
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
-      revealElements.forEach(function(el) { revealObserver.observe(el); });
+      function flash() {
+        if (document.body.classList.contains('theme-cyber')) {
+          canvas.style.opacity = '0.7';
+          setTimeout(function() { canvas.style.opacity = '0'; }, 80);
+          setTimeout(function() { canvas.style.opacity = '0.9'; }, 150);
+          setTimeout(function() { canvas.style.opacity = '0'; }, 260);
+        }
+        var nextInterval = 8000 + Math.random() * 3000; // 8 to 11 seconds
+        setTimeout(flash, nextInterval);
+      }
+      setTimeout(flash, 8000);
+    })();
+
+    // 12. PWA Install Banner Logic
+    var deferredPrompt = null;
+    var pwaBanner = document.getElementById('pwaInstallPrompt');
+    var btnAcceptPWA = document.getElementById('btnAcceptPWA');
+    var btnDismissPWA = document.getElementById('btnDismissPWA');
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      if (pwaBanner) {
+        setTimeout(function() {
+          pwaBanner.classList.remove('translate-y-full');
+        }, 1500);
+      }
     });
+
+    if (btnAcceptPWA) {
+      btnAcceptPWA.addEventListener('click', function() {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then(function(choice) {
+            if (choice.outcome === 'accepted') {
+              showToast('🎉 অ্যাপ ইনস্টল সম্পন্ন হয়েছে!');
+            }
+            deferredPrompt = null;
+          });
+        }
+        if (pwaBanner) pwaBanner.classList.add('translate-y-full');
+      });
+    }
+
+    if (btnDismissPWA && pwaBanner) {
+      btnDismissPWA.addEventListener('click', function() {
+        pwaBanner.classList.add('translate-y-full');
+      });
+    }
+
+    // 13. Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').catch(function() {});
+      });
+    }
   </script>
 </body>
-</html>
-`;
+</html>`;
 }

@@ -5143,14 +5143,14 @@ async function startTelegramPolling() {
   })();
 }
 
-// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >25s (ONLY when not in Webhook mode)
+// Watchdog timer: Auto-restarts Telegram polling if polling loop stops or hangs >15s (ONLY when not in Webhook mode)
 setInterval(() => {
   if (botState.isWebhookMode) {
     return;
   }
-  const isStale = Date.now() - botStateInternal.lastActiveTimestamp > 25000;
+  const isStale = Date.now() - botStateInternal.lastActiveTimestamp > 15000;
   if (!botState.isPolling || isStale) {
-    console.log('🤖 Bot Watchdog: Polling inactive or stale (>25s). Force restarting Telegram bot...');
+    console.log('🤖 Bot Watchdog: Polling inactive or stale (>15s). Force restarting Telegram bot instantly...');
     if (currentPollAbortController) {
       try {
         currentPollAbortController.abort();
@@ -5161,12 +5161,12 @@ setInterval(() => {
     botState.isPolling = false;
     startTelegramPolling().catch(e => console.error('Watchdog restart error:', e));
   }
-}, 8000);
+}, 5000);
 
-// Keep-alive internal self pinger to prevent Node process idle suspension
+// Keep-alive internal self pinger every 5 seconds to prevent Node process idle suspension
 setInterval(() => {
   fetch(`http://localhost:${PORT}/api/health`).catch(() => {});
-}, 15000);
+}, 5000);
 
 // Setup Express + Vite Server
 async function setupServer() {
