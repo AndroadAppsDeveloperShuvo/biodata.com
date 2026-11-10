@@ -839,7 +839,7 @@ app.post('/api/telegram-webhook', async (req, res) => {
   }
 });
 
-app.get('/api/data', (req, res) => {
+app.get(['/api/data', '/api/bio'], (req, res) => {
   const themeCfg = getThemeConfig();
   res.json({
     success: true,
@@ -1199,7 +1199,6 @@ function getMainMenuKeyboard() {
   const services = getServices();
   const social = getSocialLinks();
   const badges = getBadges();
-  const clients = getClients();
 
   return {
     inline_keyboard: [
@@ -1212,16 +1211,15 @@ function getMainMenuKeyboard() {
         { text: '📞 সরাসরি যোগাযোগ', callback_data: 'menu_contact' }
       ],
       [
-        { text: `🛠️ সাভিস সমূহ (${services.length}টি)`, callback_data: 'menu_services' },
+        { text: `🛠️ সার্ভিস সমূহ (${services.length}টি)`, callback_data: 'menu_services' },
         { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: 'cmd_full_summary' }
       ],
       [
-        { text: `👥 ক্লায়েন্ট সেল ও ম্যানেজমেন্ট (${clients.length} জন)`, callback_data: 'admin_menu_clients' },
-        { text: '📢 ক্লায়েন্ট নোটিশ পাঠান', callback_data: 'admin_menu_broadcast' }
+        { text: '🎨 ওয়েবসাইট থিম পরিবর্তন', callback_data: 'admin_menu_theme' },
+        { text: '⚡ Webhook ২৪/৭ কন্ট্রোল', callback_data: 'admin_webhook_menu' }
       ],
       [
-        { text: '⚡ Webhook ২৪/৭ কন্ট্রোল', callback_data: 'admin_webhook_menu' },
-        { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
+        { text: '🌐 আসল ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
       ]
     ]
   };
@@ -2748,22 +2746,19 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     const badges = getBadges();
     const contact = getContactInfo();
     const fbCfg = getFirebaseConfig();
-    const clients = getClients();
-
     const fbStatus = fbCfg.url ? `🟢 যুক্ত আছে (<code>${escapeHtml(fbCfg.url)}</code>)` : '⚪ যুক্ত নেই';
 
     const msg = `👑 আসসালামু আলাইকুম <b>${escapeHtml(profile.name)}</b>!\n\n`
-      + `আপনার বায়ো ডাটা এবং ক্লায়েন্ট রিসেলার <b>মাস্টার কন্ট্রোল প্যানেলে</b> স্বাগতম! 🚀\n\n`
+      + `আপনার <b>অফিসিয়াল বায়ো ডাটা ও সার্ভিস মাস্টার কন্ট্রোল প্যানেলে</b> স্বাগতম! 🚀\n\n`
       + `📊 <b>বর্তমান লাইভ পরিসংখ্যান:</b>\n`
-      + `• 👥 মোট ক্লায়েন্ট: <b>${clients.length}</b> জন\n`
       + `• 👤 আপনার নাম: <b>${escapeHtml(profile.name)}</b> (<code>${escapeHtml(profile.handle)}</code>)\n`
       + `• 💻 পদবী: ${escapeHtml(profile.title)}\n`
-      + `• 🛠️ আপনার নিজস্ব সাভিস: <b>${services.length}</b> টি লাইভ\n`
+      + `• 🛠️ লাইভ সার্ভিস: <b>${services.length}</b> টি\n`
       + `• 🌐 সোশ্যাল লিংক: <b>${social.length}</b> টি সক্রিয়\n`
       + `• 🏷️ ব্যাজ: <b>${badges.length}</b> টি\n`
       + `• 📱 WhatsApp: <code>${escapeHtml(contact.whatsappNumber)}</code>\n`
       + `• 🔥 Firebase Realtime DB: ${fbStatus}\n\n`
-      + `👇 <b>কী করতে চান নির্বাচন করুন:</b>`;
+      + `👇 <b>কী পরিবর্তন করতে চান নির্বাচন করুন:</b>`;
     await sendTelegramMessage(chatId, msg, { reply_markup: getMainMenuKeyboard() });
     return msg;
   }
@@ -3724,9 +3719,15 @@ async function handleCallbackQuery(cb: any) {
       console.warn('answerCallbackQuery warning:', e);
     }
 
-  // ==========================================
-  // ADMIN RESELLER CALLBACKS
-  // ==========================================
+  if (data === 'admin_menu_theme') {
+    userStates[chatId] = { step: 'idle' };
+    const themeCfg = getThemeConfig();
+    const currentTheme = themeCfg.themeStyle || 'shuvox_lightning_cyber';
+    const msg = `🎨 <b>ওয়েবসাইটের থিম নির্বাচন করুন:</b>\n\n`
+      + `যেকোনো থিমে ক্লিক করলেই আপনার লাইভ বায়ো সাইট সাথে সাথে নতুন ডিজাইনে বদলে যাবে! 🚀`;
+    await sendTelegramMessage(chatId, msg, { reply_markup: getAdminThemeMenuKeyboard() });
+    return;
+  }
 
   if (data === 'admin_webhook_menu') {
     userStates[chatId] = { step: 'idle' };
