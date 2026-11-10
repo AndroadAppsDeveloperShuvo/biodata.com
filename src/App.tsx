@@ -51,71 +51,15 @@ function setLocalCache(data: Partial<CachedBioData>) {
 export default function App() {
   const initialCache = getLocalCache();
 
-  // All state is purely driven by Bot / Database with instant defaults to prevent white screen
-  const [profile, setProfile] = useState<PersonalInfo | null>(initialCache?.profile || {
-    name: "⚡ 乂 ＳＨＵＶＯ 乂 ⚡",
-    handle: "@shuvo_bhai_444",
-    title: "💻 Full-Stack Developer & Tech Enthusiast",
-    location: "Natore, Bangladesh",
-    bio: "🚀 Building modern web apps with React, Node.js & TypeScript. Open source contributor, tech writer and gamer in free time!",
-    avatarUrl: "https://i.ibb.co/bRWhx1Lf/4880.jpg",
-    bannerUrl: "https://simpleprogrammer.com/wp-content/uploads/2023/05/Coding-Desk.jpg"
-  });
-  const [badges, setBadges] = useState<Badge[]>(initialCache?.badges || [
-    { id: "b2", text: "🔥 Shuvo Official" },
-    { id: "b3", text: "💻 Developer" },
-    { id: "b4", text: "🎧 Music Lover" },
-    { id: "b5", text: "🇧🇩 Bangladesh" },
-    { id: "b6", text: "💥 Free Fire Lover" },
-    { id: "b_1793006434361", text: "⚡ Pro Gamer" }
-  ]);
-  const [services, setServices] = useState<HighlightService[]>(initialCache?.services || [
-    {
-      id: "h1",
-      title: "⚡ Shuvo Official image Uploader",
-      subtitle: "Web Image Uploader",
-      imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10",
-      linkUrl: "https://androadappsdevelopershuvo.github.io/web_image_uploader/WEB%20IMAGE%20UPLOAS.html"
-    },
-    {
-      id: "h_1789432893967mf6",
-      title: "Image to PDF Converter",
-      subtitle: "ফটো ও মেমোরিজ",
-      imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT0WKD8w5ijwQjZ9Kud4DBymrTdPbChGcgVb1HzbEBxMw&s",
-      linkUrl: "https://androadappsdevelopershuvo.github.io/pdf/genaratore.html"
-    }
-  ]);
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || [
-    {
-      id: "s_1793007777906",
-      platform: "facebook",
-      title: "Facebook Profile",
-      subtitle: "অফিসিয়াল ফেসবুক প্রোফাইল",
-      buttonText: "যুক্ত হোন",
-      url: "https://www.facebook.com/share/1c63KeYHxt/",
-      enabled: true
-    },
-    {
-      id: "s_1793007904903",
-      platform: "telegram",
-      title: "Telegram Channel / Group",
-      subtitle: "টেলিগ্রাম চ্যানেল",
-      buttonText: "যুক্ত হোন",
-      url: "https://t.me/djhakar007ff",
-      enabled: true
-    }
-  ]);
-  const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || {
-    enabled: true,
-    whatsappNumber: "+8801778526313",
-    whatsappMessage: "𝐻𝐼々ᗪᴇᴠʟᴏᴘᴇʀ—͟͞Sʜᴜᴠᴏ...𝐼 𝐜𝐚𝐦𝐞 𝐟𝐫𝐨𝐦 𝐘𝐨𝐮𝐫 𝘄𝗲𝗯𝘀𝗶𝘁𝗲...𝐼 𝘄𝗮𝗻𝘁  𝗧𝗼 𝗰𝗼𝗻𝗻𝗲𝗰𝘁 𝘄𝗶𝘁𝗵 𝐘𝐨𝐮 👨‍💻",
-    email: "freefirelover2111887942@gmail.com",
-    telegramUsername: "djhakar007ff",
-    customNote: "যেকোনো প্রজেক্ট, কলাবোরেশন বা যেকোনো প্রয়োজনে সরাসরি যোগাযোগ করুন।"
-  });
+  // All state is purely driven by Bot / Database
+  const [profile, setProfile] = useState<PersonalInfo | null>(initialCache?.profile || null);
+  const [badges, setBadges] = useState<Badge[]>(initialCache?.badges || []);
+  const [services, setServices] = useState<HighlightService[]>(initialCache?.services || []);
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(initialCache?.socialLinks || []);
+  const [contact, setContact] = useState<ContactInfo | null>(initialCache?.contact || null);
   const [themeStyle, setThemeStyle] = useState<string>(initialCache?.themeStyle || 'dark_glassmorphism');
   const [layoutStyle, setLayoutStyle] = useState<string>(initialCache?.layoutStyle || 'classic_stacked');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(!initialCache?.profile);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   // Layout View State (Active Tab & Three-Dot Drawer Toggle)
