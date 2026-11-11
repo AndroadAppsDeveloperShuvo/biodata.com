@@ -1193,35 +1193,18 @@ async function answerCallbackQuery(callbackQueryId: string, text?: string) {
   });
 }
 
-// Main Menu Keyboard
 function getMainMenuKeyboard() {
-  const profile = getProfileInfo();
-  const services = getServices();
-  const social = getSocialLinks();
-  const badges = getBadges();
   const clients = getClients();
 
   return {
     inline_keyboard: [
-      [
-        { text: '👤 প্রোফাইল ও বায়ো কন্ট্রোল', callback_data: 'menu_profile' },
-        { text: `🏷️ ব্যাজ সমূহ (${badges.length})`, callback_data: 'menu_badges' }
-      ],
-      [
-        { text: `🌐 সোশ্যাল মিডিয়া (${social.length})`, callback_data: 'menu_social' },
-        { text: '📞 সরাসরি যোগাযোগ', callback_data: 'menu_contact' }
-      ],
-      [
-        { text: `🛠️ সাভিস সমূহ (${services.length}টি)`, callback_data: 'menu_services' },
-        { text: '📋 সম্পূর্ণ বায়ো প্রিভিউ', callback_data: 'cmd_full_summary' }
-      ],
       [
         { text: `👥 ক্লায়েন্ট সেল ও ম্যানেজমেন্ট (${clients.length} জন)`, callback_data: 'admin_menu_clients' },
         { text: '📢 ক্লায়েন্ট নোটিশ পাঠান', callback_data: 'admin_menu_broadcast' }
       ],
       [
         { text: '⚡ Webhook ২৪/৭ কন্ট্রোল', callback_data: 'admin_webhook_menu' },
-        { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }
+        { text: '🌐 ওয়েবসাইট লাইভ দেখুন', url: 'https://shuvopkofficial.github.io/biodata.com/' }
       ]
     ]
   };
@@ -2589,13 +2572,13 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
         + `✨ আপনি যদি আপনার নিজের নাম ও লোগো দিয়ে নিজস্ব প্রফেশনাল বায়ো ডাটা ওয়েবসাইট তৈরি করতে চান অথবা আপনার ওয়েবসাইটের বট এক্সেস নিতে চান, তবে সরাসরি অ্যাডমিনের সাথে যোগাযোগ করুন:\n\n`
         + `👉 <b>টেলিগ্রাম ইনবক্স:</b> @djhakar007ff\n`
         + `📱 <b>WhatsApp:</b> +8801778526313\n`
-        + `🌐 <b>অফিসিয়াল বায়ো সাইট:</b> https://androadappsdevelopershuvo.github.io/biodata.com`;
+        + `🌐 <b>অফিসিয়াল বায়ো সাইট:</b> https://shuvopkofficial.github.io/biodata.com/`;
       await sendTelegramMessage(chatId, unknownMsg, {
         reply_markup: {
           inline_keyboard: [
             [{ text: '💬 টেলিগ্রামে অ্যাডমিনকে মেসেজ দিন', url: 'https://t.me/djhakar007ff' }],
             [{ text: '📱 WhatsApp এ যোগাযোগ করুন', url: 'https://wa.me/8801778526313' }],
-            [{ text: '🌐 অফিসিয়াল বায়ো সাইট দেখুন', url: 'https://androadappsdevelopershuvo.github.io/biodata.com' }]
+            [{ text: '🌐 অফিসিয়াল বায়ো সাইট দেখুন', url: 'https://shuvopkofficial.github.io/biodata.com/' }]
           ]
         }
       });
@@ -3220,7 +3203,7 @@ async function handleUserMessage(chatId: string, text: string, senderName: strin
     if (parts.length >= 2) {
       const title = parts[0];
       const imageUrl = parts[1] || 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTfH9zfFpRCmlHhd3O2zdevPVkl63_176D67FiAnTlgTQ&s=10';
-      const linkUrl = parts[2] || 'https://androadappsdevelopershuvo.github.io/biodata.com';
+      const linkUrl = parts[2] || 'https://shuvopkofficial.github.io/biodata.com/';
       const subtitle = parts[3] || 'ফটো ও মেমোরিজ';
 
       const services = getServices();

@@ -161,7 +161,7 @@ export const ServiceModal: React.FC<Props> = ({
               required
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
-              placeholder="https://androadappsdevelopershuvo.github.io/..."
+              placeholder="https://shuvopkofficial.github.io/..."
               className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-colors"
             />
           </div>

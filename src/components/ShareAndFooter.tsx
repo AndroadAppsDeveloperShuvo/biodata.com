@@ -9,7 +9,13 @@ interface Props {
 export const ShareAndFooter: React.FC<Props> = ({ onShowToast, themeStyle }) => {
   const [copied, setCopied] = useState(false);
   const isIgnitronSpace = themeStyle === 'ignitron_cyber_space';
-  const shareUrl = 'https://androadappsdevelopershuvo.github.io/biodata.com';
+  const getShareUrl = () => {
+    if (typeof window !== 'undefined' && window.location.href.startsWith('http')) {
+      return window.location.origin + window.location.pathname;
+    }
+    return 'https://shuvopkofficial.github.io/biodata.com/';
+  };
+  const shareUrl = getShareUrl();
 
   const handleCopy = () => {
     if (navigator.clipboard) {
